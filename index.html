@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fame Checker</title>
+    <title>Scam Checker</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --text: #ffffff; --accent: #ff2a2a; --border: #222222; }
@@ -71,7 +71,7 @@
     <div class="container">
         <div class="header-row fade-in delay-1">
             <button class="icon-btn" onclick="document.getElementById('sideMenu').classList.add('open')">≡</button>
-            <div class="header-title">Fame Checker</div>
+            <div class="header-title">Scam Checker</div>
             <button class="icon-btn" onclick="document.getElementById('username').focus()">⌕</button>
         </div>
         <p class="subtitle fade-in delay-1">Проверка аккаунтов по базам данных</p>
@@ -81,9 +81,9 @@
         </div>
 
         <div class="badges fade-in delay-3">
-            <div class="badge badge-fame" onclick="showList('fame')">Фейм</div>
-            <div class="badge badge-fake" onclick="showList('fake')">Фейк</div>
-            <div class="badge badge-scam" onclick="showList('scam')">Скам</div>
+            <div class="badge badge-fame" id="badge-fame" onclick="showList('fame')">Фейм</div>
+            <div class="badge badge-fake" id="badge-fake" onclick="showList('fake')">Фейк</div>
+            <div class="badge badge-scam" id="badge-scam" onclick="showList('scam')">Скам</div>
         </div>
 
         <div class="owner-section fade-in delay-3">
@@ -146,6 +146,8 @@
         const ADMIN_API = "https://fame-api-bs11.onrender.com/api/admin/action";
         const LIST_API = "https://fame-api-bs11.onrender.com/api/lists";
 
+        let currentListType = null;
+
         function check(type) {
             const username = document.getElementById('username').value.trim();
             const resultBox = document.getElementById('resultBox');
@@ -169,8 +171,8 @@
             .catch(error => { resultBox.innerHTML = `<span style="color:#ff2a2a;">Ошибка сервера.</span> Подождите.`; });
         }
 
-        // ЗАПРАШИВАЕМ СПИСОК С СЕРВЕРА (ВМЕСТО ЗАХАРДКОЖЕННЫХ)
         function showList(type) {
+            currentListType = type;
             document.getElementById('resultBox').style.display = 'none';
             const listDiv = document.getElementById('peopleList');
             const content = document.getElementById('listContent');
@@ -194,13 +196,18 @@
                     });
 
                     if (type === 'fame') {
-                        html += `<button class="btn" style="margin-top:10px;">Купить Фейм за 5000 звезд</button>`;
+                        html += `<button class="btn btn-main" style="margin-top:10px;" onclick="buyFame()">Купить Фейм за 5000 звезд</button>`;
                     }
                     content.innerHTML = html;
                 })
                 .catch(err => {
                     content.innerHTML = "<div>Ошибка загрузки списка.</div>";
                 });
+        }
+
+        function buyFame() {
+            const botUsername = "@Scamcheckbot"; 
+            tg.openTelegramLink(`https://t.me/${botUsername}?start=buyfame`);
         }
 
         let loginAttempts = 0;
@@ -248,9 +255,9 @@
                 notification.innerText = data.msg || "Успешно!";
                 setTimeout(() => notification.remove(), 3000);
                 btns.forEach(b => b.disabled = false);
-                // После действия обновляем список, если он открыт
-                if (document.getElementById('peopleList').style.display === 'block') {
-                    showList(document.querySelector('.badge-fame').classList.contains('active') ? 'fame' : 'fake'); // грубое обновление
+                
+                if (currentListType) {
+                    showList(currentListType);
                 }
             })
             .catch(err => {
