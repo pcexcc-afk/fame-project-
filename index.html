@@ -8,53 +8,32 @@
     <style>
         :root { --text: #ffffff; --accent: #ff2a2a; --border: #222222; }
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        
-        body {
-            background-color: #000000;
-            color: var(--text); 
-            margin: 0; 
-            padding: 20px; 
-            overflow-x: hidden; 
-            min-height: 100vh;
-        }
-
+        body { background-color: #000000; color: var(--text); margin: 0; padding: 20px; min-height: 100vh; }
         .container { width: 100%; max-width: 400px; margin: 0 auto; }
         
-        /* АНИМАЦИЯ */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in { animation: fadeInUp 0.8s ease forwards; }
-        .delay-1 { animation-delay: 0.1s; opacity: 0; }
-        .delay-2 { animation-delay: 0.3s; opacity: 0; }
-        .delay-3 { animation-delay: 0.5s; opacity: 0; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeInUp 0.8s ease forwards; opacity: 0; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.3s; }
+        .delay-3 { animation-delay: 0.5s; }
 
-        .menu-btn { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; background: #141414; border: 1px solid var(--border); border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; z-index: 10; }
-        .menu-btn div { width: 20px; height: 2px; background: var(--text); margin: 3px 0; }
-
-        .side-menu { position: fixed; top: 0; right: -250px; width: 250px; height: 100%; background: #111; border-left: 1px solid var(--border); padding: 20px; transition: 0.3s; z-index: 20; display: flex; flex-direction: column; gap: 10px; }
+        .menu-trigger { position: absolute; top: 20px; right: 20px; background: #141414; border: 1px solid var(--border); color: #ccc; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; z-index: 10; }
+        .side-menu { position: fixed; top: 0; right: -280px; width: 280px; height: 100%; background: #0a0a0a; border-left: 1px solid var(--border); padding: 20px; transition: 0.3s; z-index: 20; display: flex; flex-direction: column; }
         .side-menu.open { right: 0; }
-        .side-menu .btn { margin-bottom: 0; }
-        .close-btn { align-self: flex-end; background: none; border: none; color: #888; font-size: 24px; cursor: pointer; margin-bottom: 10px; }
+        .close-btn { align-self: flex-end; background: none; border: none; color: #666; font-size: 28px; cursor: pointer; margin-bottom: 20px; }
+        .side-menu h3 { font-size: 18px; margin-top: 0; margin-bottom: 20px; color: white; }
+        .side-menu .btn { margin-bottom: 12px; padding: 16px; border-radius: 10px; font-size: 15px; background: #141414; border: 1px solid #333; text-align: left; display: flex; justify-content: space-between; }
+        .side-menu .btn::after { content: '→'; color: #555; font-size: 18px; }
 
-        h1 { font-size: 20px; font-weight: 600; margin-bottom: 5px; text-align: left; }
-        p.subtitle { color: #aaa; font-size: 13px; margin-bottom: 30px; text-align: left; }
+        h1 { font-size: 20px; font-weight: 600; margin-bottom: 5px; }
+        p.subtitle { color: #aaa; font-size: 13px; margin-bottom: 30px; }
+        input[type="text"], input[type="password"] { width: 100%; padding: 14px; border-radius: 8px; border: 1px solid var(--border); background-color: #141414; color: white; font-size: 15px; outline: none; margin-bottom: 10px; }
         
-        .input-group { margin-bottom: 20px; }
-        input[type="text"], input[type="password"] {
-            width: 100%; padding: 14px; border-radius: 8px; border: 1px solid var(--border); background-color: #141414; color: white; font-size: 15px; outline: none; margin-bottom: 10px;
-        }
-        input[type="text"]:focus, input[type="password"]:focus { border-color: var(--accent); }
-
-        .btn {
-            display: block; width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--border); background-color: #141414; color: var(--text); font-size: 14px; font-weight: 500; cursor: pointer; text-align: center;
-        }
+        .btn { display: block; width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--border); background-color: #141414; color: var(--text); font-size: 14px; font-weight: 500; cursor: pointer; text-align: center; }
         .btn:hover { border-color: var(--accent); }
         .btn-main { background-color: var(--accent); border-color: var(--accent); color: white; font-weight: 600; }
 
         .result-card { margin-top: 20px; padding: 20px; border-radius: 8px; background: #141414; display: none; border: 1px solid var(--border); border-left: 4px solid var(--accent); }
-        
         .badges { display: flex; justify-content: center; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
         .badge { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 2px solid var(--border); background: #141414; cursor: pointer; }
         .badge-fame { color: #fff; border-color: #ffffff; }
@@ -62,9 +41,7 @@
         .badge-scam { color: var(--accent); border-color: var(--accent); }
 
         .people-list { margin-top: 20px; display: none; }
-        .person { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #141414; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; }
-        .person-info { display: flex; align-items: center; gap: 10px; }
-        .person-name { font-weight: 600; font-size: 15px; }
+        .person { display: flex; justify-content: space-between; padding: 12px; background: #141414; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; }
         .person-status { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
         .status-fame { color: #fff; border: 2px solid #fff; }
         .status-fake { color: var(--accent); border: 2px solid var(--accent); }
@@ -74,24 +51,18 @@
         .owner-section .btn { display: inline-block; width: auto; padding: 8px 16px; font-size: 12px; color: #888; border-color: #333; }
 
         .admin-panel { margin-top: 20px; padding: 20px; border-radius: 8px; background: #141414; border: 1px solid var(--border); display: none; }
-        .admin-panel h2 { font-size: 15px; margin-top: 0; margin-bottom: 15px; font-weight: 600; color: #aaa; }
-        .admin-btn { display: block; width: 100%; padding: 12px; background: transparent; border: 1px solid var(--border); color: #ccc; border-radius: 6px; margin-bottom: 8px; font-size: 13px; cursor: pointer; text-align: left;}
-        .admin-btn:hover { border-color: var(--accent); color: white; }
-        
+        .admin-panel h2 { font-size: 15px; margin-top: 0; margin-bottom: 15px; color: #aaa; }
+        .admin-btn { display: block; width: 100%; padding: 12px; background: transparent; border: 1px solid var(--border); color: #ccc; border-radius: 6px; margin-bottom: 8px; font-size: 13px; cursor: pointer; text-align: left; }
         .admin-input-box { display: none; margin-top: 10px; padding: 10px; background: #000; border-radius: 6px; border: 1px solid #333; }
-        
-        /* ВЫПАДАЮЩИЙ СПИСОК ДЛЯ МЕТОК */
-        select.admin-select { width: 100%; padding: 12px; margin-bottom: 10px; background: #111; color: white; border: 1px solid #444; border-radius: 6px; font-size: 14px; outline: none; }
-        select.admin-select:focus { border-color: var(--accent); }
+        select.admin-select { width: 100%; padding: 12px; margin-bottom: 10px; background: #111; color: white; border: 1px solid #444; border-radius: 6px; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="menu-btn" onclick="document.getElementById('sideMenu').classList.toggle('open')"><div></div><div></div><div></div></div>
-
+        <button class="menu-trigger" onclick="document.getElementById('sideMenu').classList.add('open')">Меню проверок</button>
         <div class="side-menu" id="sideMenu">
             <button class="close-btn" onclick="document.getElementById('sideMenu').classList.remove('open')">×</button>
-            <h3 style="margin-top:0; font-size:16px;">Варианты проверки</h3>
+            <h3>Выберите действие</h3>
             <button class="btn" onclick="check('scam'); document.getElementById('sideMenu').classList.remove('open')">Проверить на скам</button>
             <button class="btn" onclick="check('fake'); document.getElementById('sideMenu').classList.remove('open')">Проверить на фейк</button>
             <button class="btn btn-main" onclick="check('all'); document.getElementById('sideMenu').classList.remove('open')">Полный анализ</button>
@@ -102,7 +73,7 @@
             <p class="subtitle">Проверка аккаунтов по базам данных</p>
         </div>
 
-        <div class="input-group fade-in delay-2">
+        <div class="fade-in delay-2">
             <input type="text" id="username" placeholder="Введите username">
         </div>
 
@@ -121,49 +92,45 @@
             <button class="btn btn-main" style="max-width: 200px; margin: 0 auto; display: block;" onclick="loginAdmin()">Войти</button>
         </div>
 
-        <div class="people-list" id="peopleList">
-            <h3 style="font-size:14px; color:#aaa; margin-bottom:10px;">Список аккаунтов</h3>
-            <div id="listContent"></div>
-        </div>
-
+        <div class="people-list" id="peopleList"><div id="listContent"></div></div>
         <div class="result-card" id="resultBox"></div>
 
         <div class="admin-panel" id="adminPanel">
             <h2>Панель владельца</h2>
             
-            <button class="admin-btn" onclick="document.getElementById('box1').style.display='block'">Принять жалобы</button>
+            <button class="admin-btn" onclick="document.getElementById('box1').style.display='block'">Забанить (Скам)</button>
             <div class="admin-input-box" id="box1">
-                <input type="text" placeholder="Ник для бана">
-                <button class="admin-btn" style="background:var(--accent); color:white; text-align: center;">Забанить</button>
+                <input type="text" id="banNick" placeholder="Ник">
+                <button class="admin-btn" style="background:var(--accent); color:white;" onclick="doAdminAction('ban', 'banNick', 'scam')">Забанить</button>
             </div>
 
             <button class="admin-btn" onclick="document.getElementById('box2').style.display='block'">Выдать баланс</button>
             <div class="admin-input-box" id="box2">
-                <input type="text" placeholder="Ник">
-                <input type="text" placeholder="Сумма">
-                <button class="admin-btn" style="background:var(--accent); color:white; text-align: center;">Выдать</button>
+                <input type="text" id="balNick" placeholder="Ник">
+                <input type="text" id="balAmount" placeholder="Сумма">
+                <button class="admin-btn" style="background:var(--accent); color:white;" onclick="doAdminAction('balance', 'balNick', document.getElementById('balAmount').value)">Выдать</button>
             </div>
 
             <button class="admin-btn" onclick="document.getElementById('box4').style.display='block'">Добавить метку</button>
             <div class="admin-input-box" id="box4">
-                <input type="text" placeholder="Ник пользователя">
-                <select class="admin-select">
-                    <option value="fame">Фейм (белая)</option>
-                    <option value="fake">Фейк (красная)</option>
-                    <option value="scam">Скам (красная)</option>
-                </select>
-                <button class="admin-btn" style="background:var(--accent); color:white; text-align: center;">Добавить</button>
-            </div>
-
-            <button class="admin-btn" onclick="document.getElementById('box5').style.display='block'">Убрать метку</button>
-            <div class="admin-input-box" id="box5">
-                <input type="text" placeholder="Ник пользователя">
-                <select class="admin-select">
+                <input type="text" id="markAddNick" placeholder="Ник пользователя">
+                <select class="admin-select" id="markAddType">
                     <option value="fame">Фейм</option>
                     <option value="fake">Фейк</option>
                     <option value="scam">Скам</option>
                 </select>
-                <button class="admin-btn" style="background:var(--accent); color:white; text-align: center;">Убрать</button>
+                <button class="admin-btn" style="background:var(--accent); color:white;" onclick="doAdminAction('add_mark', 'markAddNick', document.getElementById('markAddType').value)">Добавить</button>
+            </div>
+
+            <button class="admin-btn" onclick="document.getElementById('box5').style.display='block'">Убрать метку</button>
+            <div class="admin-input-box" id="box5">
+                <input type="text" id="markRemNick" placeholder="Ник пользователя">
+                <select class="admin-select" id="markRemType">
+                    <option value="fame">Фейм</option>
+                    <option value="fake">Фейк</option>
+                    <option value="scam">Скам</option>
+                </select>
+                <button class="admin-btn" style="background:var(--accent); color:white;" onclick="doAdminAction('remove_mark', 'markRemNick', document.getElementById('markRemType').value)">Убрать</button>
             </div>
         </div>
     </div>
@@ -173,6 +140,8 @@
         tg.expand();
 
         const API_URL = "https://fame-api-bs11.onrender.com/api/check"; 
+        const ADMIN_API = "https://fame-api-bs11.onrender.com/api/admin/action";
+
         function check(type) {
             const username = document.getElementById('username').value.trim();
             const resultBox = document.getElementById('resultBox');
@@ -204,18 +173,17 @@
 
             let html = '';
             if (type === 'fame') {
-                html = `<div class="person"><div class="person-info"><span class="person-name">@doctor</span><span class="person-status status-fame">Фейм</span></div></div>`;
+                html = `<div class="person"><span class="person-name">@doctor</span><span class="person-status status-fame">Фейм</span></div>`;
                 html += `<button class="btn" style="margin-top:10px;">Купить Фейм за 5000 звезд</button>`;
             } else if (type === 'fake') {
-                html = `<div class="person"><div class="person-info"><span class="person-name">@0ksy</span><span class="person-status status-fake">Фейк</span></div></div>`;
+                html = `<div class="person"><span class="person-name">@0ksy</span><span class="person-status status-fake">Фейк</span></div>`;
             } else if (type === 'scam') {
-                html = `<div class="person"><div class="person-info"><span class="person-name">@bad_user</span><span class="person-status status-scam">Скам</span></div></div>`;
+                html = `<div class="person"><span class="person-name">@bad_user</span><span class="person-status status-scam">Скам</span></div>`;
             }
             content.innerHTML = html;
         }
 
         let loginAttempts = 0;
-
         function showOwnerLogin() {
             document.getElementById('ownerBtn').style.display = 'none';
             document.getElementById('ownerForm').style.display = 'block';
@@ -226,14 +194,32 @@
             if (pass === "QWERTYUIOP(1234)a") {
                 document.getElementById('adminPanel').style.display = 'block';
                 document.getElementById('ownerForm').style.display = 'none'; 
-                alert("Доступ разрешен");
             } else {
                 loginAttempts++;
                 if (loginAttempts >= 1) {
                     document.getElementById('ownerForm').style.display = 'none'; 
-                    alert("Неверный код! Доступ заблокирован.");
+                    alert("Неверный код!");
                 }
             }
+        }
+
+        // ОТПРАВКА КОМАНД С САЙТА НА СЕРВЕР
+        function doAdminAction(action, inputId, value) {
+            const target = document.getElementById(inputId).value.trim();
+            if (!target) { alert("Введите ник"); return; }
+
+            fetch(ADMIN_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: action, target: target, value: value })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.msg);
+            })
+            .catch(err => {
+                alert("Ошибка сервера. Подождите (он просыпается).");
+            });
         }
     </script>
 </body>
