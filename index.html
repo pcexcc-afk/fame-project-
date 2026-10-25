@@ -20,16 +20,12 @@
 
         .container { width: 100%; max-width: 400px; margin: 0 auto; }
         
-        /* АНИМАЦИЯ ПОЯВЛЕНИЯ ТЕКСТА */
+        /* АНИМАЦИЯ */
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
-        .fade-in {
-            animation: fadeInUp 0.8s ease forwards;
-        }
-        
+        .fade-in { animation: fadeInUp 0.8s ease forwards; }
         .delay-1 { animation-delay: 0.1s; opacity: 0; }
         .delay-2 { animation-delay: 0.3s; opacity: 0; }
         .delay-3 { animation-delay: 0.5s; opacity: 0; }
@@ -74,16 +70,8 @@
         .status-fake { color: var(--accent); border: 2px solid var(--accent); }
         .status-scam { color: var(--accent); border: 2px solid var(--accent); }
 
-        /* ПАНЕЛЬ ВЛАДЕЛЬЦА РЯДОМ С МЕТКАМИ */
         .owner-section { margin-top: 15px; text-align: center; }
-        .owner-section .btn { 
-            display: inline-block; 
-            width: auto; 
-            padding: 8px 16px; 
-            font-size: 12px; 
-            color: #888; 
-            border-color: #333; 
-        }
+        .owner-section .btn { display: inline-block; width: auto; padding: 8px 16px; font-size: 12px; color: #888; border-color: #333; }
 
         .admin-panel { margin-top: 20px; padding: 20px; border-radius: 8px; background: #141414; border: 1px solid var(--border); display: none; }
         .admin-panel h2 { font-size: 15px; margin-top: 0; margin-bottom: 15px; font-weight: 600; color: #aaa; }
@@ -91,6 +79,10 @@
         .admin-btn:hover { border-color: var(--accent); color: white; }
         
         .admin-input-box { display: none; margin-top: 10px; padding: 10px; background: #000; border-radius: 6px; border: 1px solid #333; }
+        
+        /* ВЫПАДАЮЩИЙ СПИСОК ДЛЯ МЕТОК */
+        select.admin-select { width: 100%; padding: 12px; margin-bottom: 10px; background: #111; color: white; border: 1px solid #444; border-radius: 6px; font-size: 14px; outline: none; }
+        select.admin-select:focus { border-color: var(--accent); }
     </style>
 </head>
 <body>
@@ -105,7 +97,6 @@
             <button class="btn btn-main" onclick="check('all'); document.getElementById('sideMenu').classList.remove('open')">Полный анализ</button>
         </div>
 
-        <!-- ЗАГОЛОВКИ С АНИМАЦИЕЙ -->
         <div class="fade-in delay-1">
             <h1>Fame Checker</h1>
             <p class="subtitle">Проверка аккаунтов по базам данных</p>
@@ -121,7 +112,6 @@
             <div class="badge badge-scam" onclick="showList('scam')">Скам</div>
         </div>
 
-        <!-- ПАНЕЛЬ ВЛАДЕЛЬЦА (ТЕПЕРЬ ПОД МЕТКАМИ) -->
         <div class="owner-section fade-in delay-3">
              <button class="btn" id="ownerBtn" onclick="showOwnerLogin()">Панель владельца</button>
         </div>
@@ -157,17 +147,22 @@
             <button class="admin-btn" onclick="document.getElementById('box4').style.display='block'">Добавить метку</button>
             <div class="admin-input-box" id="box4">
                 <input type="text" placeholder="Ник пользователя">
-                <select style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:white; border:1px solid #444; border-radius:6px;">
-                    <option>Фейм</option>
-                    <option>Фейк</option>
-                    <option>Скам</option>
+                <select class="admin-select">
+                    <option value="fame">Фейм (белая)</option>
+                    <option value="fake">Фейк (красная)</option>
+                    <option value="scam">Скам (красная)</option>
                 </select>
-                <button class="admin-btn" style="background:var(--accent); color:white; text-align: center;">Выдать метку</button>
+                <button class="admin-btn" style="background:var(--accent); color:white; text-align: center;">Добавить</button>
             </div>
 
             <button class="admin-btn" onclick="document.getElementById('box5').style.display='block'">Убрать метку</button>
             <div class="admin-input-box" id="box5">
                 <input type="text" placeholder="Ник пользователя">
+                <select class="admin-select">
+                    <option value="fame">Фейм</option>
+                    <option value="fake">Фейк</option>
+                    <option value="scam">Скам</option>
+                </select>
                 <button class="admin-btn" style="background:var(--accent); color:white; text-align: center;">Убрать</button>
             </div>
         </div>
@@ -219,7 +214,6 @@
             content.innerHTML = html;
         }
 
-        // ЛОГИКА ПАНЕЛИ ВЛАДЕЛЬЦА
         let loginAttempts = 0;
 
         function showOwnerLogin() {
