@@ -6,114 +6,42 @@
     <title>Fame Checker</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root {
-            --text: #ffffff;
-            --accent: #ff2a2a;
-            --border: #222222;
-        }
+        :root { --text: #ffffff; --accent: #ff2a2a; --border: #222222; }
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         
         body {
-            color: var(--text);
-            margin: 0;
-            padding: 20px;
-            overflow-x: hidden;
-            position: relative;
-            min-height: 100vh;
+            color: var(--text); margin: 0; padding: 20px; overflow-x: hidden; position: relative; min-height: 100vh;
             background-image: url('https://images.unsplash.com/photo-1522383225653-ed111181a951?q=80&w=1000&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            background-size: cover; background-position: center; background-attachment: fixed;
         }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.75);
-            z-index: -1;
-        }
+        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: -1; }
 
         .container { width: 100%; max-width: 400px; margin: 0 auto; position: relative; z-index: 1; }
         
-        .menu-btn {
-            position: absolute;
-            top: 0; right: 0;
-            width: 40px; height: 40px;
-            background: rgba(20, 20, 20, 0.8);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            z-index: 10;
-            backdrop-filter: blur(5px);
-        }
+        .menu-btn { position: absolute; top: 0; right: 0; width: 40px; height: 40px; background: rgba(20, 20, 20, 0.8); border: 1px solid var(--border); border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; z-index: 10; backdrop-filter: blur(5px); }
         .menu-btn div { width: 20px; height: 2px; background: var(--text); margin: 3px 0; }
 
-        .side-menu {
-            position: fixed;
-            top: 0; right: -250px;
-            width: 250px; height: 100%;
-            background: rgba(15, 15, 15, 0.95);
-            border-left: 1px solid var(--border);
-            padding: 20px;
-            transition: 0.3s;
-            z-index: 20;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            backdrop-filter: blur(10px);
-        }
+        .side-menu { position: fixed; top: 0; right: -250px; width: 250px; height: 100%; background: rgba(15, 15, 15, 0.95); border-left: 1px solid var(--border); padding: 20px; transition: 0.3s; z-index: 20; display: flex; flex-direction: column; gap: 10px; backdrop-filter: blur(10px); }
         .side-menu.open { right: 0; }
         .side-menu .btn { margin-bottom: 0; }
         .close-btn { align-self: flex-end; background: none; border: none; color: #888; font-size: 24px; cursor: pointer; margin-bottom: 10px; }
 
         h1 { font-size: 20px; font-weight: 600; margin-bottom: 5px; text-align: left; }
         p.subtitle { color: #aaa; font-size: 13px; margin-bottom: 30px; text-align: left; }
-        
         .input-group { margin-bottom: 20px; }
+        
         input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 14px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background-color: rgba(20, 20, 20, 0.8);
-            color: white;
-            font-size: 15px;
-            outline: none;
-            backdrop-filter: blur(5px);
-            margin-bottom: 10px;
+            width: 100%; padding: 14px; border-radius: 8px; border: 1px solid var(--border); background-color: rgba(20, 20, 20, 0.8); color: white; font-size: 15px; outline: none; backdrop-filter: blur(5px); margin-bottom: 10px;
         }
         input[type="text"]:focus, input[type="password"]:focus { border-color: var(--accent); }
 
         .btn {
-            display: block;
-            width: 100%;
-            padding: 14px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background-color: rgba(20, 20, 20, 0.8);
-            color: var(--text);
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            text-align: center;
-            backdrop-filter: blur(5px);
+            display: block; width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--border); background-color: rgba(20, 20, 20, 0.8); color: var(--text); font-size: 14px; font-weight: 500; cursor: pointer; text-align: center; backdrop-filter: blur(5px);
         }
         .btn:hover { border-color: var(--accent); }
         .btn-main { background-color: var(--accent); border-color: var(--accent); color: white; font-weight: 600; }
 
-        .result-card {
-            margin-top: 20px; padding: 20px;
-            border-radius: 8px; background: rgba(20, 20, 20, 0.9);
-            display: none; border: 1px solid var(--border);
-            border-left: 4px solid var(--accent);
-            backdrop-filter: blur(5px);
-        }
+        .result-card { margin-top: 20px; padding: 20px; border-radius: 8px; background: rgba(20, 20, 20, 0.9); display: none; border: 1px solid var(--border); border-left: 4px solid var(--accent); backdrop-filter: blur(5px); }
         
         .badges { display: flex; justify-content: center; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
         .badge { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid var(--border); background: rgba(20, 20, 20, 0.8); cursor: pointer; backdrop-filter: blur(5px); }
@@ -129,30 +57,21 @@
         .status-fake { color: var(--accent); border: 1px solid var(--accent); }
         .status-scam { color: var(--accent); border: 1px solid var(--accent); }
 
-        .admin-panel {
-            margin-top: 20px; padding: 20px;
-            border-radius: 8px; background: rgba(20, 20, 20, 0.9);
-            border: 1px solid var(--border); display: none;
-            backdrop-filter: blur(5px);
-        }
+        .admin-panel { margin-top: 20px; padding: 20px; border-radius: 8px; background: rgba(20, 20, 20, 0.9); border: 1px solid var(--border); display: none; backdrop-filter: blur(5px); }
         .admin-panel h2 { font-size: 15px; margin-top: 0; margin-bottom: 15px; font-weight: 600; color: #aaa; }
         .admin-btn { display: block; width: 100%; padding: 12px; background: transparent; border: 1px solid var(--border); color: #ccc; border-radius: 6px; margin-bottom: 8px; font-size: 13px; cursor: pointer; }
-        
-        /* Стили для кнопки и формы входа владельца */
-        .owner-section { margin-top: 20px; padding-top: 20px; border-top: 1px dashed #333; text-align: center; }
-        .owner-login-form { display: none; margin-top: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="menu-btn" onclick="toggleMenu()"><div></div><div></div><div></div></div>
+        <div class="menu-btn" onclick="document.getElementById('sideMenu').classList.toggle('open')"><div></div><div></div><div></div></div>
 
         <div class="side-menu" id="sideMenu">
-            <button class="close-btn" onclick="toggleMenu()">×</button>
+            <button class="close-btn" onclick="document.getElementById('sideMenu').classList.remove('open')">×</button>
             <h3 style="margin-top:0; font-size:16px;">Варианты проверки</h3>
-            <button class="btn" onclick="check('scam'); toggleMenu()">Проверить на скам</button>
-            <button class="btn" onclick="check('fake'); toggleMenu()">Проверить на фейк</button>
-            <button class="btn btn-main" onclick="check('all'); toggleMenu()">Полный анализ</button>
+            <button class="btn" onclick="check('scam'); document.getElementById('sideMenu').classList.remove('open')">Проверить на скам</button>
+            <button class="btn" onclick="check('fake'); document.getElementById('sideMenu').classList.remove('open')">Проверить на фейк</button>
+            <button class="btn btn-main" onclick="check('all'); document.getElementById('sideMenu').classList.remove('open')">Полный анализ</button>
         </div>
 
         <h1>Fame Checker</h1>
@@ -175,19 +94,16 @@
 
         <div class="result-card" id="resultBox"></div>
 
-        <!-- БЛОК ВЛАДЕЛЬЦА -->
-        <div class="owner-section">
-            <!-- Кнопка вызова панели -->
-            <button class="btn" id="ownerBtn" onclick="showOwnerLogin()" style="opacity: 0.5;">Панель владельца</button>
-            
-            <!-- Форма ввода пароля (скрыта) -->
-            <div class="owner-login-form" id="ownerLoginForm">
-                <input type="password" id="adminPass" placeholder="Код доступа">
-                <button class="btn" onclick="loginAdmin()">Войти</button>
-            </div>
+        <!-- КНОПКА ВЛАДЕЛЬЦА (ВСЕГДА ВИДНА) -->
+        <button class="btn" style="margin-top: 30px; border-color: #555;" onclick="document.getElementById('ownerForm').style.display='block'; this.style.display='none';">Панель владельца</button>
+
+        <!-- ФОРМА ВВОДА ПАРОЛЯ -->
+        <div id="ownerForm" style="display: none; margin-top: 10px;">
+            <input type="password" id="adminPass" placeholder="Код доступа">
+            <button class="btn btn-main" onclick="loginAdmin()">Войти</button>
         </div>
 
-        <!-- Сама панель (скрыта) -->
+        <!-- ПАНЕЛЬ ВЛАДЕЛЬЦА -->
         <div class="admin-panel" id="adminPanel">
             <h2>Панель владельца</h2>
             <button class="admin-btn">Принять жалобы</button>
@@ -202,21 +118,17 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        function toggleMenu() { document.getElementById('sideMenu').classList.toggle('open'); }
-
         const API_URL = "https://fame-api-bs11.onrender.com/api/check"; 
         function check(type) {
             const username = document.getElementById('username').value.trim();
             const resultBox = document.getElementById('resultBox');
             if (!username) { alert("Введите ник"); return; }
-            
             document.getElementById('peopleList').style.display = 'none';
             resultBox.style.display = 'block';
             resultBox.innerHTML = `<div>Поиск...</div>`;
 
             fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: username, type: type })
             })
             .then(res => res.json())
@@ -227,9 +139,7 @@
                 if (!data.is_scam && !data.is_fake) html += `<div style="margin-bottom:6px;">В базах не найден.</div>`;
                 resultBox.innerHTML = html;
             })
-            .catch(error => {
-                resultBox.innerHTML = `<span style="color:#ff2a2a;">Ошибка сервера.</span> Подождите.`;
-            });
+            .catch(error => { resultBox.innerHTML = `<span style="color:#ff2a2a;">Ошибка сервера.</span> Подождите.`; });
         }
 
         function showList(type) {
@@ -250,25 +160,20 @@
             content.innerHTML = html;
         }
 
-        // ЛОГИКА ВЛАДЕЛЬЦА
+        // ПРОСТАЯ ЛОГИКА ВЛАДЕЛЬЦА
         let loginAttempts = 0;
-
-        function showOwnerLogin() {
-            document.getElementById('ownerBtn').style.display = 'none'; // Прячем кнопку
-            document.getElementById('ownerLoginForm').style.display = 'block'; // Показываем поле
-        }
 
         function loginAdmin() {
             const pass = document.getElementById('adminPass').value;
             
             if (pass === "QWERTYUIOP(1234)a") {
                 document.getElementById('adminPanel').style.display = 'block';
-                document.getElementById('ownerLoginForm').style.display = 'none'; 
+                document.getElementById('ownerForm').style.display = 'none'; 
                 alert("Доступ разрешен");
             } else {
                 loginAttempts++;
                 if (loginAttempts >= 1) {
-                    document.getElementById('ownerLoginForm').style.display = 'none'; // Прячем форму
+                    document.getElementById('ownerForm').style.display = 'none'; 
                     alert("Неверный код! Доступ заблокирован.");
                 }
             }
