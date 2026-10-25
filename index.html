@@ -203,10 +203,18 @@
             }
         }
 
-        // ОТПРАВКА КОМАНД С САЙТА НА СЕРВЕР
         function doAdminAction(action, inputId, value) {
             const target = document.getElementById(inputId).value.trim();
             if (!target) { alert("Введите ник"); return; }
+
+            // Меняем текст кнопки, показывая загрузку
+            const btns = document.querySelectorAll('.admin-btn');
+            btns.forEach(b => b.disabled = true);
+            
+            const notification = document.createElement('div');
+            notification.style = "position:fixed; bottom:20px; left:20px; right:20px; background:#141414; color:white; padding:15px; border-radius:8px; text-align:center; border:1px solid #333; z-index:1000;";
+            notification.innerText = "Сервер просыпается, подождите (до 50 сек)...";
+            document.body.appendChild(notification);
 
             fetch(ADMIN_API, {
                 method: 'POST',
@@ -215,10 +223,14 @@
             })
             .then(res => res.json())
             .then(data => {
-                alert(data.msg);
+                notification.innerText = data.msg;
+                setTimeout(() => notification.remove(), 3000);
+                btns.forEach(b => b.disabled = false);
             })
             .catch(err => {
-                alert("Ошибка сервера. Подождите (он просыпается).");
+                notification.innerText = "Ошибка связи. Сервер не ответил.";
+                setTimeout(() => notification.remove(), 3000);
+                btns.forEach(b => b.disabled = false);
             });
         }
     </script>
