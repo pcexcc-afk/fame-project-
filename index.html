@@ -2,40 +2,198 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fame Checker</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background-color: #17212b; color: #ffffff; font-family: sans-serif; padding: 20px; text-align: center; margin: 0; }
-        h1 { color: #2ea6ff; margin-bottom: 20px; }
-        .card { background: #232e3c; padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: left; }
-        .btn { display: block; background: #2ea6ff; color: #fff; padding: 12px; margin: 10px 0; border-radius: 8px; text-decoration: none; font-weight: bold; text-align: center; }
-        .btn-red { background: #ff4d4d; }
-        input { width: 100%; padding: 10px; border-radius: 8px; border: none; margin-bottom: 10px; box-sizing: border-box; }
+        body {
+            background-color: #0a0a0a; /* Черный фон */
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 { font-size: 22px; margin-bottom: 20px; }
+        
+        .form-group { margin-bottom: 15px; }
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #333;
+            background-color: #1a1a1a;
+            color: white;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+        }
+        input[type="text"]:focus { border-color: #ff3333; }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border: 2px solid #ff3333;
+            background-color: #1a0000;
+            color: #ff3333;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-sizing: border-box;
+            transition: 0.2s;
+        }
+        .btn:active { background-color: #ff3333; color: white; }
+        
+        .btn-main {
+            background-color: #ff3333;
+            color: white;
+            border: none;
+        }
+        .btn-main:active { background-color: #cc0000; }
+
+        /* Стили для меток (значков) */
+        .badges { display: flex; justify-content: center; gap: 10px; margin-top: 30px; flex-wrap: wrap; }
+        
+        .badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 2px solid;
+            background: transparent;
+        }
+        .badge-fame { border-color: #ffffff; color: #ffffff; }
+        .badge-fake { border-color: #ff3333; color: #ff3333; }
+        .badge-scam { border-color: #ff3333; color: #ff3333; }
+
+        /* Результаты */
+        #resultBox {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #1a1a1a;
+            display: none;
+            text-align: left;
+            border-left: 5px solid #ff3333;
+        }
+        
+        .result-title { color: #ff3333; font-weight: bold; margin-bottom: 5px; }
+        .result-text { color: #ffffff; margin-bottom: 10px; }
+        
+        .admin-section {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px dashed #333;
+            display: none; /* Скрыто по умолчанию */
+        }
     </style>
 </head>
 <body>
 
-    <h1>🕵️‍♂️ Fame Checker</h1>
+    <h1>Приветствую тебя 👋</h1>
+    <p style="color: #888; margin-bottom: 30px;">Выбери способ анализа</p>
 
-    <div class="card">
-        <h3>🔍 Проверка ника</h3>
-        <input type="text" id="nick" placeholder="Введи @username">
-        <button class="btn" onclick="check()">Проверить (100 ⭐)</button>
+    <div class="form-group">
+        <input type="text" id="username" placeholder="Введи @username">
     </div>
 
-    <div class="card">
-        <h3>⚠️ Базы</h3>
-        <a href="#" class="btn btn-red">Скам-база</a>
-        <a href="#" class="btn">Фейк-база</a>
-        <a href="#" class="btn">👑 Фейм-база</a>
+    <!-- Кнопки анализа -->
+    <button class="btn" onclick="check('scam')">⚠️ Проверить на СКАМ</button>
+    <button class="btn" onclick="check('fake')">🤡 Проверить на ФЕЙК</button>
+    <button class="btn btn-main" onclick="check('all')">🔍 Полный анализ (Скам + Фейк)</button>
+
+    <!-- Место для вывода результата -->
+    <div id="resultBox"></div>
+
+    <!-- Метки -->
+    <div class="badges">
+        <div class="badge badge-fame">👑 Фейм</div>
+        <div class="badge badge-fake">⚠️ Фейк</div>
+        <div class="badge badge-scam">🚨 Скам</div>
+    </div>
+
+    <!-- Блок Админки (Скрыт) -->
+    <div class="admin-section" id="adminPanel">
+        <h2>🛠 Панель владельца</h2>
+        <button class="btn">📥 Принять жалобы</button>
+        <button class="btn">🚫 Забанить</button>
+        <button class="btn">✅ Разбанить</button>
     </div>
 
     <script>
-        function check() {
-            const nick = document.getElementById('nick').value;
-            if (!nick) { alert("Введи ник!"); return; }
-            alert("Проверка " + nick + " запущена (это демо-режим).");
+        // Инициализация Telegram
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // ВАЖНО: Вставь сюда свой ID в Telegram (число)
+        const OWNER_ID = 1780245651; 
+        
+        // Если ты открываешь сайт через Telegram и твой ID совпадает — показываем админку
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            if (tg.initDataUnsafe.user.id === OWNER_ID) {
+                document.getElementById('adminPanel').style.display = 'block';
+            }
+        }
+
+        // ТВОЙ АДРЕС НА RENDER
+        const API_URL = "https://fame-api-bs11.onrender.com/api/check"; 
+
+        function check(type) {
+            const username = document.getElementById('username').value;
+            const resultBox = document.getElementById('resultBox');
+            
+            if (!username) {
+                alert("Введи ник!");
+                return;
+            }
+
+            resultBox.style.display = 'block';
+            resultBox.style.borderLeftColor = "#ffcc00";
+            resultBox.innerHTML = `⏳ Анализируем <b>${username}</b>... (Первый раз может занять до 50 секунд, сервер просыпается)`;
+
+            // Отправляем запрос на Render
+            fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: username, type: type })
+            })
+            .then(response => response.json())
+            .then(data => {
+                resultBox.style.borderLeftColor = "#ff3333";
+                let html = `<h3>Результат: ${data.username}</h3>`;
+
+                // Если СКАМ
+                if (data.is_scam) {
+                    html += `<div class="result-title">🚨 СКАМ</div>`;
+                    html += `<div class="result-text">Причина: ${data.scam_reason}</div>`;
+                }
+                
+                // Если ФЕЙК
+                if (data.is_fake) {
+                    html += `<div class="result-title">⚠️ ФЕЙК</div>`;
+                    html += `<div class="result-text">Причина: ${data.fake_reason}</div>`;
+                }
+
+                // Если чисто
+                if (!data.is_scam && !data.is_fake) {
+                    html += `<div class="result-text">В базах скама и фейков не найден.</div>`;
+                }
+
+                // Сайты
+                if (data.found_sites && data.found_sites.length > 0) {
+                    html += `<div class="result-text"><br>Найден на сайтах: ${data.found_sites.join(', ')}</div>`;
+                }
+
+                resultBox.innerHTML = html;
+            })
+            .catch(error => {
+                resultBox.style.borderLeftColor = "#ff3333";
+                resultBox.innerHTML = `❌ Ошибка связи с сервером. Подожди минуту и попробуй снова.`;
+            });
         }
     </script>
 </body>
