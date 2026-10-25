@@ -20,14 +20,12 @@
             overflow-x: hidden;
             position: relative;
             min-height: 100vh;
-            /* ФОНОВАЯ КАРТИНКА САКУРЫ */
             background-image: url('https://images.unsplash.com/photo-1522383225653-ed111181a951?q=80&w=1000&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
         }
 
-        /* Затемнение фона, чтобы текст был читаемым */
         body::before {
             content: '';
             position: fixed;
@@ -140,9 +138,9 @@
         .admin-panel h2 { font-size: 15px; margin-top: 0; margin-bottom: 15px; font-weight: 600; color: #aaa; }
         .admin-btn { display: block; width: 100%; padding: 12px; background: transparent; border: 1px solid var(--border); color: #ccc; border-radius: 6px; margin-bottom: 8px; font-size: 13px; cursor: pointer; }
         
-        .secret-login { margin-top: 30px; text-align: center; }
-        .secret-login input { max-width: 200px; margin: 0 auto 10px; }
-        .secret-login .btn { max-width: 200px; margin: 0 auto; }
+        /* Стили для кнопки и формы входа владельца */
+        .owner-section { margin-top: 20px; padding-top: 20px; border-top: 1px dashed #333; text-align: center; }
+        .owner-login-form { display: none; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -177,11 +175,19 @@
 
         <div class="result-card" id="resultBox"></div>
 
-        <div class="secret-login" id="secretLogin">
-            <input type="password" id="adminPass" placeholder="Код доступа владельца">
-            <button class="btn" onclick="loginAdmin()">Войти в панель</button>
+        <!-- БЛОК ВЛАДЕЛЬЦА -->
+        <div class="owner-section">
+            <!-- Кнопка вызова панели -->
+            <button class="btn" id="ownerBtn" onclick="showOwnerLogin()" style="opacity: 0.5;">Панель владельца</button>
+            
+            <!-- Форма ввода пароля (скрыта) -->
+            <div class="owner-login-form" id="ownerLoginForm">
+                <input type="password" id="adminPass" placeholder="Код доступа">
+                <button class="btn" onclick="loginAdmin()">Войти</button>
+            </div>
         </div>
 
+        <!-- Сама панель (скрыта) -->
         <div class="admin-panel" id="adminPanel">
             <h2>Панель владельца</h2>
             <button class="admin-btn">Принять жалобы</button>
@@ -244,17 +250,25 @@
             content.innerHTML = html;
         }
 
+        // ЛОГИКА ВЛАДЕЛЬЦА
         let loginAttempts = 0;
+
+        function showOwnerLogin() {
+            document.getElementById('ownerBtn').style.display = 'none'; // Прячем кнопку
+            document.getElementById('ownerLoginForm').style.display = 'block'; // Показываем поле
+        }
+
         function loginAdmin() {
             const pass = document.getElementById('adminPass').value;
+            
             if (pass === "QWERTYUIOP(1234)a") {
                 document.getElementById('adminPanel').style.display = 'block';
-                document.getElementById('secretLogin').style.display = 'none'; 
+                document.getElementById('ownerLoginForm').style.display = 'none'; 
                 alert("Доступ разрешен");
             } else {
                 loginAttempts++;
                 if (loginAttempts >= 1) {
-                    document.getElementById('secretLogin').style.display = 'none';
+                    document.getElementById('ownerLoginForm').style.display = 'none'; // Прячем форму
                     alert("Неверный код! Доступ заблокирован.");
                 }
             }
