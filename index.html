@@ -10,84 +10,87 @@
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         
         body {
-            color: var(--text); margin: 0; padding: 20px; overflow-x: hidden; position: relative; min-height: 100vh;
-            /* НОВОЕ ФОТО САКУРЫ (белая на черном) */
-            background-image: url('https://images.unsplash.com/photo-1522383225653-ed111181a951?q=80&w=1000&auto=format&fit=crop');
-            background-size: cover; background-position: center; background-attachment: fixed;
+            background-color: #000000;
+            color: var(--text); 
+            margin: 0; 
+            padding: 20px; 
+            overflow-x: hidden; 
+            min-height: 100vh;
         }
-        /* Затемнение, чтобы текст читался */
-        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: -1; }
 
-        .container { width: 100%; max-width: 400px; margin: 0 auto; position: relative; z-index: 1; }
+        .container { width: 100%; max-width: 400px; margin: 0 auto; }
         
-        .menu-btn { position: absolute; top: 0; right: 0; width: 40px; height: 40px; background: rgba(20, 20, 20, 0.8); border: 1px solid var(--border); border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; z-index: 10; backdrop-filter: blur(5px); }
+        /* АНИМАЦИЯ ПОЯВЛЕНИЯ ТЕКСТА */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+        
+        .delay-1 { animation-delay: 0.1s; opacity: 0; }
+        .delay-2 { animation-delay: 0.3s; opacity: 0; }
+        .delay-3 { animation-delay: 0.5s; opacity: 0; }
+
+        .menu-btn { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; background: #141414; border: 1px solid var(--border); border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; z-index: 10; }
         .menu-btn div { width: 20px; height: 2px; background: var(--text); margin: 3px 0; }
 
-        .side-menu { position: fixed; top: 0; right: -250px; width: 250px; height: 100%; background: rgba(15, 15, 15, 0.95); border-left: 1px solid var(--border); padding: 20px; transition: 0.3s; z-index: 20; display: flex; flex-direction: column; gap: 10px; backdrop-filter: blur(10px); }
+        .side-menu { position: fixed; top: 0; right: -250px; width: 250px; height: 100%; background: #111; border-left: 1px solid var(--border); padding: 20px; transition: 0.3s; z-index: 20; display: flex; flex-direction: column; gap: 10px; }
         .side-menu.open { right: 0; }
         .side-menu .btn { margin-bottom: 0; }
         .close-btn { align-self: flex-end; background: none; border: none; color: #888; font-size: 24px; cursor: pointer; margin-bottom: 10px; }
 
         h1 { font-size: 20px; font-weight: 600; margin-bottom: 5px; text-align: left; }
         p.subtitle { color: #aaa; font-size: 13px; margin-bottom: 30px; text-align: left; }
-        .input-group { margin-bottom: 20px; }
         
+        .input-group { margin-bottom: 20px; }
         input[type="text"], input[type="password"] {
-            width: 100%; padding: 14px; border-radius: 8px; border: 1px solid var(--border); background-color: rgba(20, 20, 20, 0.8); color: white; font-size: 15px; outline: none; backdrop-filter: blur(5px); margin-bottom: 10px;
+            width: 100%; padding: 14px; border-radius: 8px; border: 1px solid var(--border); background-color: #141414; color: white; font-size: 15px; outline: none; margin-bottom: 10px;
         }
         input[type="text"]:focus, input[type="password"]:focus { border-color: var(--accent); }
 
         .btn {
-            display: block; width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--border); background-color: rgba(20, 20, 20, 0.8); color: var(--text); font-size: 14px; font-weight: 500; cursor: pointer; text-align: center; backdrop-filter: blur(5px);
+            display: block; width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--border); background-color: #141414; color: var(--text); font-size: 14px; font-weight: 500; cursor: pointer; text-align: center;
         }
         .btn:hover { border-color: var(--accent); }
         .btn-main { background-color: var(--accent); border-color: var(--accent); color: white; font-weight: 600; }
 
-        .result-card { margin-top: 20px; padding: 20px; border-radius: 8px; background: rgba(20, 20, 20, 0.9); display: none; border: 1px solid var(--border); border-left: 4px solid var(--accent); backdrop-filter: blur(5px); }
+        .result-card { margin-top: 20px; padding: 20px; border-radius: 8px; background: #141414; display: none; border: 1px solid var(--border); border-left: 4px solid var(--accent); }
         
         .badges { display: flex; justify-content: center; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
-        
-        /* МЕТКИ (ФЕЙМ - БЕЛАЯ, ОСТАЛЬНЫЕ - КРАСНЫЕ) */
-        .badge { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 2px solid var(--border); background: rgba(20, 20, 20, 0.8); cursor: pointer; backdrop-filter: blur(5px); }
-        .badge-fame { color: #fff; border-color: #ffffff; box-shadow: 0 0 8px rgba(255, 255, 255, 0.3); }
-        .badge-fake { color: var(--accent); border-color: var(--accent); box-shadow: 0 0 8px rgba(255, 42, 42, 0.3); }
-        .badge-scam { color: var(--accent); border-color: var(--accent); box-shadow: 0 0 8px rgba(255, 42, 42, 0.3); }
+        .badge { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 2px solid var(--border); background: #141414; cursor: pointer; }
+        .badge-fame { color: #fff; border-color: #ffffff; }
+        .badge-fake { color: var(--accent); border-color: var(--accent); }
+        .badge-scam { color: var(--accent); border-color: var(--accent); }
 
         .people-list { margin-top: 20px; display: none; }
-        
-        /* СТИЛЬ ДЛЯ СПИСКА, ЧТОБЫ МЕТКА БЫЛА РЯДОМ С НИКОМ */
-        .person { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 12px; 
-            background: rgba(20, 20, 20, 0.8); 
-            border: 1px solid var(--border); 
-            border-radius: 8px; 
-            margin-bottom: 8px; 
-            backdrop-filter: blur(5px); 
-        }
-        
+        .person { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #141414; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; }
         .person-info { display: flex; align-items: center; gap: 10px; }
         .person-name { font-weight: 600; font-size: 15px; }
-        
-        /* МЕТКА РЯДОМ С НИКОМ */
-        .person-status { 
-            font-size: 11px; 
-            padding: 3px 8px; 
-            border-radius: 4px; 
-            font-weight: bold;
-        }
+        .person-status { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
         .status-fame { color: #fff; border: 2px solid #fff; }
         .status-fake { color: var(--accent); border: 2px solid var(--accent); }
         .status-scam { color: var(--accent); border: 2px solid var(--accent); }
 
-        .admin-panel { margin-top: 20px; padding: 20px; border-radius: 8px; background: rgba(20, 20, 20, 0.9); border: 1px solid var(--border); display: none; backdrop-filter: blur(5px); }
+        /* ПАНЕЛЬ ВЛАДЕЛЬЦА РЯДОМ С МЕТКАМИ */
+        .owner-section { margin-top: 15px; text-align: center; }
+        .owner-section .btn { 
+            display: inline-block; 
+            width: auto; 
+            padding: 8px 16px; 
+            font-size: 12px; 
+            color: #888; 
+            border-color: #333; 
+        }
+
+        .admin-panel { margin-top: 20px; padding: 20px; border-radius: 8px; background: #141414; border: 1px solid var(--border); display: none; }
         .admin-panel h2 { font-size: 15px; margin-top: 0; margin-bottom: 15px; font-weight: 600; color: #aaa; }
-        .admin-btn { display: block; width: 100%; padding: 12px; background: transparent; border: 1px solid var(--border); color: #ccc; border-radius: 6px; margin-bottom: 8px; font-size: 13px; cursor: pointer; }
+        .admin-btn { display: block; width: 100%; padding: 12px; background: transparent; border: 1px solid var(--border); color: #ccc; border-radius: 6px; margin-bottom: 8px; font-size: 13px; cursor: pointer; text-align: left;}
         .admin-btn:hover { border-color: var(--accent); color: white; }
         
-        .admin-input-box { display: none; margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.5); border-radius: 6px; }
+        .admin-input-box { display: none; margin-top: 10px; padding: 10px; background: #000; border-radius: 6px; border: 1px solid #333; }
     </style>
 </head>
 <body>
@@ -102,17 +105,30 @@
             <button class="btn btn-main" onclick="check('all'); document.getElementById('sideMenu').classList.remove('open')">Полный анализ</button>
         </div>
 
-        <h1>Fame Checker</h1>
-        <p class="subtitle">Проверка аккаунтов по базам данных</p>
+        <!-- ЗАГОЛОВКИ С АНИМАЦИЕЙ -->
+        <div class="fade-in delay-1">
+            <h1>Fame Checker</h1>
+            <p class="subtitle">Проверка аккаунтов по базам данных</p>
+        </div>
 
-        <div class="input-group">
+        <div class="input-group fade-in delay-2">
             <input type="text" id="username" placeholder="Введите username">
         </div>
 
-        <div class="badges">
+        <div class="badges fade-in delay-3">
             <div class="badge badge-fame" onclick="showList('fame')">Фейм</div>
             <div class="badge badge-fake" onclick="showList('fake')">Фейк</div>
             <div class="badge badge-scam" onclick="showList('scam')">Скам</div>
+        </div>
+
+        <!-- ПАНЕЛЬ ВЛАДЕЛЬЦА (ТЕПЕРЬ ПОД МЕТКАМИ) -->
+        <div class="owner-section fade-in delay-3">
+             <button class="btn" id="ownerBtn" onclick="showOwnerLogin()">Панель владельца</button>
+        </div>
+
+        <div id="ownerForm" style="display: none; margin-top: 10px; text-align: center;">
+            <input type="password" id="adminPass" placeholder="Код доступа" style="max-width: 200px; margin: 0 auto 10px; display: block;">
+            <button class="btn btn-main" style="max-width: 200px; margin: 0 auto; display: block;" onclick="loginAdmin()">Войти</button>
         </div>
 
         <div class="people-list" id="peopleList">
@@ -122,50 +138,37 @@
 
         <div class="result-card" id="resultBox"></div>
 
-        <button class="btn" style="margin-top: 30px; border-color: #555;" onclick="document.getElementById('ownerForm').style.display='block'; this.style.display='none';">Панель владельца</button>
-
-        <div id="ownerForm" style="display: none; margin-top: 10px;">
-            <input type="password" id="adminPass" placeholder="Код доступа">
-            <button class="btn btn-main" onclick="loginAdmin()">Войти</button>
-        </div>
-
         <div class="admin-panel" id="adminPanel">
             <h2>Панель владельца</h2>
             
             <button class="admin-btn" onclick="document.getElementById('box1').style.display='block'">Принять жалобы</button>
             <div class="admin-input-box" id="box1">
                 <input type="text" placeholder="Ник для бана">
-                <button class="admin-btn" style="background:var(--accent); color:white;">Забанить</button>
+                <button class="admin-btn" style="background:var(--accent); color:white; text-align: center;">Забанить</button>
             </div>
 
             <button class="admin-btn" onclick="document.getElementById('box2').style.display='block'">Выдать баланс</button>
             <div class="admin-input-box" id="box2">
                 <input type="text" placeholder="Ник">
                 <input type="text" placeholder="Сумма">
-                <button class="admin-btn" style="background:var(--accent); color:white;">Выдать</button>
-            </div>
-
-            <button class="admin-btn" onclick="document.getElementById('box3').style.display='block'">Сделать рассылку</button>
-            <div class="admin-input-box" id="box3">
-                <input type="text" placeholder="Текст рассылки">
-                <button class="admin-btn" style="background:var(--accent); color:white;">Отправить</button>
+                <button class="admin-btn" style="background:var(--accent); color:white; text-align: center;">Выдать</button>
             </div>
 
             <button class="admin-btn" onclick="document.getElementById('box4').style.display='block'">Добавить метку</button>
             <div class="admin-input-box" id="box4">
                 <input type="text" placeholder="Ник пользователя">
-                <select style="width:100%; padding:10px; margin-bottom:10px; background:#222; color:white; border:1px solid #444; border-radius:6px;">
+                <select style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:white; border:1px solid #444; border-radius:6px;">
                     <option>Фейм</option>
                     <option>Фейк</option>
                     <option>Скам</option>
                 </select>
-                <button class="admin-btn" style="background:var(--accent); color:white;">Выдать метку</button>
+                <button class="admin-btn" style="background:var(--accent); color:white; text-align: center;">Выдать метку</button>
             </div>
 
             <button class="admin-btn" onclick="document.getElementById('box5').style.display='block'">Убрать метку</button>
             <div class="admin-input-box" id="box5">
                 <input type="text" placeholder="Ник пользователя">
-                <button class="admin-btn" style="background:var(--accent); color:white;">Убрать</button>
+                <button class="admin-btn" style="background:var(--accent); color:white; text-align: center;">Убрать</button>
             </div>
         </div>
     </div>
@@ -216,7 +219,13 @@
             content.innerHTML = html;
         }
 
+        // ЛОГИКА ПАНЕЛИ ВЛАДЕЛЬЦА
         let loginAttempts = 0;
+
+        function showOwnerLogin() {
+            document.getElementById('ownerBtn').style.display = 'none';
+            document.getElementById('ownerForm').style.display = 'block';
+        }
 
         function loginAdmin() {
             const pass = document.getElementById('adminPass').value;
