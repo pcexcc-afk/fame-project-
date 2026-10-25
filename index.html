@@ -11,10 +11,12 @@
         
         body {
             color: var(--text); margin: 0; padding: 20px; overflow-x: hidden; position: relative; min-height: 100vh;
+            /* НОВОЕ ФОТО САКУРЫ (белая на черном) */
             background-image: url('https://images.unsplash.com/photo-1522383225653-ed111181a951?q=80&w=1000&auto=format&fit=crop');
             background-size: cover; background-position: center; background-attachment: fixed;
         }
-        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: -1; }
+        /* Затемнение, чтобы текст читался */
+        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: -1; }
 
         .container { width: 100%; max-width: 400px; margin: 0 auto; position: relative; z-index: 1; }
         
@@ -44,22 +46,48 @@
         .result-card { margin-top: 20px; padding: 20px; border-radius: 8px; background: rgba(20, 20, 20, 0.9); display: none; border: 1px solid var(--border); border-left: 4px solid var(--accent); backdrop-filter: blur(5px); }
         
         .badges { display: flex; justify-content: center; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
-        .badge { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid var(--border); background: rgba(20, 20, 20, 0.8); cursor: pointer; backdrop-filter: blur(5px); }
-        .badge-fame { color: #fff; border-color: #fff; }
-        .badge-fake { color: var(--accent); border-color: var(--accent); }
-        .badge-scam { color: var(--accent); border-color: var(--accent); }
+        
+        /* МЕТКИ (ФЕЙМ - БЕЛАЯ, ОСТАЛЬНЫЕ - КРАСНЫЕ) */
+        .badge { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 2px solid var(--border); background: rgba(20, 20, 20, 0.8); cursor: pointer; backdrop-filter: blur(5px); }
+        .badge-fame { color: #fff; border-color: #ffffff; box-shadow: 0 0 8px rgba(255, 255, 255, 0.3); }
+        .badge-fake { color: var(--accent); border-color: var(--accent); box-shadow: 0 0 8px rgba(255, 42, 42, 0.3); }
+        .badge-scam { color: var(--accent); border-color: var(--accent); box-shadow: 0 0 8px rgba(255, 42, 42, 0.3); }
 
         .people-list { margin-top: 20px; display: none; }
-        .person { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(20, 20, 20, 0.8); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; backdrop-filter: blur(5px); }
-        .person-name { font-weight: 600; }
-        .person-status { font-size: 12px; padding: 4px 8px; border-radius: 4px; }
-        .status-fame { color: #fff; border: 1px solid #fff; }
-        .status-fake { color: var(--accent); border: 1px solid var(--accent); }
-        .status-scam { color: var(--accent); border: 1px solid var(--accent); }
+        
+        /* СТИЛЬ ДЛЯ СПИСКА, ЧТОБЫ МЕТКА БЫЛА РЯДОМ С НИКОМ */
+        .person { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 12px; 
+            background: rgba(20, 20, 20, 0.8); 
+            border: 1px solid var(--border); 
+            border-radius: 8px; 
+            margin-bottom: 8px; 
+            backdrop-filter: blur(5px); 
+        }
+        
+        .person-info { display: flex; align-items: center; gap: 10px; }
+        .person-name { font-weight: 600; font-size: 15px; }
+        
+        /* МЕТКА РЯДОМ С НИКОМ */
+        .person-status { 
+            font-size: 11px; 
+            padding: 3px 8px; 
+            border-radius: 4px; 
+            font-weight: bold;
+        }
+        .status-fame { color: #fff; border: 2px solid #fff; }
+        .status-fake { color: var(--accent); border: 2px solid var(--accent); }
+        .status-scam { color: var(--accent); border: 2px solid var(--accent); }
 
         .admin-panel { margin-top: 20px; padding: 20px; border-radius: 8px; background: rgba(20, 20, 20, 0.9); border: 1px solid var(--border); display: none; backdrop-filter: blur(5px); }
         .admin-panel h2 { font-size: 15px; margin-top: 0; margin-bottom: 15px; font-weight: 600; color: #aaa; }
         .admin-btn { display: block; width: 100%; padding: 12px; background: transparent; border: 1px solid var(--border); color: #ccc; border-radius: 6px; margin-bottom: 8px; font-size: 13px; cursor: pointer; }
+        .admin-btn:hover { border-color: var(--accent); color: white; }
+        
+        .admin-input-box { display: none; margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.5); border-radius: 6px; }
     </style>
 </head>
 <body>
@@ -94,23 +122,51 @@
 
         <div class="result-card" id="resultBox"></div>
 
-        <!-- КНОПКА ВЛАДЕЛЬЦА (ВСЕГДА ВИДНА) -->
         <button class="btn" style="margin-top: 30px; border-color: #555;" onclick="document.getElementById('ownerForm').style.display='block'; this.style.display='none';">Панель владельца</button>
 
-        <!-- ФОРМА ВВОДА ПАРОЛЯ -->
         <div id="ownerForm" style="display: none; margin-top: 10px;">
             <input type="password" id="adminPass" placeholder="Код доступа">
             <button class="btn btn-main" onclick="loginAdmin()">Войти</button>
         </div>
 
-        <!-- ПАНЕЛЬ ВЛАДЕЛЬЦА -->
         <div class="admin-panel" id="adminPanel">
             <h2>Панель владельца</h2>
-            <button class="admin-btn">Принять жалобы</button>
-            <button class="admin-btn">Выдать баланс</button>
-            <button class="admin-btn">Сделать рассылку</button>
-            <button class="admin-btn">Добавить метку</button>
-            <button class="admin-btn">Убрать метку</button>
+            
+            <button class="admin-btn" onclick="document.getElementById('box1').style.display='block'">Принять жалобы</button>
+            <div class="admin-input-box" id="box1">
+                <input type="text" placeholder="Ник для бана">
+                <button class="admin-btn" style="background:var(--accent); color:white;">Забанить</button>
+            </div>
+
+            <button class="admin-btn" onclick="document.getElementById('box2').style.display='block'">Выдать баланс</button>
+            <div class="admin-input-box" id="box2">
+                <input type="text" placeholder="Ник">
+                <input type="text" placeholder="Сумма">
+                <button class="admin-btn" style="background:var(--accent); color:white;">Выдать</button>
+            </div>
+
+            <button class="admin-btn" onclick="document.getElementById('box3').style.display='block'">Сделать рассылку</button>
+            <div class="admin-input-box" id="box3">
+                <input type="text" placeholder="Текст рассылки">
+                <button class="admin-btn" style="background:var(--accent); color:white;">Отправить</button>
+            </div>
+
+            <button class="admin-btn" onclick="document.getElementById('box4').style.display='block'">Добавить метку</button>
+            <div class="admin-input-box" id="box4">
+                <input type="text" placeholder="Ник пользователя">
+                <select style="width:100%; padding:10px; margin-bottom:10px; background:#222; color:white; border:1px solid #444; border-radius:6px;">
+                    <option>Фейм</option>
+                    <option>Фейк</option>
+                    <option>Скам</option>
+                </select>
+                <button class="admin-btn" style="background:var(--accent); color:white;">Выдать метку</button>
+            </div>
+
+            <button class="admin-btn" onclick="document.getElementById('box5').style.display='block'">Убрать метку</button>
+            <div class="admin-input-box" id="box5">
+                <input type="text" placeholder="Ник пользователя">
+                <button class="admin-btn" style="background:var(--accent); color:white;">Убрать</button>
+            </div>
         </div>
     </div>
 
@@ -150,12 +206,12 @@
 
             let html = '';
             if (type === 'fame') {
-                html = `<div class="person"><span class="person-name">@doctor</span><span class="person-status status-fame">Фейм</span></div>`;
+                html = `<div class="person"><div class="person-info"><span class="person-name">@doctor</span><span class="person-status status-fame">Фейм</span></div></div>`;
                 html += `<button class="btn" style="margin-top:10px;">Купить Фейм за 5000 звезд</button>`;
             } else if (type === 'fake') {
-                html = `<div class="person"><span class="person-name">@0ksy</span><span class="person-status status-fake">Фейк</span></div>`;
+                html = `<div class="person"><div class="person-info"><span class="person-name">@0ksy</span><span class="person-status status-fake">Фейк</span></div></div>`;
             } else if (type === 'scam') {
-                html = `<div class="person"><span class="person-name">@bad_user</span><span class="person-status status-scam">Скам</span></div>`;
+                html = `<div class="person"><div class="person-info"><span class="person-name">@bad_user</span><span class="person-status status-scam">Скам</span></div></div>`;
             }
             content.innerHTML = html;
         }
@@ -164,7 +220,6 @@
 
         function loginAdmin() {
             const pass = document.getElementById('adminPass').value;
-            
             if (pass === "QWERTYUIOP(1234)a") {
                 document.getElementById('adminPanel').style.display = 'block';
                 document.getElementById('ownerForm').style.display = 'none'; 
