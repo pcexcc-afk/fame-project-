@@ -144,6 +144,7 @@
 
         const API_URL = "https://fame-api-bs11.onrender.com/api/check"; 
         const ADMIN_API = "https://fame-api-bs11.onrender.com/api/admin/action";
+        const LIST_API = "https://fame-api-bs11.onrender.com/api/lists";
 
         function check(type) {
             const username = document.getElementById('username').value.trim();
@@ -168,22 +169,38 @@
             .catch(error => { resultBox.innerHTML = `<span style="color:#ff2a2a;">Ошибка сервера.</span> Подождите.`; });
         }
 
+        // ЗАПРАШИВАЕМ СПИСОК С СЕРВЕРА (ВМЕСТО ЗАХАРДКОЖЕННЫХ)
         function showList(type) {
             document.getElementById('resultBox').style.display = 'none';
             const listDiv = document.getElementById('peopleList');
             const content = document.getElementById('listContent');
             listDiv.style.display = 'block';
+            content.innerHTML = "<div>Загрузка списка...</div>";
 
-            let html = '';
-            if (type === 'fame') {
-                html = `<div class="person"><span class="person-name">@doctor</span><span class="person-status status-fame">Фейм</span></div>`;
-                html += `<button class="btn" style="margin-top:10px;">Купить Фейм за 5000 звезд</button>`;
-            } else if (type === 'fake') {
-                html = `<div class="person"><span class="person-name">@0ksy</span><span class="person-status status-fake">Фейк</span></div>`;
-            } else if (type === 'scam') {
-                html = `<div class="person"><span class="person-name">@bad_user</span><span class="person-status status-scam">Скам</span></div>`;
-            }
-            content.innerHTML = html;
+            fetch(LIST_API)
+                .then(res => res.json())
+                .then(data => {
+                    let users = data[type] || [];
+                    if (users.length === 0) {
+                        content.innerHTML = "<div>Список пуст.</div>";
+                        return;
+                    }
+                    
+                    let html = '';
+                    users.forEach(user => {
+                        let statusClass = type === 'fame' ? 'status-fame' : (type === 'fake' ? 'status-fake' : 'status-scam');
+                        let statusName = type === 'fame' ? 'Фейм' : (type === 'fake' ? 'Фейк' : 'Скам');
+                        html += `<div class="person"><span class="person-name">@${user}</span><span class="person-status ${statusClass}">${statusName}</span></div>`;
+                    });
+
+                    if (type === 'fame') {
+                        html += `<button class="btn" style="margin-top:10px;">Купить Фейм за 5000 звезд</button>`;
+                    }
+                    content.innerHTML = html;
+                })
+                .catch(err => {
+                    content.innerHTML = "<div>Ошибка загрузки списка.</div>";
+                });
         }
 
         let loginAttempts = 0;
@@ -231,9 +248,13 @@
                 notification.innerText = data.msg || "Успешно!";
                 setTimeout(() => notification.remove(), 3000);
                 btns.forEach(b => b.disabled = false);
+                // После действия обновляем список, если он открыт
+                if (document.getElementById('peopleList').style.display === 'block') {
+                    showList(document.querySelector('.badge-fame').classList.contains('active') ? 'fame' : 'fake'); // грубое обновление
+                }
             })
             .catch(err => {
-                notification.innerText = "Ошибка: " + err.message + ". Сервер не ответил.";
+                notification.innerText = "Ошибка: " + err.message;
                 setTimeout(() => notification.remove(), 5000);
                 btns.forEach(b => b.disabled = false);
             });
