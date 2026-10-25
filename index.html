@@ -7,8 +7,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg: #050505;
-            --card: #141414;
             --text: #ffffff;
             --accent: #ff2a2a;
             --border: #222222;
@@ -16,35 +14,26 @@
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         
         body {
-            background-color: var(--bg);
             color: var(--text);
             margin: 0;
             padding: 20px;
             overflow-x: hidden;
             position: relative;
             min-height: 100vh;
-            /* Фоновое изображение сакуры, если анимация не сработает */
+            /* ФОНОВАЯ КАРТИНКА САКУРЫ */
             background-image: url('https://images.unsplash.com/photo-1522383225653-ed111181a951?q=80&w=1000&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
         }
 
-        /* Затемнение фона, чтобы текст читался */
+        /* Затемнение фона, чтобы текст был читаемым */
         body::before {
             content: '';
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.75);
             z-index: -1;
-        }
-
-        #sakura-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -1;
-            pointer-events: none;
         }
 
         .container { width: 100%; max-width: 400px; margin: 0 auto; position: relative; z-index: 1; }
@@ -70,7 +59,7 @@
             position: fixed;
             top: 0; right: -250px;
             width: 250px; height: 100%;
-            background: rgba(20, 20, 20, 0.95);
+            background: rgba(15, 15, 15, 0.95);
             border-left: 1px solid var(--border);
             padding: 20px;
             transition: 0.3s;
@@ -143,7 +132,7 @@
         .status-scam { color: var(--accent); border: 1px solid var(--accent); }
 
         .admin-panel {
-            margin-top: 30px; padding: 20px;
+            margin-top: 20px; padding: 20px;
             border-radius: 8px; background: rgba(20, 20, 20, 0.9);
             border: 1px solid var(--border); display: none;
             backdrop-filter: blur(5px);
@@ -151,13 +140,12 @@
         .admin-panel h2 { font-size: 15px; margin-top: 0; margin-bottom: 15px; font-weight: 600; color: #aaa; }
         .admin-btn { display: block; width: 100%; padding: 12px; background: transparent; border: 1px solid var(--border); color: #ccc; border-radius: 6px; margin-bottom: 8px; font-size: 13px; cursor: pointer; }
         
-        .secret-login { margin-top: 50px; text-align: center; opacity: 0.2; transition: 0.3s; }
-        .secret-login:hover { opacity: 1; }
+        .secret-login { margin-top: 30px; text-align: center; }
+        .secret-login input { max-width: 200px; margin: 0 auto 10px; }
+        .secret-login .btn { max-width: 200px; margin: 0 auto; }
     </style>
 </head>
 <body>
-    <canvas id="sakura-canvas"></canvas>
-
     <div class="container">
         <div class="menu-btn" onclick="toggleMenu()"><div></div><div></div><div></div></div>
 
@@ -189,6 +177,11 @@
 
         <div class="result-card" id="resultBox"></div>
 
+        <div class="secret-login" id="secretLogin">
+            <input type="password" id="adminPass" placeholder="Код доступа владельца">
+            <button class="btn" onclick="loginAdmin()">Войти в панель</button>
+        </div>
+
         <div class="admin-panel" id="adminPanel">
             <h2>Панель владельца</h2>
             <button class="admin-btn">Принять жалобы</button>
@@ -197,47 +190,9 @@
             <button class="admin-btn">Добавить метку</button>
             <button class="admin-btn">Убрать метку</button>
         </div>
-
-        <div class="secret-login" id="secretLogin">
-            <input type="password" id="adminPass" placeholder="Код доступа">
-            <button class="btn" onclick="loginAdmin()">Войти</button>
-        </div>
     </div>
 
     <script>
-        // === АНИМАЦИЯ ЛЕПЕСТКОВ ===
-        const canvas = document.getElementById('sakura-canvas');
-        const ctx = canvas.getContext('2d');
-        let width, height; let petals = [];
-        function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
-        window.addEventListener('resize', resize); resize();
-
-        class Petal {
-            constructor() {
-                this.x = Math.random() * width; this.y = Math.random() * height - height;
-                this.size = Math.random() * 8 + 4; this.speedY = Math.random() * 1.5 + 0.5;
-                this.speedX = Math.random() * 2 - 1; this.opacity = Math.random() * 0.5 + 0.3;
-                this.angle = Math.random() * 360; this.spin = Math.random() * 2 - 1;
-            }
-            update() {
-                this.y += this.speedY; this.x += Math.sin(this.y / 50) * 0.5 + this.speedX; this.angle += this.spin;
-                if (this.y > height) { this.y = -20; this.x = Math.random() * width; }
-            }
-            draw() {
-                ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.angle * Math.PI / 180);
-                ctx.beginPath(); ctx.ellipse(0, 0, this.size, this.size / 2, 0, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 180, 200, ${this.opacity})`; ctx.fill(); ctx.restore();
-            }
-        }
-        for (let i = 0; i < 50; i++) { petals.push(new Petal()); }
-        function animate() {
-            ctx.clearRect(0, 0, width, height);
-            petals.forEach(petal => { petal.update(); petal.draw(); });
-            requestAnimationFrame(animate);
-        }
-        animate();
-
-        // === ЛОГИКА САЙТА ===
         const tg = window.Telegram.WebApp;
         tg.expand();
 
@@ -289,6 +244,7 @@
             content.innerHTML = html;
         }
 
+        let loginAttempts = 0;
         function loginAdmin() {
             const pass = document.getElementById('adminPass').value;
             if (pass === "QWERTYUIOP(1234)a") {
@@ -296,7 +252,11 @@
                 document.getElementById('secretLogin').style.display = 'none'; 
                 alert("Доступ разрешен");
             } else {
-                alert("Неверный код");
+                loginAttempts++;
+                if (loginAttempts >= 1) {
+                    document.getElementById('secretLogin').style.display = 'none';
+                    alert("Неверный код! Доступ заблокирован.");
+                }
             }
         }
     </script>
