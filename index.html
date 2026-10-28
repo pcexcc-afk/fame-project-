@@ -3,269 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Scam Checker</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>OSINT</title>
     <style>
-        :root { --text: #ffffff; --accent: #ff2a2a; --border: #222222; }
-        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #000000; color: var(--text); margin: 0; padding: 20px; min-height: 100vh; }
-        .container { width: 100%; max-width: 400px; margin: 0 auto; }
-        
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-in { animation: fadeInUp 0.8s ease forwards; opacity: 0; }
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.3s; }
-        .delay-3 { animation-delay: 0.5s; }
+        /* Светлый, голубой, аккуратный фон */
+        body {
+            background-color: #e6f2ff; /* Нежно-голубой */
+            color: #1a365d; /* Темно-синий текст */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        .icon-btn { background: #141414; border: 1px solid var(--border); color: #aaa; width: 40px; height: 40px; border-radius: 8px; font-size: 22px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; font-family: monospace; }
-        .icon-btn:hover { border-color: var(--accent); color: white; }
-        .header-title { font-size: 20px; font-weight: 600; text-align: center; flex-grow: 1; }
-        .subtitle { color: #aaa; font-size: 13px; margin-bottom: 30px; text-align: center; }
+        .container {
+            width: 100%;
+            max-width: 400px;
+        }
 
-        .side-menu { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #0a0a0a; border-right: 1px solid var(--border); padding: 20px; transition: 0.3s; z-index: 20; display: flex; flex-direction: column; }
-        .side-menu.open { left: 0; }
-        .close-btn { align-self: flex-end; background: none; border: none; color: #666; font-size: 28px; cursor: pointer; margin-bottom: 20px; }
-        .side-menu h3 { font-size: 18px; margin-top: 0; margin-bottom: 20px; color: white; }
-        .side-menu .btn { margin-bottom: 12px; padding: 16px; border-radius: 10px; font-size: 15px; background: #141414; border: 1px solid #333; text-align: left; display: flex; justify-content: space-between; color: white;}
-        .side-menu .btn::after { content: '→'; color: #555; font-size: 18px; }
+        /* Верхнее меню из 4 кружочков */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            margin-top: 10px;
+        }
 
-        input[type="text"], input[type="password"] { width: 100%; padding: 14px; border-radius: 8px; border: 1px solid var(--border); background-color: #141414; color: white; font-size: 15px; outline: none; margin-bottom: 10px; }
-        .btn { display: block; width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--border); background-color: #141414; color: var(--text); font-size: 14px; font-weight: 500; cursor: pointer; text-align: center; }
-        .btn:hover { border-color: var(--accent); }
-        .btn-main { background-color: var(--accent); border-color: var(--accent); color: white; font-weight: 600; }
+        .circle-btn {
+            width: 65px;
+            height: 65px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 10px;
+            font-weight: 600;
+            color: #2b6cb0;
+            box-shadow: 0 4px 10px rgba(43, 108, 176, 0.15);
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+            line-height: 1.1;
+            user-select: none;
+        }
 
-        .result-card { margin-top: 20px; padding: 20px; border-radius: 8px; background: #141414; display: none; border: 1px solid var(--border); border-left: 4px solid var(--accent); }
-        .badges { display: flex; justify-content: center; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
-        .badge { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 2px solid var(--border); background: #141414; cursor: pointer; }
-        .badge-fame { color: #fff; border-color: #ffffff; }
-        .badge-fake { color: var(--accent); border-color: var(--accent); }
-        .badge-scam { color: var(--accent); border-color: var(--accent); }
+        .circle-btn:hover, .circle-btn:active {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(43, 108, 176, 0.25);
+            background-color: #f7fafc;
+        }
 
-        .people-list { margin-top: 20px; display: none; }
-        .person { display: flex; justify-content: space-between; padding: 12px; background: #141414; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; }
-        .person-status { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
-        .status-fame { color: #fff; border: 2px solid #fff; }
-        .status-fake { color: var(--accent); border: 2px solid var(--accent); }
-        .status-scam { color: var(--accent); border: 2px solid var(--accent); }
+        .circle-btn span {
+            font-size: 18px;
+            margin-bottom: 2px;
+        }
 
-        .owner-section { margin-top: 15px; text-align: center; }
-        .owner-section .btn { display: inline-block; width: auto; padding: 8px 16px; font-size: 12px; color: #888; border-color: #333; }
+        /* Строка поиска */
+        .search-box {
+            position: relative;
+            width: 100%;
+            margin-bottom: 40px;
+        }
 
-        .admin-panel { margin-top: 20px; padding: 20px; border-radius: 8px; background: #141414; border: 1px solid var(--border); display: none; }
-        .admin-panel h2 { font-size: 15px; margin-top: 0; margin-bottom: 15px; color: #aaa; }
-        .admin-btn { display: block; width: 100%; padding: 12px; background: transparent; border: 1px solid var(--border); color: #ccc; border-radius: 6px; margin-bottom: 8px; font-size: 13px; cursor: pointer; text-align: left; }
-        .admin-input-box { display: none; margin-top: 10px; padding: 10px; background: #000; border-radius: 6px; border: 1px solid #333; }
-        select.admin-select { width: 100%; padding: 12px; margin-bottom: 10px; background: #111; color: white; border: 1px solid #444; border-radius: 6px; font-size: 14px; }
+        .search-box input {
+            width: 100%;
+            padding: 16px 20px;
+            border-radius: 30px;
+            border: none;
+            background-color: #ffffff;
+            color: #1a365d;
+            font-size: 16px;
+            outline: none;
+            box-shadow: 0 4px 15px rgba(43, 108, 176, 0.1);
+            box-sizing: border-box;
+        }
+
+        .search-box input::placeholder {
+            color: #90cdf4;
+        }
+
+        .search-box .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            bottom: 5px;
+            width: 45px;
+            border-radius: 50%;
+            border: none;
+            background-color: #3182ce;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Главный заголовок OSINT */
+        .main-title {
+            text-align: center;
+            font-size: 56px;
+            font-weight: 800;
+            letter-spacing: 5px;
+            color: #2b6cb0;
+            text-shadow: 2px 2px 10px rgba(43, 108, 176, 0.2);
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
-    <div class="side-menu" id="sideMenu">
-        <button class="close-btn" onclick="document.getElementById('sideMenu').classList.remove('open')">×</button>
-        <h3>Выберите действие</h3>
-        <button class="btn" onclick="check('scam'); document.getElementById('sideMenu').classList.remove('open')">Проверить на скам</button>
-        <button class="btn" onclick="check('fake'); document.getElementById('sideMenu').classList.remove('open')">Проверить на фейк</button>
-        <button class="btn btn-main" onclick="check('all'); document.getElementById('sideMenu').classList.remove('open')">Полный анализ</button>
-    </div>
 
     <div class="container">
-        <div class="header-row fade-in delay-1">
-            <button class="icon-btn" onclick="document.getElementById('sideMenu').classList.add('open')">≡</button>
-            <div class="header-title">Scam Checker</div>
-            <button class="icon-btn" onclick="document.getElementById('username').focus()">⌕</button>
-        </div>
-        <p class="subtitle fade-in delay-1">Проверка аккаунтов по базам данных</p>
-
-        <div class="fade-in delay-2">
-            <input type="text" id="username" placeholder="Введите username">
-        </div>
-
-        <div class="badges fade-in delay-3">
-            <div class="badge badge-fame" id="badge-fame" onclick="showList('fame')">Фейм</div>
-            <div class="badge badge-fake" id="badge-fake" onclick="showList('fake')">Фейк</div>
-            <div class="badge badge-scam" id="badge-scam" onclick="showList('scam')">Скам</div>
-        </div>
-
-        <div class="owner-section fade-in delay-3">
-             <button class="btn" id="ownerBtn" onclick="showOwnerLogin()">Панель владельца</button>
-        </div>
-
-        <div id="ownerForm" style="display: none; margin-top: 10px; text-align: center;">
-            <input type="password" id="adminPass" placeholder="Код доступа" style="max-width: 200px; margin: 0 auto 10px; display: block;">
-            <button class="btn btn-main" style="max-width: 200px; margin: 0 auto; display: block;" onclick="loginAdmin()">Войти</button>
-        </div>
-
-        <div class="people-list" id="peopleList"><div id="listContent"></div></div>
-        <div class="result-card" id="resultBox"></div>
-
-        <div class="admin-panel" id="adminPanel">
-            <h2>Панель владельца</h2>
-            
-            <button class="admin-btn" onclick="document.getElementById('box1').style.display='block'">Забанить (Скам)</button>
-            <div class="admin-input-box" id="box1">
-                <input type="text" id="banNick" placeholder="Ник">
-                <button class="admin-btn" style="background:var(--accent); color:white;" onclick="doAdminAction('ban', 'banNick', 'scam')">Забанить</button>
+        <!-- 4 Кружочка сверху -->
+        <div class="top-nav">
+            <div class="circle-btn" onclick="alert('Тут будет поиск')">
+                <span>🔍</span>
+                Поиск
             </div>
-
-            <button class="admin-btn" onclick="document.getElementById('box2').style.display='block'">Выдать баланс</button>
-            <div class="admin-input-box" id="box2">
-                <input type="text" id="balNick" placeholder="Ник">
-                <input type="text" id="balAmount" placeholder="Сумма">
-                <button class="admin-btn" style="background:var(--accent); color:white;" onclick="doAdminAction('balance', 'balNick', document.getElementById('balAmount').value)">Выдать</button>
+            <div class="circle-btn" onclick="alert('Тут будет Апилогер')">
+                <span>📷</span>
+                Апилогер
             </div>
-
-            <button class="admin-btn" onclick="document.getElementById('box4').style.display='block'">Добавить метку</button>
-            <div class="admin-input-box" id="box4">
-                <input type="text" id="markAddNick" placeholder="Ник пользователя">
-                <select class="admin-select" id="markAddType">
-                    <option value="fame">Фейм</option>
-                    <option value="fake">Фейк</option>
-                    <option value="scam">Скам</option>
-                </select>
-                <button class="admin-btn" style="background:var(--accent); color:white;" onclick="doAdminAction('add_mark', 'markAddNick', document.getElementById('markAddType').value)">Добавить</button>
+            <div class="circle-btn" onclick="alert('Тут будет Фотолагер')">
+                <span>🖼</span>
+                Фотолагер
             </div>
-
-            <button class="admin-btn" onclick="document.getElementById('box5').style.display='block'">Убрать метку</button>
-            <div class="admin-input-box" id="box5">
-                <input type="text" id="markRemNick" placeholder="Ник пользователя">
-                <select class="admin-select" id="markRemType">
-                    <option value="fame">Фейм</option>
-                    <option value="fake">Фейк</option>
-                    <option value="scam">Скам</option>
-                </select>
-                <button class="admin-btn" style="background:var(--accent); color:white;" onclick="doAdminAction('remove_mark', 'markRemNick', document.getElementById('markRemType').value)">Убрать</button>
+            <div class="circle-btn" onclick="alert('Тут будет Фан Стат')">
+                <span>📊</span>
+                Фан Стат
             </div>
+        </div>
+
+        <!-- Строка поиска -->
+        <div class="search-box">
+            <input type="text" placeholder="Введите номер или ник...">
+            <button class="search-btn">➔</button>
+        </div>
+
+        <!-- Название -->
+        <div class="main-title">
+            OSINT
         </div>
     </div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-
-        const API_URL = "https://fame-api-bs11.onrender.com/api/check"; 
-        const ADMIN_API = "https://fame-api-bs11.onrender.com/api/admin/action";
-        const LIST_API = "https://fame-api-bs11.onrender.com/api/lists";
-
-        let currentListType = null;
-
-        function check(type) {
-            const username = document.getElementById('username').value.trim();
-            const resultBox = document.getElementById('resultBox');
-            if (!username) { alert("Введите ник"); return; }
-            document.getElementById('peopleList').style.display = 'none';
-            resultBox.style.display = 'block';
-            resultBox.innerHTML = `<div>Поиск...</div>`;
-
-            fetch(API_URL, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: username, type: type })
-            })
-            .then(res => res.json())
-            .then(data => {
-                let html = `<div style="font-weight:600; margin-bottom:10px;">@${data.username}</div>`;
-                if (data.is_scam) html += `<div style="margin-bottom:6px; color:#ff2a2a;">Скам: ${data.scam_reason}</div>`;
-                if (data.is_fake) html += `<div style="margin-bottom:6px; color:#ff2a2a;">Фейк: ${data.fake_reason}</div>`;
-                if (!data.is_scam && !data.is_fake) html += `<div style="margin-bottom:6px;">В базах не найден.</div>`;
-                resultBox.innerHTML = html;
-            })
-            .catch(error => { resultBox.innerHTML = `<span style="color:#ff2a2a;">Ошибка сервера.</span> Подождите.`; });
-        }
-
-        function showList(type) {
-            currentListType = type;
-            document.getElementById('resultBox').style.display = 'none';
-            const listDiv = document.getElementById('peopleList');
-            const content = document.getElementById('listContent');
-            listDiv.style.display = 'block';
-            content.innerHTML = "<div>Загрузка списка...</div>";
-
-            fetch(LIST_API)
-                .then(res => res.json())
-                .then(data => {
-                    let users = data[type] || [];
-                    if (users.length === 0) {
-                        content.innerHTML = "<div>Список пуст.</div>";
-                        return;
-                    }
-                    
-                    let html = '';
-                    users.forEach(user => {
-                        let statusClass = type === 'fame' ? 'status-fame' : (type === 'fake' ? 'status-fake' : 'status-scam');
-                        let statusName = type === 'fame' ? 'Фейм' : (type === 'fake' ? 'Фейк' : 'Скам');
-                        html += `<div class="person"><span class="person-name">@${user}</span><span class="person-status ${statusClass}">${statusName}</span></div>`;
-                    });
-
-                    if (type === 'fame') {
-                        html += `<button class="btn btn-main" style="margin-top:10px;" onclick="buyFame()">Купить Фейм за 5000 звезд</button>`;
-                    }
-                    content.innerHTML = html;
-                })
-                .catch(err => {
-                    content.innerHTML = "<div>Ошибка загрузки списка.</div>";
-                });
-        }
-
-        function buyFame() {
-            const botUsername = "@Scamcheckbot"; 
-            tg.openTelegramLink(`https://t.me/${botUsername}?start=buyfame`);
-        }
-
-        let loginAttempts = 0;
-        function showOwnerLogin() {
-            document.getElementById('ownerBtn').style.display = 'none';
-            document.getElementById('ownerForm').style.display = 'block';
-        }
-
-        function loginAdmin() {
-            const pass = document.getElementById('adminPass').value;
-            if (pass === "QWERTYUIOP(1234)a") {
-                document.getElementById('adminPanel').style.display = 'block';
-                document.getElementById('ownerForm').style.display = 'none'; 
-            } else {
-                loginAttempts++;
-                if (loginAttempts >= 1) {
-                    document.getElementById('ownerForm').style.display = 'none'; 
-                    alert("Неверный код!");
-                }
-            }
-        }
-
-        function doAdminAction(action, inputId, value) {
-            const target = document.getElementById(inputId).value.trim();
-            if (!target) { alert("Введите ник"); return; }
-
-            const btns = document.querySelectorAll('.admin-btn');
-            btns.forEach(b => b.disabled = true);
-            
-            const notification = document.createElement('div');
-            notification.style = "position:fixed; bottom:20px; left:20px; right:20px; background:#141414; color:white; padding:15px; border-radius:8px; text-align:center; border:1px solid #333; z-index:1000;";
-            notification.innerText = "Отправка запроса на сервер...";
-            document.body.appendChild(notification);
-
-            fetch(ADMIN_API, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: action, target: target, value: value })
-            })
-            .then(res => {
-                if (!res.ok) throw new Error('Сервер ответил с ошибкой');
-                return res.json();
-            })
-            .then(data => {
-                notification.innerText = data.msg || "Успешно!";
-                setTimeout(() => notification.remove(), 3000);
-                btns.forEach(b => b.disabled = false);
-                
-                if (currentListType) {
-                    showList(currentListType);
-                }
-            })
-            .catch(err => {
-                notification.innerText = "Ошибка: " + err.message;
-                setTimeout(() => notification.remove(), 5000);
-                btns.forEach(b => b.disabled = false);
-            });
-        }
-    </script>
 </body>
 </html>
