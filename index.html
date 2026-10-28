@@ -5,17 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>OSINT</title>
     <style>
-        /* Светлый, голубой, аккуратный фон */
-        body {
-            background-color: #e6f2ff; /* Нежно-голубой */
-            color: #1a365d; /* Темно-синий текст */
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        /* Подключаем красивый шрифт */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap');
+
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            /* Красивый мягкий градиент */
+            background: linear-gradient(135deg, #f0f7ff 0%, #e0edff 100%);
+            color: #1e293b;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding: 30px 20px;
         }
 
         .container {
@@ -23,131 +31,120 @@
             max-width: 400px;
         }
 
-        /* Верхнее меню из 4 кружочков */
-        .top-nav {
+        /* Верхнее меню из 4 кружочков (без смайлов) */
+        .nav-menu {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 30px;
-            margin-top: 10px;
-        }
-
-        .circle-btn {
-            width: 65px;
-            height: 65px;
-            background-color: #ffffff;
-            border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-size: 10px;
-            font-weight: 600;
-            color: #2b6cb0;
-            box-shadow: 0 4px 10px rgba(43, 108, 176, 0.15);
-            cursor: pointer;
-            transition: 0.2s;
-            text-align: center;
-            line-height: 1.1;
-            user-select: none;
-        }
-
-        .circle-btn:hover, .circle-btn:active {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(43, 108, 176, 0.25);
-            background-color: #f7fafc;
-        }
-
-        .circle-btn span {
-            font-size: 18px;
-            margin-bottom: 2px;
-        }
-
-        /* Строка поиска */
-        .search-box {
-            position: relative;
-            width: 100%;
             margin-bottom: 40px;
         }
 
-        .search-box input {
-            width: 100%;
-            padding: 16px 20px;
-            border-radius: 30px;
-            border: none;
-            background-color: #ffffff;
-            color: #1a365d;
-            font-size: 16px;
-            outline: none;
-            box-shadow: 0 4px 15px rgba(43, 108, 176, 0.1);
-            box-sizing: border-box;
-        }
-
-        .search-box input::placeholder {
-            color: #90cdf4;
-        }
-
-        .search-box .search-btn {
-            position: absolute;
-            right: 5px;
-            top: 5px;
-            bottom: 5px;
-            width: 45px;
+        .nav-circle {
+            width: 72px;
+            height: 72px;
+            background: #ffffff;
             border-radius: 50%;
-            border: none;
-            background-color: #3182ce;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: #3b82f6;
+            text-align: center;
+            line-height: 1.2;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.08);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.8);
         }
 
-        /* Главный заголовок OSINT */
-        .main-title {
-            text-align: center;
-            font-size: 56px;
-            font-weight: 800;
-            letter-spacing: 5px;
-            color: #2b6cb0;
-            text-shadow: 2px 2px 10px rgba(43, 108, 176, 0.2);
-            margin-top: 20px;
+        .nav-circle:hover, .nav-circle:active {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 25px rgba(59, 130, 246, 0.15);
+            color: #1d4ed8;
         }
+
+        /* Строка поиска */
+        .search-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 60px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 18px 24px 18px 56px; /* Отступ слева для иконки */
+            border-radius: 24px;
+            border: none;
+            background: #ffffff;
+            font-size: 16px;
+            color: #1e293b;
+            outline: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .search-input:focus {
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15);
+        }
+
+        .search-input::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        /* Векторная иконка лупы (не смайл, а SVG) */
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 22px;
+            height: 22px;
+            fill: #94a3b8;
+            pointer-events: none;
+        }
+
+        /* Главный заголовок */
+        .main-logo {
+            text-align: center;
+            font-size: 64px;
+            font-weight: 800;
+            letter-spacing: 12px;
+            /* Красивый градиентный текст */
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-top: 20px;
+            text-shadow: 0px 10px 20px rgba(59, 130, 246, 0.1);
+        }
+
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- 4 Кружочка сверху -->
-        <div class="top-nav">
-            <div class="circle-btn" onclick="alert('Тут будет поиск')">
-                <span>🔍</span>
-                Поиск
-            </div>
-            <div class="circle-btn" onclick="alert('Тут будет Апилогер')">
-                <span>📷</span>
-                Апилогер
-            </div>
-            <div class="circle-btn" onclick="alert('Тут будет Фотолагер')">
-                <span>🖼</span>
-                Фотолагер
-            </div>
-            <div class="circle-btn" onclick="alert('Тут будет Фан Стат')">
-                <span>📊</span>
-                Фан Стат
-            </div>
+        
+        <!-- 4 круглые кнопки -->
+        <div class="nav-menu">
+            <div class="nav-circle">Поиск</div>
+            <div class="nav-circle">Апилогер</div>
+            <div class="nav-circle">Фотологер</div>
+            <div class="nav-circle">Фан Стат</div>
         </div>
 
-        <!-- Строка поиска -->
-        <div class="search-box">
-            <input type="text" placeholder="Введите номер или ник...">
-            <button class="search-btn">➔</button>
+        <!-- Поиск -->
+        <div class="search-container">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            </svg>
+            <input type="text" class="search-input" placeholder="Введите номер или ник">
         </div>
 
-        <!-- Название -->
-        <div class="main-title">
+        <!-- Логотип -->
+        <div class="main-logo">
             OSINT
         </div>
+
     </div>
 
 </body>
