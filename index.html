@@ -5,20 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>OSINT</title>
     <style>
-        /* Подключаем красивый шрифт */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap');
+        :root {
+            --bg: #09090b;          /* Глубокий черный */
+            --card: #18181b;        /* Темно-серый для карточек */
+            --text: #fafafa;        /* Белый текст */
+            --text-muted: #a1a1aa;  /* Серый текст */
+            --border: #27272a;      /* Границы */
+            --accent: #ffffff;      /* Белый акцент */
+        }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            /* Красивый мягкий градиент */
-            background: linear-gradient(135deg, #f0f7ff 0%, #e0edff 100%);
-            color: #1e293b;
+            background-color: var(--bg);
+            color: var(--text);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -31,121 +37,291 @@
             max-width: 400px;
         }
 
-        /* Верхнее меню из 4 кружочков (без смайлов) */
-        .nav-menu {
-            display: flex;
-            justify-content: space-between;
+        /* Шапка с логотипом */
+        .header {
+            text-align: center;
+            font-size: 42px;
+            font-weight: 800;
+            letter-spacing: 4px;
             margin-bottom: 40px;
+            background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .nav-circle {
-            width: 72px;
-            height: 72px;
-            background: #ffffff;
-            border-radius: 50%;
+        /* Меню из 4 кнопок (квадраты со скруглениями) */
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .nav-btn {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px; /* Аккуратный "прямой кружок" */
+            padding: 15px 5px;
             display: flex;
             justify-content: center;
             align-items: center;
+            text-align: center;
             font-size: 11px;
             font-weight: 600;
-            color: #3b82f6;
-            text-align: center;
-            line-height: 1.2;
-            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.08);
+            color: var(--text-muted);
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: all 0.2s ease;
+            letter-spacing: 0.5px;
         }
 
-        .nav-circle:hover, .nav-circle:active {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 25px rgba(59, 130, 246, 0.15);
-            color: #1d4ed8;
+        .nav-btn.active, .nav-btn:active {
+            background-color: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+            transform: scale(0.96);
         }
 
-        /* Строка поиска */
-        .search-container {
-            position: relative;
-            width: 100%;
-            margin-bottom: 60px;
+        /* Строка поиска и кнопка "Вариант" */
+        .search-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
         .search-input {
-            width: 100%;
-            padding: 18px 24px 18px 56px; /* Отступ слева для иконки */
-            border-radius: 24px;
-            border: none;
-            background: #ffffff;
-            font-size: 16px;
-            color: #1e293b;
+            flex: 1;
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px 20px;
+            font-size: 15px;
+            color: var(--text);
             outline: none;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-            transition: box-shadow 0.3s ease;
+            transition: border 0.2s;
         }
 
         .search-input:focus {
-            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15);
+            border-color: #52525b;
         }
 
         .search-input::placeholder {
-            color: #94a3b8;
-            font-weight: 400;
+            color: #52525b;
         }
 
-        /* Векторная иконка лупы (не смайл, а SVG) */
-        .search-icon {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 22px;
-            height: 22px;
-            fill: #94a3b8;
-            pointer-events: none;
+        .options-btn {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            width: 54px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: 0.2s;
         }
 
-        /* Главный заголовок */
-        .main-logo {
-            text-align: center;
-            font-size: 64px;
-            font-weight: 800;
-            letter-spacing: 12px;
-            /* Красивый градиентный текст */
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-top: 20px;
-            text-shadow: 0px 10px 20px rgba(59, 130, 246, 0.1);
+        .options-btn:active {
+            background-color: var(--border);
         }
 
+        .options-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* Секции */
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Карточка Фан Стат */
+        .funstat-card {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background-color: var(--border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        .user-info h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .user-info p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-box {
+            background-color: var(--bg);
+            padding: 16px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+        }
+
+        .stat-val {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-lbl {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-row:last-child {
+            border-bottom: none;
+        }
+
+        .data-label {
+            color: var(--text-muted);
+        }
+
+        .data-value {
+            font-weight: 500;
+            color: var(--text);
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        
-        <!-- 4 круглые кнопки -->
-        <div class="nav-menu">
-            <div class="nav-circle">Поиск</div>
-            <div class="nav-circle">Апилогер</div>
-            <div class="nav-circle">Фотологер</div>
-            <div class="nav-circle">Фан Стат</div>
+        <!-- Заголовок -->
+        <div class="header">OSINT</div>
+
+        <!-- Меню из 4 кнопок -->
+        <div class="nav-grid">
+            <div class="nav-btn active" id="btn-search" onclick="switchTab('search')">ПОИСК</div>
+            <div class="nav-btn" onclick="alert('Апилогер в разработке')">АПИЛОГЕР</div>
+            <div class="nav-btn" onclick="alert('Фотологер в разработке')">ФОТОЛОГЕР</div>
+            <div class="nav-btn" id="btn-funstat" onclick="switchTab('funstat')">ФАН СТАТ</div>
         </div>
 
-        <!-- Поиск -->
-        <div class="search-container">
-            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-            </svg>
-            <input type="text" class="search-input" placeholder="Введите номер или ник">
+        <!-- СЕКЦИЯ 1: ПОИСК -->
+        <div class="section active" id="section-search">
+            <div class="search-row">
+                <input type="text" class="search-input" placeholder="Введите ник, номер или email">
+                
+                <!-- Кнопка "Вариант" (фильтр) -->
+                <div class="options-btn" onclick="alert('Выбор типа поиска (номер, ник, email)')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/>
+                    </svg>
+                </div>
+            </div>
         </div>
 
-        <!-- Логотип -->
-        <div class="main-logo">
-            OSINT
+        <!-- СЕКЦИЯ 2: ФАН СТАТ -->
+        <div class="section" id="section-funstat">
+            <div class="funstat-card">
+                <div class="profile-header">
+                    <div class="avatar">U</div>
+                    <div class="user-info">
+                        <h3 id="fs-username">@username</h3>
+                        <p id="fs-id">ID: Скрыт</p>
+                    </div>
+                </div>
+
+                <div class="stat-grid">
+                    <div class="stat-box">
+                        <div class="stat-val">1 248</div>
+                        <div class="stat-lbl">Сообщений</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-val">34</div>
+                        <div class="stat-lbl">Групп</div>
+                    </div>
+                </div>
+
+                <div class="data-row">
+                    <span class="data-label">Дата регистрации</span>
+                    <span class="data-value">12.08.2019</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Телефон</span>
+                    <span class="data-value">+7 (9**) ***-**-45</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Telegram Premium</span>
+                    <span class="data-value">Да</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Последний онлайн</span>
+                    <span class="data-value">Недавно</span>
+                </div>
+            </div>
         </div>
 
     </div>
 
+    <script>
+        // Логика переключения вкладок
+        function switchTab(tab) {
+            // Сбрасываем все кнопки и секции
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+
+            if (tab === 'search') {
+                document.getElementById('btn-search').classList.add('active');
+                document.getElementById('section-search').classList.add('active');
+            } else if (tab === 'funstat') {
+                document.getElementById('btn-funstat').classList.add('active');
+                document.getElementById('section-funstat').classList.add('active');
+            }
+        }
+    </script>
 </body>
 </html>
