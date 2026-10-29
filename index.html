@@ -6,321 +6,144 @@
     <title>OSINT</title>
     <style>
         :root {
-            --bg: #09090b;          /* Глубокий черный */
-            --card: #18181b;        /* Темно-серый для карточек */
-            --text: #fafafa;        /* Белый текст */
-            --text-muted: #a1a1aa;  /* Серый текст */
-            --border: #27272a;      /* Границы */
-            --accent: #ffffff;      /* Белый акцент */
+            --bg: #000000; --card: #0a0a0a; --text: #ffffff; --text-muted: #888888; --border: #222222; --accent: #ff2a2a;
         }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 30px 20px; }
+        .container { width: 100%; max-width: 400px; }
+        .header { text-align: center; font-size: 42px; font-weight: 800; letter-spacing: 4px; margin-bottom: 40px; color: #ffffff; text-shadow: 0 0 20px rgba(255, 42, 42, 0.3); }
+        
+        .nav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 30px; }
+        .nav-btn { background-color: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 15px 5px; display: flex; justify-content: center; align-items: center; text-align: center; font-size: 11px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all 0.2s ease; }
+        .nav-btn.active, .nav-btn:active { background-color: var(--accent); color: #ffffff; border-color: var(--accent); }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+        .section { display: none; }
+        .section.active { display: block; }
 
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 30px 20px;
-        }
+        .search-row { display: flex; gap: 10px; margin-bottom: 20px; }
+        .search-input { flex: 1; background-color: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 20px; font-size: 15px; color: var(--text); outline: none; }
+        .search-input:focus { border-color: var(--accent); }
+        
+        .options-btn { background-color: var(--card); border: 1px solid var(--border); border-radius: 14px; width: 54px; display: flex; justify-content: center; align-items: center; cursor: pointer; color: var(--accent); }
+        .options-btn svg { width: 20px; height: 20px; fill: currentColor; }
 
-        .container {
-            width: 100%;
-            max-width: 400px;
-        }
+        .btn { display: block; width: 100%; padding: 16px; background: var(--accent); border: none; border-radius: 14px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
+        
+        .result-card { background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); margin-top: 20px; display: none; }
+        .result-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .result-row:last-child { border-bottom: none; }
+        .result-label { color: var(--text-muted); }
+        .result-value { font-weight: 600; color: var(--accent); }
 
-        /* Шапка с логотипом */
-        .header {
-            text-align: center;
-            font-size: 42px;
-            font-weight: 800;
-            letter-spacing: 4px;
-            margin-bottom: 40px;
-            background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        /* Модальное окно выбора */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; }
+        .modal-content { background: var(--card); padding: 20px; border-radius: 20px; width: 90%; max-width: 350px; border: 1px solid var(--border); }
+        .modal-title { text-align: center; margin-bottom: 20px; font-size: 18px; }
+        .modal-btn { display: block; width: 100%; padding: 15px; margin-bottom: 10px; background: transparent; border: 1px solid var(--border); border-radius: 12px; color: white; font-size: 15px; cursor: pointer; text-align: left; }
+        .modal-btn:active { border-color: var(--accent); }
 
-        /* Меню из 4 кнопок (квадраты со скруглениями) */
-        .nav-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .nav-btn {
-            background-color: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 16px; /* Аккуратный "прямой кружок" */
-            padding: 15px 5px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            letter-spacing: 0.5px;
-        }
-
-        .nav-btn.active, .nav-btn:active {
-            background-color: var(--accent);
-            color: var(--bg);
-            border-color: var(--accent);
-            transform: scale(0.96);
-        }
-
-        /* Строка поиска и кнопка "Вариант" */
-        .search-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .search-input {
-            flex: 1;
-            background-color: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 16px 20px;
-            font-size: 15px;
-            color: var(--text);
-            outline: none;
-            transition: border 0.2s;
-        }
-
-        .search-input:focus {
-            border-color: #52525b;
-        }
-
-        .search-input::placeholder {
-            color: #52525b;
-        }
-
-        .options-btn {
-            background-color: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            width: 54px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            color: var(--text-muted);
-            transition: 0.2s;
-        }
-
-        .options-btn:active {
-            background-color: var(--border);
-        }
-
-        .options-btn svg {
-            width: 20px;
-            height: 20px;
-            fill: currentColor;
-        }
-
-        /* Секции */
-        .section {
-            display: none;
-            animation: fadeIn 0.3s ease forwards;
-        }
-
-        .section.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Карточка Фан Стат */
-        .funstat-card {
-            background-color: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 24px;
-        }
-
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 24px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .avatar {
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            background-color: var(--border);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--text-muted);
-        }
-
-        .user-info h3 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .user-info p {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .stat-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .stat-box {
-            background-color: var(--bg);
-            padding: 16px;
-            border-radius: 14px;
-            border: 1px solid var(--border);
-        }
-
-        .stat-val {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .stat-lbl {
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .data-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .data-row:last-child {
-            border-bottom: none;
-        }
-
-        .data-label {
-            color: var(--text-muted);
-        }
-
-        .data-value {
-            font-weight: 500;
-            color: var(--text);
-        }
+        .loader { border: 2px solid #111; border-top: 2px solid var(--accent); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 10px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-
     <div class="container">
-        <!-- Заголовок -->
         <div class="header">OSINT</div>
 
-        <!-- Меню из 4 кнопок -->
         <div class="nav-grid">
             <div class="nav-btn active" id="btn-search" onclick="switchTab('search')">ПОИСК</div>
             <div class="nav-btn" onclick="alert('Апилогер в разработке')">АПИЛОГЕР</div>
             <div class="nav-btn" onclick="alert('Фотологер в разработке')">ФОТОЛОГЕР</div>
-            <div class="nav-btn" id="btn-funstat" onclick="switchTab('funstat')">ФАН СТАТ</div>
+            <div class="nav-btn" onclick="alert('Фан Стат в разработке')">ФАН СТАТ</div>
         </div>
 
-        <!-- СЕКЦИЯ 1: ПОИСК -->
         <div class="section active" id="section-search">
             <div class="search-row">
-                <input type="text" class="search-input" placeholder="Введите ник, номер или email">
-                
-                <!-- Кнопка "Вариант" (фильтр) -->
-                <div class="options-btn" onclick="alert('Выбор типа поиска (номер, ник, email)')">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/>
-                    </svg>
+                <input type="text" id="query" class="search-input" placeholder="Введите данные">
+                <div class="options-btn" onclick="openModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
                 </div>
             </div>
+            <button class="btn" onclick="doSearch()" id="searchBtn">Найти</button>
+            
+            <div class="result-card" id="resultCard"></div>
         </div>
+    </div>
 
-        <!-- СЕКЦИЯ 2: ФАН СТАТ -->
-        <div class="section" id="section-funstat">
-            <div class="funstat-card">
-                <div class="profile-header">
-                    <div class="avatar">U</div>
-                    <div class="user-info">
-                        <h3 id="fs-username">@username</h3>
-                        <p id="fs-id">ID: Скрыт</p>
-                    </div>
-                </div>
-
-                <div class="stat-grid">
-                    <div class="stat-box">
-                        <div class="stat-val">1 248</div>
-                        <div class="stat-lbl">Сообщений</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-val">34</div>
-                        <div class="stat-lbl">Групп</div>
-                    </div>
-                </div>
-
-                <div class="data-row">
-                    <span class="data-label">Дата регистрации</span>
-                    <span class="data-value">12.08.2019</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Телефон</span>
-                    <span class="data-value">+7 (9**) ***-**-45</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Telegram Premium</span>
-                    <span class="data-value">Да</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Последний онлайн</span>
-                    <span class="data-value">Недавно</span>
-                </div>
-            </div>
+    <!-- МОДАЛЬНОЕ ОКНО ВЫБОРА -->
+    <div class="modal-overlay" id="modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-title">Выбери тип поиска</div>
+            <button class="modal-btn" onclick="selectType('sherlock')">Поиск по нику (Соцсети)</button>
+            <button class="modal-btn" onclick="selectType('phone')">Поиск по номеру</button>
+            <button class="modal-btn" onclick="selectType('email')">Проверка Email</button>
+            <button class="modal-btn" onclick="selectType('ip')">Анализ IP-адреса</button>
+            <button class="modal-btn" onclick="selectType('whois')">WHOIS (Домен)</button>
         </div>
-
     </div>
 
     <script>
-        // Логика переключения вкладок
-        function switchTab(tab) {
-            // Сбрасываем все кнопки и секции
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+        const SERVER = "https://fame-api-bs11.onrender.com";
+        let currentType = 'sherlock'; // По умолчанию
 
-            if (tab === 'search') {
-                document.getElementById('btn-search').classList.add('active');
-                document.getElementById('section-search').classList.add('active');
-            } else if (tab === 'funstat') {
-                document.getElementById('btn-funstat').classList.add('active');
-                document.getElementById('section-funstat').classList.add('active');
-            }
+        function switchTab(tab) {
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${tab}`).classList.add('active');
+        }
+
+        // Открытие/закрытие модалки
+        function openModal() { document.getElementById('modal').style.display = 'flex'; }
+        function closeModal(e) { if(e.target.id === 'modal') document.getElementById('modal').style.display = 'none'; }
+        
+        // Выбор типа
+        function selectType(type) {
+            currentType = type;
+            const placeholders = {
+                'sherlock': 'Введите ник (без @)',
+                'phone': 'Введите номер (+7...)',
+                'email': 'Введите email',
+                'ip': 'Введите IP-адрес',
+                'whois': 'Введите домен (example.com)'
+            };
+            document.getElementById('query').placeholder = placeholders[type];
+            closeModal({target: {id: 'modal'}}); // Закрываем
+            document.getElementById('resultCard').style.display = 'none'; // Скрываем старый результат
+        }
+
+        // Основная функция поиска
+        function doSearch() {
+            const query = document.getElementById('query').value.trim();
+            const resCard = document.getElementById('resultCard');
+            if (!query) { alert("Введите данные"); return; }
+
+            resCard.style.display = 'block';
+            resCard.innerHTML = '<div style="text-align:center; padding: 10px;"><div class="loader"></div> Загрузка...</div>';
+
+            const endpoint = `/api/${currentType}`;
+            const bodyData = currentType === 'sherlock' ? { query: query } : { [currentType === 'phone' ? 'phone' : currentType]: query };
+
+            fetch(SERVER + endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bodyData)
+            })
+            .then(res => res.json())
+            .then(data => {
+                let html = '';
+                if (data.error) {
+                    html = `<div style="color: var(--accent); text-align: center;">${data.error}</div>`;
+                } else {
+                    for (const [key, value] of Object.entries(data)) {
+                        if (key !== 'error' && key !== 'query') {
+                            html += `<div class="result-row"><span class="result-label">${key.toUpperCase()}</span><span class="result-value">${value}</span></div>`;
+                        }
+                    }
+                }
+                resCard.innerHTML = html;
+            })
+            .catch(err => {
+                resCard.innerHTML = '<div style="color: var(--accent); text-align: center;">Сервер просыпается. Подождите 30-50 сек...</div>';
+            });
         }
     </script>
 </body>
