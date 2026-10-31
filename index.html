@@ -7,197 +7,151 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --glass: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --text: #ffffff;
-            --accent: #0a84ff;
-            --gold: #ffd60a;
-            --green: #30d158;
-            --red: #ff453a;
-            --bg: #000000;
+            --glass: rgba(255, 255, 255, 0.08); --glass-border: rgba(255, 255, 255, 0.15);
+            --text: #ffffff; --accent: #0a84ff; --gold: #ffd60a; --green: #30d158; --red: #ff453a;
+            --bg: #000000; --muted: #8e8e93; --msg-out: #0a84ff; --msg-in: rgba(255,255,255,0.15);
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; }
         body { background-color: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; background-image: radial-gradient(circle at top right, #1a1a2e, #000000); }
+        .glass { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 14px; }
 
-        /* СТЕКЛО */
-        .glass { background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 16px; }
-
-        #mainApp { display: flex; height: 100%; flex-direction: column; position: relative; }
-
-        /* ШАПКА */
-        .header { padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; background: var(--glass); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); z-index: 10; }
-        .header-title { font-size: 22px; font-weight: 700; }
-        .menu-btn { cursor: pointer; font-size: 24px; }
-
+        #mainApp { display: flex; height: 100%; flex-direction: column; }
+        .header { padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; background: var(--glass); border-bottom: 1px solid var(--glass-border); }
+        .header-title { font-size: 20px; font-weight: 700; }
+        
         .content { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 100px; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* ПРОФИЛЬ */
-        .profile-card { padding: 25px; text-align: center; margin-bottom: 20px; }
-        .profile-avatar { width: 100px; height: 100px; border-radius: 50%; background: var(--accent); margin: 0 auto 15px; display: flex; justify-content: center; align-items: center; font-size: 40px; font-weight: bold; }
-        .info-row { display: flex; justify-content: space-between; padding: 15px; border-bottom: 1px solid var(--glass-border); font-size: 16px; }
-        .info-row:last-child { border-bottom: none; }
-        .info-label { color: #aaa; }
+        /* ЧАТЫ */
+        .chat-item { display: flex; align-items: center; padding: 12px; cursor: pointer; border-radius: 12px; margin-bottom: 5px; border-bottom: 1px solid var(--glass-border); }
+        .chat-avatar { width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; font-weight: bold; margin-right: 15px; background: var(--accent); }
+        .chat-info { flex: 1; }
+        .chat-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+        .chat-msg { font-size: 14px; color: var(--muted); }
 
-        /* НАСТРОЙКИ */
-        .settings-group { margin-bottom: 20px; overflow: hidden; }
-        .settings-title { font-size: 13px; color: #aaa; padding: 15px 15px 5px 15px; text-transform: uppercase; }
-        .settings-item { padding: 15px; border-bottom: 1px solid var(--glass-border); cursor: pointer; display: flex; align-items: center; gap: 15px; font-size: 16px; }
-        .settings-item:last-child { border-bottom: none; }
-        .settings-icon { width: 30px; font-size: 20px; text-align: center; }
-        .settings-value { margin-left: auto; color: #888; font-size: 14px; }
+        /* ЭКРАН ЧАТА */
+        #chatScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 1000; display: none; flex-direction: column; }
+        .chat-header { padding: 15px; display: flex; align-items: center; background: var(--glass); border-bottom: 1px solid var(--glass-border); }
+        .back-btn { font-size: 22px; cursor: pointer; margin-right: 15px; color: var(--accent); }
+        .chat-title { font-size: 16px; font-weight: 600; }
+        .messages-area { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .msg { padding: 10px 14px; border-radius: 14px; max-width: 80%; font-size: 15px; }
+        .msg.out { background: var(--msg-out); align-self: flex-end; border-bottom-right-radius: 4px; }
+        .msg.in { background: var(--msg-in); align-self: flex-start; border-bottom-left-radius: 4px; }
+        .input-area { padding: 10px; display: flex; gap: 10px; background: var(--glass); border-top: 1px solid var(--glass-border); }
+        .msg-input { flex: 1; padding: 12px; border-radius: 20px; border: none; background: rgba(255,255,255,0.1); color: white; outline: none; font-size: 15px; }
+        .send-btn { background: var(--accent); border: none; color: white; width: 45px; height: 45px; border-radius: 50%; font-size: 16px; cursor: pointer; }
+
+        /* ПРОФИЛЬ */
+        .profile-card { padding: 20px; text-align: center; margin-bottom: 20px; }
+        .profile-avatar { width: 90px; height: 90px; border-radius: 50%; background: var(--accent); margin: 0 auto 15px; display: flex; justify-content: center; align-items: center; font-size: 36px; font-weight: bold; }
+        .info-row { display: flex; justify-content: space-between; padding: 14px; border-bottom: 1px solid var(--glass-border); font-size: 15px; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: var(--muted); }
 
         /* КАЗИНО */
+        .casino-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .casino-tab { flex: 1; padding: 12px; text-align: center; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 10px; background: rgba(255,255,255,0.05); color: var(--muted); }
+        .casino-tab.active { background: var(--accent); color: white; }
         .game-box { padding: 20px; margin-bottom: 20px; text-align: center; }
-        .modal-input { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 10px; color: white; margin-bottom: 10px; outline: none; text-align: center; font-size: 16px;}
-        .btn { width: 100%; padding: 15px; background: var(--accent); border: none; border-radius: 12px; color: white; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 10px; }
-        
+        .modal-input { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 10px; color: white; margin-bottom: 10px; outline: none; text-align: center; font-size: 15px;}
+        .btn { width: 100%; padding: 14px; background: var(--accent); border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+
         /* НИЖНЕЕ МЕНЮ */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--glass); backdrop-filter: blur(20px); display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid var(--glass-border); z-index: 10; }
-        .nav-item { text-align: center; color: #888; font-size: 11px; cursor: pointer; flex: 1; font-weight: 500; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--glass); backdrop-filter: blur(20px); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid var(--glass-border); z-index: 10; }
+        .nav-item { text-align: center; color: var(--muted); font-size: 11px; cursor: pointer; flex: 1; font-weight: 500; }
         .nav-item.active { color: var(--accent); }
-
-        /* КНОПКА КАРАНДАШ (СНИЗУ СЛЕВА) */
-        .create-btn { position: fixed; bottom: 90px; left: 20px; width: 56px; height: 56px; background: var(--accent); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; box-shadow: 0 4px 15px rgba(10, 132, 255, 0.5); z-index: 11; }
-
-        /* ВЫЕЗЖАЮЩЕЕ МЕНЮ (ПОЛОСОЧКИ) */
-        .drawer { position: fixed; top: 0; right: -300px; width: 300px; height: 100%; background: rgba(20,20,30,0.95); backdrop-filter: blur(30px); z-index: 100; transition: right 0.3s ease; padding: 20px; border-left: 1px solid var(--glass-border); }
-        .drawer.open { right: 0; }
-        .drawer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .drawer-close { cursor: pointer; font-size: 28px; color: #aaa; }
-        .drawer-item { padding: 15px 0; border-bottom: 1px solid var(--glass-border); display: flex; align-items: center; gap: 15px; cursor: pointer; font-size: 16px; }
-
-        /* МОДАЛЬНЫЕ ОКНА */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 200; justify-content: flex-end; flex-direction: column; padding: 20px; }
-        .modal-content { background: var(--glass); backdrop-filter: blur(30px); border-radius: 20px; padding: 20px; width: 100%; max-width: 400px; margin: 0 auto 20px; border: 1px solid var(--glass-border); }
-        .modal-btn { display: flex; align-items: center; gap: 15px; padding: 15px; font-size: 16px; cursor: pointer; border-radius: 10px; }
 
         /* АДМИНКА */
         #adminPanel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); z-index: 9999; flex-direction: column; }
         .admin-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); }
         .admin-list { flex: 1; overflow-y: auto; padding: 15px; }
         .user-card { padding: 15px; margin-bottom: 15px; }
-        .role-badge { padding: 3px 8px; border-radius: 5px; font-size: 12px; font-weight: bold; }
-        .role-owner { background: var(--gold); color: #000; }
-        .role-admin { background: var(--accent); color: #fff; }
-        .role-user { background: #333; color: #aaa; }
-        .admin-buttons { display: flex; gap: 5px; margin-top: 10px; }
-        .admin-btn { flex: 1; padding: 8px; font-size: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .role-badge { padding: 3px 8px; border-radius: 5px; font-size: 12px; font-weight: bold; background: #333; }
+        .admin-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 10px; }
+        .admin-btn { padding: 8px; font-size: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: white; }
     </style>
 </head>
 <body>
 
-    <!-- ВЫЕЗЖАЮЩЕЕ МЕНЮ СПРАВА -->
-    <div class="drawer" id="drawerMenu">
-        <div class="drawer-header">
-            <div style="font-size: 20px; font-weight: bold;">Меню</div>
-            <div class="drawer-close" onclick="toggleDrawer()">×</div>
+    <div id="chatScreen">
+        <div class="chat-header">
+            <div class="back-btn" onclick="closeChat()">←</div>
+            <div class="chat-title" id="chatTitle">Чат</div>
         </div>
-        <div class="drawer-item" onclick="alert('Добавить аккаунт')">👤 Добавить аккаунт</div>
-        <div class="drawer-item" onclick="alert('Мой профиль')">⭐ Мой профиль</div>
-        <div class="drawer-item" onclick="alert('Избранные контакты')">⭐ Избранные</div>
-        <div class="drawer-item" onclick="alert('Контакты')">👥 Контакты</div>
-        <div class="drawer-item" onclick="switchTab('settings'); toggleDrawer()">⚙️ Настройки</div>
+        <div class="messages-area" id="messagesArea"></div>
+        <div class="input-area">
+            <input type="text" class="msg-input" id="msgInput" placeholder="Написать сообщение...">
+            <button class="send-btn" onclick="sendMessage()">→</button>
+        </div>
     </div>
 
-    <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
     <div id="mainApp">
         <div class="header">
-            <div class="header-title">Pepegram 🐸</div>
-            <!-- Кнопка админки (скрыта по умолчанию) -->
-            <div id="adminBtn" style="cursor:pointer; font-size:24px; display:none;" onclick="openAdmin()">👑</div>
-            <!-- Три полосочки -->
-            <div class="menu-btn" onclick="toggleDrawer()">☰</div>
+            <div class="header-title">Pepegram</div>
+            <div id="adminBtn" style="cursor:pointer; font-size:20px; display:none; color:var(--gold);" onclick="openAdmin()">A</div>
         </div>
 
         <div class="content">
-            <!-- ЧАТЫ -->
             <div class="tab-content active" id="tab-chats">
-                <div class="glass settings-group">
-                    <div class="settings-item">
-                        <div style="width:50px; height:50px; border-radius:50%; background:var(--accent); display:flex; justify-content:center; align-items:center; font-weight:bold;">P</div>
-                        <div style="flex:1;">
-                            <div style="font-weight:600;">Pepegram Chat</div>
-                            <div style="font-size:13px; color:#aaa;">Вы подписаны</div>
-                        </div>
-                    </div>
+                <div class="chat-item glass" onclick="openChat('pepegram_chat')">
+                    <div class="chat-avatar">P</div>
+                    <div class="chat-info"><div class="chat-name">Pepegram Chat</div><div class="chat-msg">Общий чат</div></div>
+                </div>
+                <div class="chat-item glass" onclick="openChat('pepegram_channel')">
+                    <div class="chat-avatar" style="background:var(--gold);">C</div>
+                    <div class="chat-info"><div class="chat-name">Pepegram Channel</div><div class="chat-msg">Канал</div></div>
                 </div>
             </div>
 
-            <!-- ПРОФИЛЬ -->
             <div class="tab-content" id="tab-profile">
                 <div class="glass profile-card">
-                    <div class="profile-avatar">D</div>
-                    <h2 id="profileName">doctor</h2>
+                    <div class="profile-avatar" id="profAvatar">D</div>
+                    <h2 id="profileName">Загрузка...</h2>
                     <div id="roleText" style="color: var(--gold); font-size: 14px; font-weight: bold; margin-bottom: 15px;"></div>
                     <div class="info-row"><span class="info-label">ID</span><span id="profileId">...</span></div>
-                    <div class="info-row"><span class="info-label">⭐ Звезды</span><span id="profileStars">0</span></div>
-                    <div class="info-row"><span class="info-label">🟢 Граммы</span><span id="profileGrams">0</span></div>
+                    <div class="info-row"><span class="info-label">Звезды</span><span id="profileStars">0</span></div>
+                    <div class="info-row"><span class="info-label">Граммы</span><span id="profileGrams">0</span></div>
                 </div>
             </div>
 
-            <!-- КАЗИНО -->
             <div class="tab-content" id="tab-casino">
-                <div class="glass game-box">
-                    <div style="font-size:18px; font-weight:bold; margin-bottom:15px;">📈 Апгрейдер (x2)</div>
-                    <input type="number" id="upgAmount" class="modal-input" placeholder="Сумма ставки">
-                    <button class="btn" style="background:var(--green); color:#000;" onclick="playUpgrader()">Апгрейд</button>
+                <div class="casino-tabs">
+                    <div class="casino-tab active" onclick="switchCasinoTab('crash')">Краш</div>
+                    <div class="casino-tab" onclick="switchCasinoTab('roulette')">Рулетка</div>
+                    <div class="casino-tab" onclick="switchCasinoTab('rocket')">Ракетка</div>
                 </div>
-                <div class="glass game-box">
-                    <div style="font-size:18px; font-weight:bold; margin-bottom:15px;">🚀 Ракетка (x3)</div>
+                <div id="casino-crash" class="game-box glass">
+                    <div style="font-size:18px; font-weight:bold; margin-bottom:15px;">Краш</div>
+                    <input type="number" id="crashAmount" class="modal-input" placeholder="Сумма ставки">
+                    <button class="btn" style="background:var(--green); color:#000;" onclick="playCrash()">Ставка</button>
+                </div>
+                <div id="casino-roulette" class="game-box glass" style="display:none;">
+                    <div style="font-size:18px; font-weight:bold; margin-bottom:15px;">Рулетка</div>
+                    <input type="number" id="rouletteAmount" class="modal-input" placeholder="Сумма ставки">
+                    <button class="btn" style="background:var(--gold); color:#000;" onclick="playRoulette()">Крутить</button>
+                </div>
+                <div id="casino-rocket" class="game-box glass" style="display:none;">
+                    <div style="font-size:18px; font-weight:bold; margin-bottom:15px;">Ракетка</div>
                     <input type="number" id="rocketAmount" class="modal-input" placeholder="Сумма ставки">
-                    <button class="btn" style="background:var(--gold); color:#000;" onclick="playRocket()">Запустить</button>
-                </div>
-            </div>
-
-            <!-- НАСТРОЙКИ -->
-            <div class="tab-content" id="tab-settings">
-                <div class="glass settings-group">
-                    <div class="settings-title">Аккаунт</div>
-                    <div class="settings-item"><span class="settings-icon">👤</span> Профиль</div>
-                    <div class="settings-item"><span class="settings-icon">🎨</span> Кастомизация</div>
-                </div>
-                <div class="glass settings-group">
-                    <div class="settings-title">СтатиГрамм</div>
-                    <div class="settings-item"><span class="settings-icon">⭐</span> Premium <span class="settings-value">Активен</span></div>
-                    <div class="settings-item"><span class="settings-icon">💰</span> Мои звезды</div>
-                </div>
-                <div class="glass settings-group">
-                    <div class="settings-title">Общие</div>
-                    <div class="settings-item"><span class="settings-icon">🔒</span> Конфиденциальность</div>
-                    <div class="settings-item"><span class="settings-icon">🌐</span> Язык <span class="settings-value">Русский</span></div>
-                    <div class="settings-item"><span class="settings-icon">📱</span> Активные сеансы</div>
+                    <button class="btn" style="background:var(--accent); color:#fff;" onclick="playRocket()">Запуск</button>
                 </div>
             </div>
         </div>
 
-        <!-- КНОПКА КАРАНДАШ (СНИЗУ СЛЕВА) -->
-        <div class="create-btn" onclick="openCreateModal()">✏️</div>
-
-        <!-- НИЖНЕЕ МЕНЮ -->
         <div class="bottom-nav">
-            <div class="nav-item active" onclick="switchTab('chats', this)">💬<br>Чаты</div>
-            <div class="nav-item" onclick="switchTab('casino', this)">🎰<br>Казино</div>
-            <div class="nav-item" onclick="switchTab('settings', this)">⚙️<br>Настройки</div>
-            <div class="nav-item" onclick="switchTab('profile', this)">👤<br>Профиль</div>
-        </div>
-    </div>
-
-    <!-- МОДАЛЬНОЕ ОКНО СОЗДАНИЯ -->
-    <div class="modal-overlay" id="createModal" onclick="closeCreateModal(event)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-btn" onclick="alert('Создать канал')">📢 Создать канал</div>
-            <div class="modal-btn" onclick="alert('Создать группу')">👥 Создать группу</div>
-            <div class="modal-btn" onclick="alert('Новое сообщество')">🌐 Новое сообщество</div>
+            <div class="nav-item active" onclick="switchTab('chats', this)">Чаты</div>
+            <div class="nav-item" onclick="switchTab('casino', this)">Казино</div>
+            <div class="nav-item" onclick="switchTab('profile', this)">Профиль</div>
         </div>
     </div>
 
     <!-- АДМИН ПАНЕЛЬ -->
     <div id="adminPanel">
         <div class="admin-header">
-            <div style="font-weight:bold; font-size:20px;">Панель Владельца</div>
-            <button style="background:var(--red); color:white; border:none; padding:10px 15px; border-radius:8px; cursor:pointer; font-weight:bold;" onclick="document.getElementById('adminPanel').style.display='none'">Закрыть</button>
+            <div style="font-weight:bold; font-size:18px;">Панель Владельца</div>
+            <button style="background:var(--red); color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;" onclick="document.getElementById('adminPanel').style.display='none'">Закрыть</button>
         </div>
         <div class="admin-list" id="adminList"></div>
     </div>
@@ -206,14 +160,12 @@
         const API_URL = "https://fame-api-bs11.onrender.com";
         const tg = window.Telegram.WebApp;
         tg.expand();
-        const MY_TELEGRAM_ID = "1780245651"; // Твой ID
+        const MY_TELEGRAM_ID = "1780245651"; 
         let currentUsername = "doctor";
-
         if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.username) {
             currentUsername = tg.initDataUnsafe.user.username;
         }
-
-        function toggleDrawer() { document.getElementById('drawerMenu').classList.toggle('open'); }
+        let currentChat = "";
 
         function switchTab(tabId, element) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -222,8 +174,40 @@
             if (element) element.classList.add('active');
         }
 
-        function openCreateModal() { document.getElementById('createModal').style.display = 'flex'; }
-        function closeCreateModal(e) { if (e.target.id === 'createModal') document.getElementById('createModal').style.display = 'none'; }
+        function openChat(chatName) {
+            currentChat = chatName;
+            document.getElementById('chatScreen').style.display = 'flex';
+            document.getElementById('chatTitle').innerText = chatName === 'pepegram_chat' ? 'Pepegram Chat' : 'Pepegram Channel';
+            loadMessages();
+        }
+        function closeChat() { document.getElementById('chatScreen').style.display = 'none'; }
+        function loadMessages() {
+            const area = document.getElementById('messagesArea');
+            area.innerHTML = "Загрузка...";
+            fetch(API_URL + '/api/get_messages', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user1: currentUsername, user2: currentChat })
+            }).then(res => res.json()).then(messages => {
+                area.innerHTML = "";
+                if (messages.length === 0) area.innerHTML = "Нет сообщений.";
+                messages.forEach(m => {
+                    const div = document.createElement('div');
+                    div.className = 'msg ' + (m.sender === currentUsername ? 'out' : 'in');
+                    div.innerText = m.text;
+                    area.appendChild(div);
+                });
+                area.scrollTop = area.scrollHeight;
+            });
+        }
+        function sendMessage() {
+            const input = document.getElementById('msgInput');
+            const text = input.value.trim();
+            if (!text) return;
+            fetch(API_URL + '/api/send_message', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sender: currentUsername, receiver: currentChat, text: text })
+            }).then(() => { input.value = ""; loadMessages(); });
+        }
 
         function loadProfile() {
             fetch(API_URL + '/api/profile/' + currentUsername)
@@ -233,37 +217,31 @@
                 document.getElementById('profileId').innerText = data.user_id;
                 document.getElementById('profileStars').innerText = data.stars;
                 document.getElementById('profileGrams').innerText = data.grams;
-
-                const roleMap = { 'owner': '👑 Владелец', 'head_admin': '🛡 Гл. Админ', 'admin': '🛠 Админ', 'user': '👤 Игрок' };
+                const roleMap = { 'owner': 'Владелец', 'head_admin': 'Гл. Админ', 'admin': 'Админ', 'user': 'Игрок' };
                 document.getElementById('roleText').innerText = roleMap[data.role] || 'Игрок';
-
-                // Показываем кнопку админки только тебе
                 const myTgId = tg.initDataUnsafe.user ? String(tg.initDataUnsafe.user.id) : MY_TELEGRAM_ID;
                 if (myTgId === MY_TELEGRAM_ID || data.user_id === MY_TELEGRAM_ID) {
                     document.getElementById('adminBtn').style.display = 'block';
                 } else {
                     document.getElementById('adminBtn').style.display = 'none';
                 }
-            }).catch(err => console.log("Сервер спит"));
+            });
         }
 
-        // КАЗИНО
-        function playUpgrader() {
-            const amount = parseInt(document.getElementById('upgAmount').value);
+        function playCrash() {
+            const amount = parseInt(document.getElementById('crashAmount').value);
             if (!amount) return alert("Введите сумму");
-            fetch(API_URL + '/api/casino/upgrader', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: currentUsername, amount: amount })
-            }).then(res => res.json()).then(data => { alert(data.message || data.error); loadProfile(); });
+            fetch(API_URL + '/api/casino/upgrader', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: currentUsername, amount: amount }) })
+            .then(res => res.json()).then(data => { alert(data.message || data.error); loadProfile(); });
         }
-
-        function playRocket() {
-            const amount = parseInt(document.getElementById('rocketAmount').value);
-            if (!amount) return alert("Введите сумму");
-            fetch(API_URL + '/api/casino/rocket', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: currentUsername, amount: amount })
-            }).then(res => res.json()).then(data => { alert(data.message || data.error); loadProfile(); });
+        function playRoulette() { alert("Рулетка (имитация)"); }
+        function playRocket() { alert("Ракетка (имитация)"); }
+        function switchCasinoTab(tab) {
+            document.querySelectorAll('.casino-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.game-box').forEach(t => t.style.display = 'none');
+            if (tab === 'crash') { document.getElementById('casino-crash').style.display = 'block'; event.target.classList.add('active'); }
+            if (tab === 'roulette') { document.getElementById('casino-roulette').style.display = 'block'; event.target.classList.add('active'); }
+            if (tab === 'rocket') { document.getElementById('casino-rocket').style.display = 'block'; event.target.classList.add('active'); }
         }
 
         // АДМИНКА
@@ -281,35 +259,32 @@
                 users.forEach(u => {
                     const card = document.createElement('div');
                     card.className = 'glass user-card';
-                    let roleText = "Игрок"; let roleClass = "role-user";
-                    if (u.role === 'owner') { roleText = "👑 Владелец"; roleClass = "role-owner"; }
-                    else if (u.role === 'head_admin') { roleText = "🛡 Гл. Админ"; roleClass = "role-admin"; }
-                    else if (u.role === 'admin') { roleText = "🛠 Админ"; roleClass = "role-admin"; }
-                    
                     card.innerHTML = `
                         <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
                             <div style="font-weight:bold;">@${u.username}</div>
-                            <div class="role-badge ${roleClass}">${roleText}</div>
+                            <div class="role-badge" style="background:${u.role === 'owner' ? 'var(--gold)' : 'var(--accent)'};">${u.role}</div>
                         </div>
-                        <div style="font-size:13px; color:#aaa; margin-bottom:10px;">ID: ${u.user_id} | ⭐ ${u.stars}</div>
+                        <div style="font-size:13px; color:#aaa; margin-bottom:10px;">ID: ${u.user_id} | Звезды: ${u.stars} | Заморожен: ${u.is_frozen ? 'Да' : 'Нет'}</div>
                         <div class="admin-buttons">
-                            <button class="admin-btn" style="background:var(--accent); color:#fff;" onclick="setRole('${u.username}', 'admin')">Админ</button>
-                            <button class="admin-btn" style="background:var(--gold); color:#000;" onclick="setRole('${u.username}', 'head_admin')">Гл. Админ</button>
-                            <button class="admin-btn" style="background:#333; color:#fff;" onclick="setRole('${u.username}', 'user')">Снять</button>
+                            <button class="admin-btn" style="background:var(--red);" onclick="adminAction('freeze', '${u.username}')">Заморозить</button>
+                            <button class="admin-btn" style="background:var(--green);" onclick="adminAction('unfreeze', '${u.username}')">Разморозить</button>
+                            <button class="admin-btn" style="background:var(--accent);" onclick="adminAction('give_stars', '${u.username}', 1000)">+1000 Звезд</button>
+                            <button class="admin-btn" style="background:#555;" onclick="adminAction('set_role', '${u.username}', 'admin')">Дать Админа</button>
+                            <button class="admin-btn" style="background:var(--gold); color: #000;" onclick="adminAction('set_role', '${u.username}', 'head_admin')">Дать Гл. Админа</button>
+                            <button class="admin-btn" style="background:#333;" onclick="adminAction('set_role', '${u.username}', 'user')">Снять</button>
                         </div>
                     `;
                     list.appendChild(card);
                 });
-            }).catch(err => list.innerHTML = "Ошибка сервера.");
+            });
         }
-
-        function setRole(target, role) {
-            fetch(API_URL + '/api/admin/set_role', {
+        function adminAction(action, target, value = 0) {
+            fetch(API_URL + '/api/admin/action', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ requester: currentUsername, target: target, role: role })
+                body: JSON.stringify({ action: action, target: target, value: value })
             }).then(res => res.json()).then(data => {
-                if (data.error) alert(data.error);
-                else { alert(data.msg); loadAdminUsers(); }
+                alert(data.msg);
+                loadAdminUsers();
             });
         }
 
