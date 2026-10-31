@@ -7,7 +7,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg: #000000;
             --glass: rgba(255, 255, 255, 0.1);
             --glass-border: rgba(255, 255, 255, 0.2);
             --text: #ffffff;
@@ -15,57 +14,72 @@
             --gold: #ffd60a;
             --green: #30d158;
             --red: #ff453a;
+            --bg: #000000;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; background-image: radial-gradient(circle at top right, #1a1a2e, #000000); }
 
-        .glass { background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 20px; }
+        /* СТЕКЛО */
+        .glass { background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 16px; }
 
-        #mainApp { display: flex; height: 100%; flex-direction: column; }
-        .header { padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; background: var(--glass); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); }
-        .header-title { font-size: 22px; font-weight: 700; color: #fff; }
-        
-        .content { flex: 1; overflow-y: auto; padding-bottom: 90px; padding: 15px; }
+        #mainApp { display: flex; height: 100%; flex-direction: column; position: relative; }
+
+        /* ШАПКА */
+        .header { padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; background: var(--glass); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); z-index: 10; }
+        .header-title { font-size: 22px; font-weight: 700; }
+        .menu-btn { cursor: pointer; font-size: 24px; }
+
+        .content { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 100px; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
+        /* ПРОФИЛЬ */
         .profile-card { padding: 25px; text-align: center; margin-bottom: 20px; }
-        .avatar-container { position: relative; width: 100px; height: 100px; margin: 0 auto 15px; }
-        .profile-avatar { width: 100%; height: 100%; border-radius: 50%; background: var(--accent); display: flex; justify-content: center; align-items: center; font-size: 40px; font-weight: bold; color: #fff; }
-        
-        .frame-gold { border: 4px solid #ffd60a; box-shadow: 0 0 15px #ffd60a; }
-        .frame-red { border: 4px solid #ff453a; box-shadow: 0 0 15px #ff453a; }
-        .frame-blue { border: 4px solid #0a84ff; box-shadow: 0 0 15px #0a84ff; }
-
+        .profile-avatar { width: 100px; height: 100px; border-radius: 50%; background: var(--accent); margin: 0 auto 15px; display: flex; justify-content: center; align-items: center; font-size: 40px; font-weight: bold; }
         .info-row { display: flex; justify-content: space-between; padding: 15px; border-bottom: 1px solid var(--glass-border); font-size: 16px; }
         .info-row:last-child { border-bottom: none; }
         .info-label { color: #aaa; }
 
-        .settings-box { padding: 20px; margin-bottom: 20px; }
-        .settings-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; color: #fff; }
-        .color-picker { display: flex; gap: 10px; margin-bottom: 15px; }
-        .color-circle { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
-        .color-circle.active { border-color: #fff; transform: scale(1.1); }
-        .frame-picker { display: flex; gap: 10px; margin-bottom: 15px; }
-        .frame-option { padding: 10px 15px; border-radius: 10px; background: rgba(255,255,255,0.1); cursor: pointer; font-size: 14px; border: 1px solid transparent; }
-        .frame-option.active { border-color: var(--accent); background: rgba(10,132,255,0.3); }
+        /* НАСТРОЙКИ */
+        .settings-group { margin-bottom: 20px; overflow: hidden; }
+        .settings-title { font-size: 13px; color: #aaa; padding: 15px 15px 5px 15px; text-transform: uppercase; }
+        .settings-item { padding: 15px; border-bottom: 1px solid var(--glass-border); cursor: pointer; display: flex; align-items: center; gap: 15px; font-size: 16px; }
+        .settings-item:last-child { border-bottom: none; }
+        .settings-icon { width: 30px; font-size: 20px; text-align: center; }
+        .settings-value { margin-left: auto; color: #888; font-size: 14px; }
 
-        .btn { width: 100%; padding: 15px; background: var(--accent); border: none; border-radius: 12px; color: white; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: 0.2s; }
-        .btn:active { transform: scale(0.98); opacity: 0.8; }
-
+        /* КАЗИНО */
+        .game-box { padding: 20px; margin-bottom: 20px; text-align: center; }
+        .modal-input { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 10px; color: white; margin-bottom: 10px; outline: none; text-align: center; font-size: 16px;}
+        .btn { width: 100%; padding: 15px; background: var(--accent); border: none; border-radius: 12px; color: white; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        
+        /* НИЖНЕЕ МЕНЮ */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--glass); backdrop-filter: blur(20px); display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid var(--glass-border); z-index: 10; }
         .nav-item { text-align: center; color: #888; font-size: 11px; cursor: pointer; flex: 1; font-weight: 500; }
         .nav-item.active { color: var(--accent); }
 
+        /* КНОПКА КАРАНДАШ (СНИЗУ СЛЕВА) */
+        .create-btn { position: fixed; bottom: 90px; left: 20px; width: 56px; height: 56px; background: var(--accent); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; box-shadow: 0 4px 15px rgba(10, 132, 255, 0.5); z-index: 11; }
+
+        /* ВЫЕЗЖАЮЩЕЕ МЕНЮ (ПОЛОСОЧКИ) */
+        .drawer { position: fixed; top: 0; right: -300px; width: 300px; height: 100%; background: rgba(20,20,30,0.95); backdrop-filter: blur(30px); z-index: 100; transition: right 0.3s ease; padding: 20px; border-left: 1px solid var(--glass-border); }
+        .drawer.open { right: 0; }
+        .drawer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .drawer-close { cursor: pointer; font-size: 28px; color: #aaa; }
+        .drawer-item { padding: 15px 0; border-bottom: 1px solid var(--glass-border); display: flex; align-items: center; gap: 15px; cursor: pointer; font-size: 16px; }
+
+        /* МОДАЛЬНЫЕ ОКНА */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 200; justify-content: flex-end; flex-direction: column; padding: 20px; }
+        .modal-content { background: var(--glass); backdrop-filter: blur(30px); border-radius: 20px; padding: 20px; width: 100%; max-width: 400px; margin: 0 auto 20px; border: 1px solid var(--glass-border); }
+        .modal-btn { display: flex; align-items: center; gap: 15px; padding: 15px; font-size: 16px; cursor: pointer; border-radius: 10px; }
+
         /* АДМИНКА */
-        #adminPanel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); z-index: 9999; flex-direction: column; }
+        #adminPanel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); z-index: 9999; flex-direction: column; }
         .admin-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); }
         .admin-list { flex: 1; overflow-y: auto; padding: 15px; }
         .user-card { padding: 15px; margin-bottom: 15px; }
-        .user-card-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
         .role-badge { padding: 3px 8px; border-radius: 5px; font-size: 12px; font-weight: bold; }
         .role-owner { background: var(--gold); color: #000; }
-        .role-head_admin { background: var(--red); color: #fff; }
         .role-admin { background: var(--accent); color: #fff; }
         .role-user { background: #333; color: #aaa; }
         .admin-buttons { display: flex; gap: 5px; margin-top: 10px; }
@@ -74,60 +88,108 @@
 </head>
 <body>
 
+    <!-- ВЫЕЗЖАЮЩЕЕ МЕНЮ СПРАВА -->
+    <div class="drawer" id="drawerMenu">
+        <div class="drawer-header">
+            <div style="font-size: 20px; font-weight: bold;">Меню</div>
+            <div class="drawer-close" onclick="toggleDrawer()">×</div>
+        </div>
+        <div class="drawer-item" onclick="alert('Добавить аккаунт')">👤 Добавить аккаунт</div>
+        <div class="drawer-item" onclick="alert('Мой профиль')">⭐ Мой профиль</div>
+        <div class="drawer-item" onclick="alert('Избранные контакты')">⭐ Избранные</div>
+        <div class="drawer-item" onclick="alert('Контакты')">👥 Контакты</div>
+        <div class="drawer-item" onclick="switchTab('settings'); toggleDrawer()">⚙️ Настройки</div>
+    </div>
+
+    <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
     <div id="mainApp">
         <div class="header">
             <div class="header-title">Pepegram 🐸</div>
             <!-- Кнопка админки (скрыта по умолчанию) -->
-            <div id="adminBtn" style="cursor:pointer; font-size:24px; display:none;" onclick="openAdmin()">⚙️</div>
+            <div id="adminBtn" style="cursor:pointer; font-size:24px; display:none;" onclick="openAdmin()">👑</div>
+            <!-- Три полосочки -->
+            <div class="menu-btn" onclick="toggleDrawer()">☰</div>
         </div>
 
         <div class="content">
+            <!-- ЧАТЫ -->
             <div class="tab-content active" id="tab-chats">
-                <div class="glass settings-box">
-                    <div class="settings-title">Pepegram Chat</div>
-                    <div style="color:#aaa; font-size:14px;">Вы подписаны автоматически</div>
+                <div class="glass settings-group">
+                    <div class="settings-item">
+                        <div style="width:50px; height:50px; border-radius:50%; background:var(--accent); display:flex; justify-content:center; align-items:center; font-weight:bold;">P</div>
+                        <div style="flex:1;">
+                            <div style="font-weight:600;">Pepegram Chat</div>
+                            <div style="font-size:13px; color:#aaa;">Вы подписаны</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
+            <!-- ПРОФИЛЬ -->
             <div class="tab-content" id="tab-profile">
                 <div class="glass profile-card">
-                    <div class="avatar-container">
-                        <div class="profile-avatar" id="profAvatar">D</div>
-                    </div>
-                    <h2 id="profileName" style="color: #fff; margin-bottom: 5px;">Загрузка...</h2>
+                    <div class="profile-avatar">D</div>
+                    <h2 id="profileName">doctor</h2>
                     <div id="roleText" style="color: var(--gold); font-size: 14px; font-weight: bold; margin-bottom: 15px;"></div>
-                    
                     <div class="info-row"><span class="info-label">ID</span><span id="profileId">...</span></div>
-                    <div class="info-row"><span class="info-label">⭐ Звезды</span><span id="profileStars" style="color:var(--gold);">0</span></div>
-                    <div class="info-row"><span class="info-label">🟢 Граммы</span><span id="profileGrams" style="color:var(--green);">0</span></div>
+                    <div class="info-row"><span class="info-label">⭐ Звезды</span><span id="profileStars">0</span></div>
+                    <div class="info-row"><span class="info-label">🟢 Граммы</span><span id="profileGrams">0</span></div>
                 </div>
+            </div>
 
-                <div class="glass settings-box">
-                    <div class="settings-title">🎨 Кастомизация профиля</div>
-                    <div style="margin-bottom: 10px; color: #aaa; font-size: 13px;">Цвет ника:</div>
-                    <div class="color-picker">
-                        <div class="color-circle" style="background: #ffffff;" onclick="setColor('#ffffff', this)"></div>
-                        <div class="color-circle" style="background: #ff453a;" onclick="setColor('#ff453a', this)"></div>
-                        <div class="color-circle" style="background: #30d158;" onclick="setColor('#30d158', this)"></div>
-                        <div class="color-circle" style="background: #0a84ff;" onclick="setColor('#0a84ff', this)"></div>
-                        <div class="color-circle" style="background: #ffd60a;" onclick="setColor('#ffd60a', this)"></div>
-                    </div>
+            <!-- КАЗИНО -->
+            <div class="tab-content" id="tab-casino">
+                <div class="glass game-box">
+                    <div style="font-size:18px; font-weight:bold; margin-bottom:15px;">📈 Апгрейдер (x2)</div>
+                    <input type="number" id="upgAmount" class="modal-input" placeholder="Сумма ставки">
+                    <button class="btn" style="background:var(--green); color:#000;" onclick="playUpgrader()">Апгрейд</button>
+                </div>
+                <div class="glass game-box">
+                    <div style="font-size:18px; font-weight:bold; margin-bottom:15px;">🚀 Ракетка (x3)</div>
+                    <input type="number" id="rocketAmount" class="modal-input" placeholder="Сумма ставки">
+                    <button class="btn" style="background:var(--gold); color:#000;" onclick="playRocket()">Запустить</button>
+                </div>
+            </div>
 
-                    <div style="margin-bottom: 10px; color: #aaa; font-size: 13px;">Рамка аватарки:</div>
-                    <div class="frame-picker">
-                        <div class="frame-option" onclick="setFrame('none', this)">Нет</div>
-                        <div class="frame-option" onclick="setFrame('gold', this)">Золото</div>
-                        <div class="frame-option" onclick="setFrame('red', this)">Огонь</div>
-                        <div class="frame-option" onclick="setFrame('blue', this)">Неон</div>
-                    </div>
-                    <button class="btn" onclick="saveCustomization()">Сохранить стиль</button>
+            <!-- НАСТРОЙКИ -->
+            <div class="tab-content" id="tab-settings">
+                <div class="glass settings-group">
+                    <div class="settings-title">Аккаунт</div>
+                    <div class="settings-item"><span class="settings-icon">👤</span> Профиль</div>
+                    <div class="settings-item"><span class="settings-icon">🎨</span> Кастомизация</div>
+                </div>
+                <div class="glass settings-group">
+                    <div class="settings-title">СтатиГрамм</div>
+                    <div class="settings-item"><span class="settings-icon">⭐</span> Premium <span class="settings-value">Активен</span></div>
+                    <div class="settings-item"><span class="settings-icon">💰</span> Мои звезды</div>
+                </div>
+                <div class="glass settings-group">
+                    <div class="settings-title">Общие</div>
+                    <div class="settings-item"><span class="settings-icon">🔒</span> Конфиденциальность</div>
+                    <div class="settings-item"><span class="settings-icon">🌐</span> Язык <span class="settings-value">Русский</span></div>
+                    <div class="settings-item"><span class="settings-icon">📱</span> Активные сеансы</div>
                 </div>
             </div>
         </div>
 
+        <!-- КНОПКА КАРАНДАШ (СНИЗУ СЛЕВА) -->
+        <div class="create-btn" onclick="openCreateModal()">✏️</div>
+
+        <!-- НИЖНЕЕ МЕНЮ -->
         <div class="bottom-nav">
             <div class="nav-item active" onclick="switchTab('chats', this)">💬<br>Чаты</div>
+            <div class="nav-item" onclick="switchTab('casino', this)">🎰<br>Казино</div>
+            <div class="nav-item" onclick="switchTab('settings', this)">⚙️<br>Настройки</div>
             <div class="nav-item" onclick="switchTab('profile', this)">👤<br>Профиль</div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО СОЗДАНИЯ -->
+    <div class="modal-overlay" id="createModal" onclick="closeCreateModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-btn" onclick="alert('Создать канал')">📢 Создать канал</div>
+            <div class="modal-btn" onclick="alert('Создать группу')">👥 Создать группу</div>
+            <div class="modal-btn" onclick="alert('Новое сообщество')">🌐 Новое сообщество</div>
         </div>
     </div>
 
@@ -142,22 +204,16 @@
 
     <script>
         const API_URL = "https://fame-api-bs11.onrender.com";
-        
-        // Получаем данные из Telegram WebApp
         const tg = window.Telegram.WebApp;
         tg.expand();
-        
-        // Твой цифровой ID в Telegram (если он не подтянется автоматически)
-        // ВАЖНО: Сюда впиши свой реальный ID, чтобы кнопка админки появилась.
-        const MY_TELEGRAM_ID = "1780245651"; // <--- ЗАМЕНИ НА СВОЙ ID
+        const MY_TELEGRAM_ID = "1780245651"; // Твой ID
+        let currentUsername = "doctor";
 
-        let currentUserData = null;
-        let currentUsername = "doctor"; // Ник по умолчанию, если не удалось получить из ТГ
-
-        // Пытаемся получить ник из Telegram
         if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.username) {
             currentUsername = tg.initDataUnsafe.user.username;
         }
+
+        function toggleDrawer() { document.getElementById('drawerMenu').classList.toggle('open'); }
 
         function switchTab(tabId, element) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -166,30 +222,23 @@
             if (element) element.classList.add('active');
         }
 
+        function openCreateModal() { document.getElementById('createModal').style.display = 'flex'; }
+        function closeCreateModal(e) { if (e.target.id === 'createModal') document.getElementById('createModal').style.display = 'none'; }
+
         function loadProfile() {
             fetch(API_URL + '/api/profile/' + currentUsername)
             .then(res => res.json())
             .then(data => {
-                currentUserData = data;
-                
                 document.getElementById('profileName').innerText = data.username;
-                document.getElementById('profileName').style.color = data.name_color;
                 document.getElementById('profileId').innerText = data.user_id;
                 document.getElementById('profileStars').innerText = data.stars;
                 document.getElementById('profileGrams').innerText = data.grams;
 
-                const roleMap = { 'owner': '👑 Владелец', 'head_admin': '🛡 Главный админ', 'admin': '🛠 Админ', 'user': '👤 Игрок' };
+                const roleMap = { 'owner': '👑 Владелец', 'head_admin': '🛡 Гл. Админ', 'admin': '🛠 Админ', 'user': '👤 Игрок' };
                 document.getElementById('roleText').innerText = roleMap[data.role] || 'Игрок';
 
-                const avatar = document.getElementById('profAvatar');
-                avatar.className = 'profile-avatar';
-                if (data.avatar_frame === 'gold') avatar.classList.add('frame-gold');
-                if (data.avatar_frame === 'red') avatar.classList.add('frame-red');
-                if (data.avatar_frame === 'blue') avatar.classList.add('frame-blue');
-
-                // ПРОВЕРКА: Показываем кнопку ТОЛЬКО если твой ID совпадает
+                // Показываем кнопку админки только тебе
                 const myTgId = tg.initDataUnsafe.user ? String(tg.initDataUnsafe.user.id) : MY_TELEGRAM_ID;
-                
                 if (myTgId === MY_TELEGRAM_ID || data.user_id === MY_TELEGRAM_ID) {
                     document.getElementById('adminBtn').style.display = 'block';
                 } else {
@@ -198,40 +247,33 @@
             }).catch(err => console.log("Сервер спит"));
         }
 
-        let selectedColor = '#ffffff';
-        let selectedFrame = 'none';
-
-        function setColor(color, element) {
-            selectedColor = color;
-            document.querySelectorAll('.color-circle').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
-        }
-
-        function setFrame(frame, element) {
-            selectedFrame = frame;
-            document.querySelectorAll('.frame-option').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
-        }
-
-        function saveCustomization() {
-            fetch(API_URL + '/api/customize', {
+        // КАЗИНО
+        function playUpgrader() {
+            const amount = parseInt(document.getElementById('upgAmount').value);
+            if (!amount) return alert("Введите сумму");
+            fetch(API_URL + '/api/casino/upgrader', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: currentUsername, color: selectedColor, frame: selectedFrame })
-            }).then(res => res.json()).then(data => {
-                alert(data.msg);
-                loadProfile();
-            });
+                body: JSON.stringify({ username: currentUsername, amount: amount })
+            }).then(res => res.json()).then(data => { alert(data.message || data.error); loadProfile(); });
         }
 
+        function playRocket() {
+            const amount = parseInt(document.getElementById('rocketAmount').value);
+            if (!amount) return alert("Введите сумму");
+            fetch(API_URL + '/api/casino/rocket', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: currentUsername, amount: amount })
+            }).then(res => res.json()).then(data => { alert(data.message || data.error); loadProfile(); });
+        }
+
+        // АДМИНКА
         function openAdmin() {
             document.getElementById('adminPanel').style.display = 'flex';
             loadAdminUsers();
         }
-
         function loadAdminUsers() {
             const list = document.getElementById('adminList');
-            list.innerHTML = "<div style='text-align:center; color:#aaa; margin-top:20px;'>Загрузка...</div>";
-            
+            list.innerHTML = "Загрузка...";
             fetch(API_URL + '/api/admin/get_all')
             .then(res => res.json())
             .then(users => {
@@ -239,39 +281,36 @@
                 users.forEach(u => {
                     const card = document.createElement('div');
                     card.className = 'glass user-card';
-                    
                     let roleText = "Игрок"; let roleClass = "role-user";
                     if (u.role === 'owner') { roleText = "👑 Владелец"; roleClass = "role-owner"; }
-                    else if (u.role === 'head_admin') { roleText = "🛡 Гл. Админ"; roleClass = "role-head_admin"; }
+                    else if (u.role === 'head_admin') { roleText = "🛡 Гл. Админ"; roleClass = "role-admin"; }
                     else if (u.role === 'admin') { roleText = "🛠 Админ"; roleClass = "role-admin"; }
-
+                    
                     card.innerHTML = `
-                        <div class="user-card-header">
-                            <div style="font-weight:bold; font-size:16px;">@${u.username}</div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                            <div style="font-weight:bold;">@${u.username}</div>
                             <div class="role-badge ${roleClass}">${roleText}</div>
                         </div>
                         <div style="font-size:13px; color:#aaa; margin-bottom:10px;">ID: ${u.user_id} | ⭐ ${u.stars}</div>
                         <div class="admin-buttons">
                             <button class="admin-btn" style="background:var(--accent); color:#fff;" onclick="setRole('${u.username}', 'admin')">Админ</button>
-                            <button class="admin-btn" style="background:var(--red); color:#fff;" onclick="setRole('${u.username}', 'head_admin')">Гл. Админ</button>
+                            <button class="admin-btn" style="background:var(--gold); color:#000;" onclick="setRole('${u.username}', 'head_admin')">Гл. Админ</button>
                             <button class="admin-btn" style="background:#333; color:#fff;" onclick="setRole('${u.username}', 'user')">Снять</button>
                         </div>
                     `;
                     list.appendChild(card);
                 });
-            }).catch(err => list.innerHTML = "<div style='color:red; text-align:center;'>Ошибка сервера.</div>");
+            }).catch(err => list.innerHTML = "Ошибка сервера.");
         }
 
         function setRole(target, role) {
             fetch(API_URL + '/api/admin/set_role', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ requester: currentUsername, target: target, role: role })
-            })
-            .then(res => res.json())
-            .then(data => {
+            }).then(res => res.json()).then(data => {
                 if (data.error) alert(data.error);
                 else { alert(data.msg); loadAdminUsers(); }
-            }).catch(err => alert("Сервер просыпается..."));
+            });
         }
 
         loadProfile();
