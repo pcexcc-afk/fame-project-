@@ -1,465 +1,210 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Pepegram</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-:root{--bg:#f0f4f8;--card:#ffffff;--txt:#1e293b;--dim:#64748b;--line:rgba(0,0,0,0.08);--blue:#0a84ff;--gold:#ffc53d;--green:#34c759;--red:#ff453a;--r:20px;--shadow:0 4px 20px rgba(0,0,0,0.05)}
-*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden}
-body{background:var(--bg);color:var(--txt);font:16px/1.4 -apple-system,BlinkMacSystemFont,sans-serif;transition:0.3s}
-.hide{display:none!important}
-.ic{width:22px;height:22px;flex:none}
-.g{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
-.scr{position:fixed;inset:0;margin:auto;max-width:480px;display:flex;flex-direction:column}
-.top{display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 14px) 18px 8px}
-.top h1{font-size:28px;font-weight:800;letter-spacing:-.02em;flex:1}
-.ib{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--txt);cursor:pointer;border:1px solid var(--line);background:var(--card)}
-.main{flex:1;overflow-y:auto;padding:6px 16px 120px}
-.tabs{position:absolute;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);display:flex;padding:6px;border-radius:28px;z-index:5;background:var(--card);box-shadow:var(--shadow)}
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;border-radius:22px;color:var(--dim);font-size:11px;font-weight:600;background:none;border:0;cursor:pointer;transition:.2s}
-.tab.on{color:var(--blue);background:rgba(10,132,255,0.1)}
-.in{width:100%;background:var(--card);border:1px solid var(--line);border-radius:14px;color:var(--txt);padding:13px 14px;font:inherit;outline:0}
-.in:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(10,132,255,0.15)}
-.btn{border:0;border-radius:14px;padding:13px 16px;font:inherit;font-weight:600;color:#fff;background:var(--blue);cursor:pointer;transition:.15s}
-.btn:active{transform:scale(.97)}
-.btn.green{background:var(--green)}.btn.red{background:var(--red)}
-.btn.ghost{background:var(--card);border:1px solid var(--line);color:var(--txt)}
-.btn.sm{padding:9px 12px;font-size:14px;border-radius:12px}.btn.wide{width:100%}
-.dim{color:var(--dim)}
-#starsCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
-#auth{justify-content:center;padding:28px;gap:14px;text-align:center;z-index:1000;background:var(--bg)}
-.logo{width:92px;height:92px;margin:0 auto 6px;border-radius:28px;display:grid;place-items:center;color:#fff;background:linear-gradient(145deg,#3bb5f5,#1d8fd6);box-shadow:0 10px 20px rgba(10,132,255,0.3)}
-#auth h1{font-size:36px;font-weight:800;letter-spacing:-.03em}
-.search{position:relative;margin-bottom:14px}
-.search .ic{position:absolute;left:13px;top:13px;color:var(--dim);width:20px;height:20px}
-.search .in{padding-left:42px;border-radius:16px}
-.grp{overflow:hidden;margin-bottom:18px}
-.it{display:flex;gap:12px;align-items:center;padding:12px 14px;cursor:pointer;transition:.15s}
-.it:active{background:rgba(0,0,0,0.03)}
-.it+.it{border-top:1px solid var(--line)}
-.it .tx{flex:1;min-width:0}.it b{display:block;font-weight:600}
-.it small{display:block;color:var(--dim);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cav{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;color:#fff;flex:none;font-weight:bold;font-size:20px;background:linear-gradient(145deg,#3bb5f5,#1c6fb0)}
-.lbl{color:var(--dim);font-size:13px;margin:0 6px 7px;text-transform:uppercase}
-.msgs{flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column}
-.msg{max-width:78%;padding:9px 13px;border-radius:18px;margin:4px 0;background:var(--card);border:1px solid var(--line);word-break:break-word}
-.msg.me{margin-left:auto;background:var(--blue);color:#fff;border-color:transparent}
-.msg b{display:block;font-size:13px;color:var(--blue)}
-.msg.me b{color:rgba(255,255,255,0.8)}
-.msg small{display:block;color:var(--dim);font-size:11px;text-align:right;margin-top:2px}
-.msg.me small{color:rgba(255,255,255,0.7)}
-.comp{display:flex;gap:10px;padding:10px 14px calc(env(safe-area-inset-bottom,0px) + 12px)}
-.comp .btn{width:48px;padding:0;display:grid;place-items:center;border-radius:50%}
-.av{padding:4px;border-radius:50%;background:var(--ring,transparent);width:112px;height:112px;margin:8px auto 12px;transition:0.3s}
-.av i{width:100%;height:100%;border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:44px;color:#fff;background:linear-gradient(145deg,#3bb5f5,#1c6fb0);border:3px solid var(--bg);font-style:normal}
-.prof{text-align:center}.prof h3{font-size:24px}
-.bal{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0 16px}
-.bal div{padding:16px;text-align:center}.bal b{display:block;font-size:26px}
-.sw{display:flex;gap:10px;margin:8px 0 16px;flex-wrap:wrap}
-.sw span{width:38px;height:38px;border-radius:50%;cursor:pointer;border:2px solid transparent;outline:1px solid var(--line);outline-offset:2px}
-.sw span.on{border-color:var(--txt)}
-.sheet{position:fixed;inset:0;z-index:30;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px)}
-.sheet>div{width:100%;max-width:480px;padding:20px 18px calc(env(safe-area-inset-bottom,0px) + 20px);border-radius:28px 28px 0 0;background:var(--card);box-shadow:0 -10px 30px rgba(0,0,0,0.1)}
-.toast{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:50%;transform:translate(-50%,-90px);z-index:99;padding:11px 18px;border-radius:30px;transition:.3s;font-size:14px;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis;background:var(--txt);color:var(--bg)}
-.toast.on{transform:translate(-50%,0)}
-.gifts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.gift{padding:14px 6px 10px;border-radius:18px;text-align:center;color:#fff;background:linear-gradient(160deg,var(--a),var(--b));display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid rgba(255,255,255,0.25);cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.1)}
-.gift b{font-size:12px}.gift small{font-size:11px;background:rgba(0,0,0,0.28);padding:2px 9px;border-radius:12px}
-#admin{max-width:760px}
-.pl{margin-bottom:12px;overflow:hidden}
-.pl summary{display:flex;gap:12px;align-items:center;padding:12px 14px;cursor:pointer;list-style:none}
-.pl summary::-webkit-details-marker{display:none}
-.pl .body{padding:4px 14px 14px;display:grid;gap:12px;border-top:1px solid var(--line)}
-.badge{font-size:11px;padding:2px 8px;border-radius:20px;margin-left:6px;border:1px solid}
-.seg{display:flex;padding:4px;gap:4px;margin-bottom:14px;border-radius:16px;background:var(--line)}
-.seg button{flex:1;border:0;background:none;color:var(--dim);padding:9px;border-radius:12px;font:inherit;font-weight:600;cursor:pointer}
-.seg button.on{background:var(--card);color:var(--txt);box-shadow:0 2px 5px rgba(0,0,0,0.05)}
-.game-box{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:20px;text-align:center}
-.cbal{text-align:center;margin-bottom:12px;color:var(--gold);font-weight:600;font-size:18px}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pepegram</title>
+    <style>
+        :root {
+            --bg: #f0f4f8; --card: #ffffff; --text: #1e293b; --muted: #64748b; 
+            --accent: #0a84ff; --gold: #ffc53d; --green: #34c759; --red: #ff453a;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        #appScreen { position: relative; height: 100%; display: flex; flex-direction: column; }
+        .content { flex: 1; overflow-y: auto; padding-bottom: 80px; }
+        
+        /* НИЖНЕЕ МЕНЮ */
+        .tab-bar { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: var(--card); display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 900; }
+        .tab-item { display: flex; flex-direction: column; align-items: center; color: var(--muted); font-size: 12px; font-weight: 600; cursor: pointer; }
+        .tab-item.active { color: var(--accent); }
+        .tab-icon { font-size: 24px; margin-bottom: 4px; }
+
+        .page { display: none; padding: 20px; }
+        .page.active { display: block; }
+        .page-header { font-size: 24px; font-weight: 800; margin-bottom: 20px; }
+        
+        /* ПРОФИЛЬ */
+        .profile-header { background: linear-gradient(to bottom, #8fa8b8, var(--bg)); padding: 40px 20px 20px; display: flex; flex-direction: column; align-items: center; border-radius: 0 0 24px 24px; margin: -20px -20px 15px -20px; }
+        .avatar { width: 100px; height: 100px; border-radius: 50%; background: #ccc; margin-bottom: 15px; }
+        .profile-name { font-size: 24px; font-weight: 800; }
+        .balance-card { margin: 15px; padding: 20px; border-radius: 20px; background: linear-gradient(135deg, #0a84ff, #0066cc); color: white; display: flex; justify-content: space-between; align-items: center; }
+        .balance-card h2 { font-size: 26px; display: flex; align-items: center; gap: 10px; }
+
+        /* МАГАЗИН */
+        .shop-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .shop-card { background: var(--card); border-radius: 16px; padding: 15px 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; }
+        .shop-emoji { font-size: 32px; margin-bottom: 8px; }
+        .shop-price { background: rgba(255,197,61,0.2); color: #d19b00; padding: 4px 10px; border-radius: 10px; font-size: 13px; font-weight: bold; display: inline-block; }
+
+        /* АДМИНКА */
+        .admin-panel { background: #1e293b; color: white; padding: 20px; border-radius: 20px; margin-top: 20px; }
+        .admin-input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: none; }
+        .admin-btn { width: 100%; padding: 12px; border-radius: 10px; border: none; background: var(--red); color: white; font-weight: bold; cursor: pointer; }
+    </style>
 </head>
 <body>
-<canvas id="starsCanvas"></canvas>
 
-<section id="auth" class="scr">
-  <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 4L3 11l6 2.5L11.5 20l2.7-4.8L19 18z"/><path d="M9 13.5L21 4"/></svg></div>
-  <h1>Pepegram</h1>
-  <p class="dim">Войдите по номеру</p>
-  <div style="display:grid;gap:12px;margin-top:10px;width:100%;max-width:300px">
-    <input id="phone" class="in" type="tel" placeholder="+7 999 123-45-67">
-    <button class="btn" style="background:var(--line);color:var(--txt)" onclick="genPhone()">Сгенерировать</button>
-    <button class="btn" onclick="login()">Войти</button>
-  </div>
-</section>
+<div id="appScreen">
+    <div class="content">
+        
+        <!-- 1. ПРОФИЛЬ -->
+        <div id="page-profile" class="page active" style="padding: 0;">
+            <div class="profile-header">
+                <div class="avatar"></div>
+                <div class="profile-name" id="userName">Загрузка...</div>
+                <div style="font-size: 14px; color: var(--muted); margin-top: 5px;">в сети</div>
+            </div>
+            
+            <div class="balance-card">
+                <div>
+                    <h2><span id="userStars">0</span> ⭐</h2>
+                    <p style="font-size: 14px; opacity: 0.8; margin-top: 5px;">Звезды</p>
+                </div>
+                <div style="font-size: 30px;">⭐</div>
+            </div>
+        </div>
 
-<section id="app" class="scr hide" style="z-index:1;">
-  <div class="top">
-    <h1 id="title">Профиль</h1>
-    <button id="adminBtn" class="g ib hide" style="background:var(--gold);color:#000" onclick="openAdmin()">A</button>
-  </div>
-  <div class="main">
-    <div id="v-profile"></div>
-    <div id="v-chats" class="hide"></div>
-    <div id="v-casino" class="hide"></div>
-    <div id="v-settings" class="hide"></div>
-  </div>
-  <nav class="tabs g">
-    <button class="tab on" data-tab="profile" onclick="setTab('profile', this)">Профиль</button>
-    <button class="tab" data-tab="chats" onclick="setTab('chats', this)">Чаты</button>
-    <button class="tab" data-tab="casino" onclick="setTab('casino', this)">Казино</button>
-    <button class="tab" data-tab="settings" onclick="setTab('settings', this)">Настройки</button>
-  </nav>
-</section>
+        <!-- 2. МАГАЗИН -->
+        <div id="page-shop" class="page">
+            <div class="page-header">Магазин</div>
+            <div class="shop-grid" id="shopGrid">
+                <!-- Сюда JS подтянет подарки -->
+            </div>
+        </div>
 
-<div id="sheet" class="sheet hide"><div id="sheetBox"></div></div>
-<div id="toast" class="toast g"></div>html><script>
-const SERVER_URL = "https://fame-api-bs11.onrender.com";
-let S = { user: null, tab: 'profile' };
+        <!-- 3. НАСТРОЙКИ -->
+        <div id="page-settings" class="page">
+            <div class="page-header">Настройки</div>
+            
+            <div class="admin-panel" id="adminPanel" style="display: none;">
+                <h3 style="margin-bottom: 15px; color: #ffc53d;">Админ-панель</h3>
+                <input type="text" id="adminTarget" class="admin-input" placeholder="ID юзера">
+                <input type="number" id="adminAmount" class="admin-input" placeholder="Сколько звезд выдать">
+                <button class="admin-btn" onclick="giveStars()">Выдать звезды</button>
+            </div>
+        </div>
+    </div>
 
-const canvas = document.getElementById('starsCanvas');
-const ctx = canvas.getContext('2d');
-let w, h, stars = [];
-function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
-window.addEventListener('resize', resize); resize();
-class Star {
-    constructor() { this.reset(); this.y = Math.random() * h; }
-    reset() { this.x = Math.random() * w; this.y = -10; this.size = Math.random() * 2 + 1; this.speed = Math.random() * 1.5 + 0.5; }
-    update() { this.y += this.speed; if (this.y > h) this.reset(); }
-    draw() { ctx.fillStyle = "rgba(10, 132, 255, 0.4)"; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
-}
-for (let i = 0; i < 80; i++) stars.push(new Star());
-function animate() { ctx.clearRect(0, 0, w, h); stars.forEach(s => { s.update(); s.draw(); }); requestAnimationFrame(animate); }
-animate();
+    <div class="tab-bar">
+        <div class="tab-item active" onclick="switchTab('profile', this)"><div class="tab-icon">👤</div>Профиль</div>
+        <div class="tab-item" onclick="switchTab('shop', this)"><div class="tab-icon">🎁</div>Магазин</div>
+        <div class="tab-item" onclick="switchTab('settings', this)"><div class="tab-icon">⚙️</div>Настройки</div>
+    </div>
+</div>
 
-const $ = s => document.querySelector(s);
-const toast = t => { const e = $('#toast'); e.textContent = t; e.classList.add('on'); setTimeout(() => e.classList.remove('on'), 2500); };
-const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-
-const GIFTS = [
-    {id:'heart', name:'Сердце', price:15, color1:'#ff5da8', color2:'#d4175f', icon:'❤️'},
-    {id:'bear', name:'Мишка', price:50, color1:'#9bbf5a', color2:'#f0873a', icon:'🧸'},
-    {id:'cake', name:'Торт', price:50, color1:'#f3d9b8', color2:'#c9885a', icon:'🎂'},
-    {id:'rocket', name:'Ракета', price:50, color1:'#7ab8ff', color2:'#2f5fd0', icon:'🚀'},
-    {id:'cup', name:'Кубок', price:100, color1:'#ffd65a', color2:'#b8790b', icon:'🏆'},
-    {id:'ring', name:'Кольцо', price:100, color1:'#9fd8ff', color2:'#4a6fa5', icon:'💍'},
-    {id:'gem', name:'Алмаз', price:100, color1:'#5ac8fa', color2:'#1c6fb0', icon:'💎'},
-    {id:'pepe', name:'Пепе', price:626336, color1:'#6fe08a', color2:'#1e8f43', icon:'🐸'}
-];
-
-function genPhone() {
-    $('#phone').value = "+7 999 " + Math.floor(Math.random()*900+100) + "-" + Math.floor(Math.random()*90+10) + "-" + Math.floor(Math.random()*90+10);
-}
-
-// ИСПРАВЛЕННЫЙ ВХОД (мгновенный)
-async function login() {
-    let phone = $('#phone').value;
-    if (!phone) phone = "+7 999 " + Math.floor(Math.random()*900+100);
-    const uid = phone.replace(/\D/g, '') || Math.floor(1e9 + Math.random()*9e9);
+<script>
+    // ВАЖНО: ЗАМЕНИ ЭТУ ССЫЛКУ НА СВОЙ РЕАЛЬНЫЙ URL С RENDER!
+    const API_URL = "https://fame-api-bs11.onrender.com"; 
     
-    S.user = { 
-        id: uid, 
-        name: 'Игрок', 
-        username: 'user' + uid.slice(-4), 
-        stars: 1000, 
-        tons: 0, 
-        role: 'user', 
-        is_frozen: 0, 
-        nick_color: '#1e293b', 
-        frame: 'none' 
-    };
-    
-    localStorage.setItem('pepegram_id', S.user.id);
-    $('#auth').classList.add('hide');
-    $('#app').classList.remove('hide');
-    renderAll();
-    toast("Успешный вход!");
-}
+    let currentUserId = "123456789"; // Тестовый ID
 
-function logout() { localStorage.removeItem('pepegram_id'); location.reload(); }
+    // 1. ЗАГРУЗКА ПРОФИЛЯ
+    async function loadUser() {
+        try {
+            const res = await fetch(API_URL + '/api/user/' + currentUserId);
+            if (!res.ok) throw new Error('Сервер не отвечает');
+            
+            const user = await res.json();
+            document.getElementById('userName').innerText = user.name;
+            document.getElementById('userStars').innerText = user.stars;
 
-function setTab(tab, el) {
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
-    el.classList.add('on');
-    ['profile', 'chats', 'casino', 'settings'].forEach(v => {
-        $('#v-' + v).classList.toggle('hide', v !== tab);
-    });
-    $('#title').innerText = { profile: 'Профиль', chats: 'Чаты', casino: 'Казино', settings: 'Настройки' }[tab];
-    if (tab === 'chats') renderChats();
-    if (tab === 'casino') renderCasino();
-    if (tab === 'settings') renderSettings();
-}
-
-function renderAll() {
-    renderProfile();
-    $('#adminBtn').classList.toggle('hide', S.user.role !== 'owner');
-}
-
-const COLORS = ['#1e293b','#0a84ff','#34c759','#ff453a','#bf5af2','#ffc53d','#ff9f0a','#5ac8fa','#ff2d55','#af52de'];
-const FRAMES = ['none', 'gold', 'neon', 'space'];
-
-function renderProfile() {
-    const u = S.user;
-    const avClass = `av frame-${u.frame || 'none'}`;
-    
-    let colorPicker = '';
-    COLORS.forEach(c => colorPicker += `<span style="background:${c}" onclick="setColor('${c}',this)"></span>`);
-    
-    let framePicker = '';
-    FRAMES.forEach(f => framePicker += `<button class="btn sm ghost" onclick="setFrame('${f}',this)">${f === 'none' ? 'Нет' : f === 'gold' ? 'Золото' : f === 'neon' ? 'Неон' : 'Космос'}</button>`);
-
-    $('#v-profile').innerHTML = `
-        <div class="glass prof" style="margin-bottom:16px;padding:20px;">
-            <div class="${avClass}"><i>${esc(u.name[0].toUpperCase())}</i></div>
-            <h3 style="color:${u.nick_color}">${esc(u.name)} ${u.role === 'owner' ? '<span class="badge" style="background:var(--gold);color:#000;border:none">Владелец</span>' : ''}</h3>
-            <p class="dim" style="font-size:14px;margin-top:4px;">ID: ${u.id}</p>
-            <div style="display:flex;justify-content:center;gap:20px;margin-top:20px;">
-                <div><b style="font-size:20px;color:var(--gold)">${u.stars}</b><br><small class="dim">Звезды</small></div>
-                <div><b style="font-size:20px;color:#0098EA">${u.tons || 0}</b><br><small class="dim">TON</small></div>
-            </div>
-        </div>
-        <div class="glass" style="padding:16px;margin-bottom:16px;">
-            <h4 style="margin-bottom:10px;">Мои подарки (${u.gifts ? u.gifts.length : 0})</h4>
-            <div class="gifts">
-                ${u.gifts && u.gifts.length ? u.gifts.map(g => {
-                    const gift = GIFTS.find(x => x.id === g.id) || { name: 'NFT', icon: '🎁' };
-                    return `<div class="gift" style="--a:#555;--b:#222;cursor:default"><div class="ic" style="font-size:30px">${gift.icon}</div><b>${gift.name}</b></div>`;
-                }).join('') : '<div class="dim" style="grid-column: 1 / -1; text-align:center;">У вас пока нет подарков</div>'}
-            </div>
-            <button class="btn wide" style="margin-top:15px; background:var(--green)" onclick="openStore()">🎁 Магазин подарков</button>
-        </div>
-        <div class="glass" style="padding:16px;margin-bottom:16px;">
-            <h4 style="margin-bottom:10px;">Цвет ника</h4>
-            <div class="sw">${colorPicker}</div>
-            <h4 style="margin:15px 0 10px;">Рамка</h4>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;">${framePicker}</div>
-        </div>
-        <button class="btn ghost wide" style="margin-bottom:10px" onclick="openAddAccount()">👤 Добавить аккаунт</button>
-        <button class="btn red wide" onclick="logout()">Выйти из аккаунта</button>
-    `;
-}
-
-async function setColor(c, el) {
-    S.user.nick_color = c;
-    document.querySelectorAll('.sw span').forEach(x => x.classList.remove('on'));
-    el.classList.add('on');
-    document.querySelector('#v-profile h3').style.color = c;
-}
-async function setFrame(f, el) {
-    S.user.frame = f;
-    renderProfile();
-}
-
-function renderChats() {
-    $('#v-chats').innerHTML = `
-        <div class="search"><span class="dim">🔍</span><input class="in" placeholder="Поиск"></div>
-        <div class="glass grp">
-            <div class="it"><div class="cav">P</div><div class="tx"><b>Pepegram Chat</b><small>Общий чат</small></div></div>
-            <div class="it"><div class="cav" style="background:linear-gradient(145deg,#ffcf5a,#c98a10)">C</div><div class="tx"><b>Pepegram Channel</b><small>Новости</small></div></div>
-        </div>
-    `;
-}
-
-function renderCasino() {
-    $('#v-casino').innerHTML = `
-        <div class="cbal">Баланс: ${S.user.stars} ⭐</div>
-        <div class="seg g">
-            <button class="on" onclick="switchCasino('crash', this)">Ракетка</button>
-            <button onclick="switchCasino('upg', this)">Апгрейдер</button>
-            <button onclick="switchCasino('mines', this)">Мины</button>
-        </div>
-        <div id="c-crash">
-            <div class="game-box">
-                <h3>Ракетка</h3>
-                <div id="crashMult" style="font-size:40px;font-weight:800;color:var(--green);margin:20px 0;">1.00x</div>
-                <div id="crashMsg" class="dim" style="margin-bottom:15px;">Сделай ставку</div>
-                <input type="number" id="crashBet" class="in" placeholder="Ставка" style="margin-bottom:10px;">
-                <button class="btn green wide" id="crashBtn" onclick="startCrash()">Запустить</button>
-            </div>
-        </div>
-        <div id="c-upg" class="hide">
-            <div class="game-box">
-                <h3>Апгрейдер</h3>
-                <p class="dim" style="margin-bottom:15px;">Шанс: 50% | Выигрыш: x2</p>
-                <input type="number" id="upgBet" class="in" placeholder="Ставка" style="margin-bottom:10px;">
-                <button class="btn wide" style="background:var(--blue)" onclick="playUpgrader()">Апгрейд</button>
-            </div>
-        </div>
-        <div id="c-mines" class="hide">
-            <div class="game-box">
-                <h3>Мины</h3>
-                <p class="dim" style="margin-bottom:15px;">Шанс 60% | Выигрыш x2</p>
-                <input type="number" id="minesBet" class="in" placeholder="Ставка" style="margin-bottom:10px;">
-                <button class="btn wide" style="background:var(--gold);color:#000" onclick="playMines()">Играть</button>
-            </div>
-        </div>
-    `;
-}
-
-function switchCasino(type, el) {
-    document.querySelectorAll('.seg button').forEach(b => b.classList.remove('on'));
-    el.classList.add('on');
-    ['crash', 'upg', 'mines'].forEach(v => {
-        $('#c-' + v).classList.toggle('hide', v !== type);
-    });
-}
-
-let crashInt = null, crashMult = 1.0, isCrashing = false;
-
-function startCrash() {
-    if (isCrashing) return;
-    const bet = parseInt($('#crashBet').value);
-    if (!bet || bet > S.user.stars) return toast('Проверьте ставку');
-    isCrashing = true;
-    S.user.stars -= bet;
-    $('.cbal').innerText = `Баланс: ${S.user.stars} ⭐`;
-    $('#crashBtn').innerText = 'Забрать';
-    $('#crashBtn').className = 'btn red wide';
-    $('#crashBtn').onclick = cashoutCrash;
-    $('#crashMsg').innerText = 'Ракета летит!';
-    crashMult = 1.00;
-    $('#crashMult').innerText = crashMult.toFixed(2) + 'x';
-    $('#crashMult').style.color = 'var(--green)';
-    crashInt = setInterval(() => {
-        crashMult += 0.05;
-        $('#crashMult').innerText = crashMult.toFixed(2) + 'x';
-        const explodeChance = Math.min(0.8, 0.05 + (crashMult - 1) * 0.1);
-        if (Math.random() < explodeChance) {
-            clearInterval(crashInt);
-            isCrashing = false;
-            $('#crashMult').innerText = 'ВЗРЫВ!';
-            $('#crashMult').style.color = 'var(--red)';
-            $('#crashMsg').innerText = 'Ракета взорвалась. Проигрыш.';
-            $('#crashBtn').innerText = 'Запустить';
-            $('#crashBtn').className = 'btn green wide';
-            $('#crashBtn').onclick = startCrash;
+            if (user.is_admin === 1) {
+                document.getElementById('adminPanel').style.display = 'block';
+            }
+        } catch (e) {
+            document.getElementById('userName').innerText = "Ошибка сети";
+            console.error("Ошибка профиля:", e);
         }
-    }, 100);
-}
+    }
 
-function cashoutCrash() {
-    if (!isCrashing) return;
-    clearInterval(crashInt);
-    isCrashing = false;
-    const bet = parseInt($('#crashBet').value);
-    const win = Math.floor(bet * crashMult);
-    S.user.stars += win;
-    $('.cbal').innerText = `Баланс: ${S.user.stars} ⭐`;
-    $('#crashMsg').innerText = `Вы забрали на ${crashMult.toFixed(2)}x`;
-    $('#crashBtn').innerText = 'Запустить';
-    $('#crashBtn').className = 'btn green wide';
-    $('#crashBtn').onclick = startCrash;
-    $('#crashMult').style.color = 'var(--gold)';
-    toast(`Выигрыш! +${win} ⭐`);
-}
+    // 2. ЗАГРУЗКА МАГАЗИНА
+    async function loadShop() {
+        const grid = document.getElementById('shopGrid');
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 20px;">Загрузка...</div>';
+        
+        try {
+            const res = await fetch(API_URL + '/api/gifts');
+            if (!res.ok) throw new Error('Сервер не отвечает');
+            
+            const gifts = await res.json();
+            grid.innerHTML = '';
 
-async function playUpgrader() {
-    const bet = parseInt($('#upgBet').value);
-    if (!bet || bet > S.user.stars) return toast('Проверьте ставку');
-    S.user.stars -= bet;
-    $('.cbal').innerText = `Баланс: ${S.user.stars} ⭐`;
-    toast('Крутим...');
-    setTimeout(() => {
-        if (Math.random() < 0.5) {
-            S.user.stars += bet * 2;
-            $('.cbal').innerText = `Баланс: ${S.user.stars} ⭐`;
-            toast(`Победа! +${bet * 2} ⭐`);
-        } else {
-            toast('Апгрейд не удался. Попробуйте еще.');
+            gifts.forEach(gift => {
+                const card = document.createElement('div');
+                card.className = 'shop-card';
+                card.innerHTML = `
+                    <div class="shop-emoji">${gift.emoji}</div>
+                    <div style="font-size: 14px; font-weight: 600;">${gift.name}</div>
+                    <div class="shop-price">${gift.price} ⭐</div>
+                `;
+                card.onclick = () => buyGift(gift.id, gift.price);
+                grid.appendChild(card);
+            });
+        } catch (e) {
+            grid.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 30px; background: var(--card); border-radius: 16px;">
+                    <div style="font-size: 40px; margin-bottom: 10px;">💤</div>
+                    <div style="font-weight: bold; margin-bottom: 5px;">Сервер просыпается</div>
+                    <div style="color: var(--muted); font-size: 14px;">Подождите 30 секунд и обновите страницу</div>
+                </div>
+            `;
+            console.error("Ошибка магазина:", e);
         }
-    }, 1500);
-}
+    }
 
-async function playMines() {
-    const bet = parseInt($('#minesBet').value);
-    if (!bet || bet > S.user.stars) return toast('Проверьте ставку');
-    S.user.stars -= bet;
-    $('.cbal').innerText = `Баланс: ${S.user.stars} ⭐`;
-    toast('Ищем мины...');
-    setTimeout(() => {
-        if (Math.random() < 0.6) {
-            S.user.stars += bet * 2;
-            $('.cbal').innerText = `Баланс: ${S.user.stars} ⭐`;
-            toast(`Победа! +${bet * 2} ⭐`);
-        } else {
-            toast('Вы наткнулись на мину. Проигрыш.');
+    // 3. ПОКУПКА
+    async function buyGift(giftId, price) {
+        if (!confirm("Купить этот подарок?")) return;
+        try {
+            const res = await fetch(API_URL + '/api/buy_gift', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ user_id: currentUserId, gift_id: giftId })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                alert("Подарок куплен!");
+                document.getElementById('userStars').innerText = data.new_balance;
+            } else {
+                alert(data.error);
+            }
+        } catch (e) {
+            alert("Сервер не отвечает");
         }
-    }, 1500);
-}
+    }
 
-function openStore() {
-    let giftsHtml = '';
-    GIFTS.forEach(g => {
-        giftsHtml += `<div class="gift" style="--a:${g.color1};--b:${g.color2}" onclick="buyGift('${g.id}')"><div class="ic" style="font-size:30px;">${g.icon}</div><b>${g.name}</b><small>${g.price} ⭐</small></div>`;
-    });
-    $('#sheetBox').innerHTML = `<h3 style="margin-bottom:15px;">Магазин <span style="float:right;font-size:14px;color:var(--gold)">${S.user.stars} ⭐</span></h3><div class="gifts">${giftsHtml}</div><button class="btn wide" style="margin-top:20px" onclick="closeSheet()">Закрыть</button>`;
-    $('#sheet').classList.remove('hide');
-}
+    // 4. АДМИНКА
+    async function giveStars() {
+        const target = document.getElementById('adminTarget').value;
+        const amount = document.getElementById('adminAmount').value;
+        if (!target || !amount) return alert("Заполни поля");
+        
+        try {
+            const res = await fetch(API_URL + '/api/admin/give_stars', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ admin_id: currentUserId, target_id: target, amount: parseInt(amount) })
+            });
+            const data = await res.json();
+            if (data.success) alert("Звезды выданы!");
+            else alert("Ошибка: " + data.error);
+        } catch (e) {
+            alert("Ошибка сервера");
+        }
+    }
 
-async function buyGift(id) {
-    const gift = GIFTS.find(g => g.id === id);
-    if (!gift) return;
-    if (S.user.stars < gift.price) return toast('Недостаточно звезд!');
-    S.user.stars -= gift.price;
-    if (!S.user.gifts) S.user.gifts = [];
-    S.user.gifts.push({ id: gift.id, up: null });
-    closeSheet();
-    toast(`Куплено: ${gift.name}!`);
-    renderProfile();
-}
+    // ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
+    function switchTab(tabId, element) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+        document.getElementById('page-' + tabId).classList.add('active');
+        element.classList.add('active');
+    }
 
-function openAddAccount() {
-    $('#sheetBox').innerHTML = `
-        <h3 style="margin-bottom:15px;">Добавить аккаунт</h3>
-        <p class="dim" style="margin-bottom:15px;font-size:14px;">Введите номер другого аккаунта, чтобы переключиться.</p>
-        <input id="newPhone" class="in" type="tel" placeholder="+7 999 123-45-67" style="margin-bottom:10px;">
-        <button class="btn wide green" onclick="switchAccount()">Войти в аккаунт</button>
-        <button class="btn wide ghost" style="margin-top:10px" onclick="closeSheet()">Отмена</button>
-    `;
-    $('#sheet').classList.remove('hide');
-}
-
-async function switchAccount() {
-    let phone = $('#newPhone').value;
-    if (!phone) return toast('Введите номер');
-    const uid = phone.replace(/\D/g, '');
-    S.user = { 
-        id: uid, 
-        name: 'Игрок', 
-        username: 'user' + uid.slice(-4), 
-        stars: 1000, 
-        tons: 0, 
-        role: 'user', 
-        is_frozen: 0, 
-        nick_color: '#1e293b', 
-        frame: 'none' 
-    };
-    localStorage.setItem('pepegram_id', S.user.id);
-    closeSheet();
-    renderAll();
-    setTab('profile', document.querySelector('[data-tab="profile"]'));
-    toast('Аккаунт переключен!');
-}
-
-function renderSettings() {
-    $('#v-settings').innerHTML = `<div class="glass grp"><div class="it"><div class="tx"><b>Конфиденциальность</b></div></div><div class="it"><div class="tx"><b>Оформление</b></div></div><div class="it"><div class="tx"><b>Premium</b></div></div><div class="it"><div class="tx"><b>Fragment (Обмен)</b></div></div></div>`;
-}
-
-function openAdmin() {
-    $('#sheetBox').innerHTML = `<h3 style="margin-bottom:15px;">Админ-панель</h3><div class="it" style="border:1px solid var(--line);border-radius:12px;margin-bottom:10px;"><div class="tx"><b>@ruslan</b><small>Главный владелец</small></div></div><button class="btn wide" onclick="closeSheet()">Закрыть</button>`;
-    $('#sheet').classList.remove('hide');
-}
-function closeSheet() { $('#sheet').classList.add('hide'); }
-
-const savedId = localStorage.getItem('pepegram_id');
-if (savedId) {
-    S.user = { id: savedId, name: 'Игрок', username: 'user' + savedId.slice(-4), stars: 1000, tons: 0, role: 'user', is_frozen: 0, nick_color: '#1e293b', frame: 'none' };
-    $('#auth').classList.add('hide');
-    $('#app').classList.remove('hide');
-    renderAll();
-}
+    // ЗАПУСК ПРИ ОТКРЫТИИ
+    loadUser();
+    loadShop();
 </script>
 </body>
 </html>
