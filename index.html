@@ -11,10 +11,8 @@
 html,body{height:100%;overflow:hidden}
 body{background:var(--bg);color:var(--txt);font:16px/1.4 -apple-system,BlinkMacSystemFont,sans-serif;transition:0.3s}
 .hide{display:none!important}
-.ic{width:22px;height:22px;flex:none}
 .g{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
 .scr{position:fixed;inset:0;margin:auto;max-width:480px;display:flex;flex-direction:column}
-.over{z-index:20;background:var(--bg);backdrop-filter:blur(10px)}
 .top{display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 14px) 18px 8px}
 .top h1{font-size:28px;font-weight:800;letter-spacing:-.02em;flex:1}
 .ib{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--txt);cursor:pointer;border:1px solid var(--line);background:var(--card)}
@@ -23,9 +21,7 @@ body{background:var(--bg);color:var(--txt);font:16px/1.4 -apple-system,BlinkMacS
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;border-radius:22px;color:var(--dim);font-size:11px;font-weight:600;background:none;border:0;cursor:pointer;transition:.2s}
 .tab.on{color:var(--blue);background:rgba(10,132,255,0.1)}
 .in{width:100%;background:var(--card);border:1px solid var(--line);border-radius:14px;color:var(--txt);padding:13px 14px;font:inherit;outline:0}
-.in:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(10,132,255,0.15)}
 .btn{border:0;border-radius:14px;padding:13px 16px;font:inherit;font-weight:600;color:#fff;background:var(--blue);cursor:pointer;transition:.15s}
-.btn:active{transform:scale(.97)}
 .btn.green{background:var(--green)}.btn.red{background:var(--red)}
 .btn.ghost{background:var(--card);border:1px solid var(--line);color:var(--txt)}
 .btn.sm{padding:9px 12px;font-size:14px;border-radius:12px}.btn.wide{width:100%}
@@ -34,31 +30,15 @@ body{background:var(--bg);color:var(--txt);font:16px/1.4 -apple-system,BlinkMacS
 #auth{justify-content:center;padding:28px;gap:14px;text-align:center;z-index:1000;background:var(--bg)}
 .logo{width:92px;height:92px;margin:0 auto 6px;border-radius:28px;display:grid;place-items:center;color:#fff;background:linear-gradient(145deg,#3bb5f5,#1d8fd6);box-shadow:0 10px 20px rgba(10,132,255,0.3)}
 #auth h1{font-size:36px;font-weight:800;letter-spacing:-.03em}
-.search{position:relative;margin-bottom:14px}
-.search .ic{position:absolute;left:13px;top:13px;color:var(--dim);width:20px;height:20px}
-.search .in{padding-left:42px;border-radius:16px}
 .grp{overflow:hidden;margin-bottom:18px}
 .it{display:flex;gap:12px;align-items:center;padding:12px 14px;cursor:pointer;transition:.15s}
-.it:active{background:rgba(0,0,0,0.03)}
 .it+.it{border-top:1px solid var(--line)}
 .it .tx{flex:1;min-width:0}.it b{display:block;font-weight:600}
 .it small{display:block;color:var(--dim);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cav{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;color:#fff;flex:none;font-weight:bold;font-size:20px;background:linear-gradient(145deg,#3bb5f5,#1c6fb0)}
-.lbl{color:var(--dim);font-size:13px;margin:0 6px 7px;text-transform:uppercase}
-.msgs{flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column}
-.msg{max-width:78%;padding:9px 13px;border-radius:18px;margin:4px 0;background:var(--card);border:1px solid var(--line);word-break:break-word}
-.msg.me{margin-left:auto;background:var(--blue);color:#fff;border-color:transparent}
-.msg b{display:block;font-size:13px;color:var(--blue)}
-.msg.me b{color:rgba(255,255,255,0.8)}
-.msg small{display:block;color:var(--dim);font-size:11px;text-align:right;margin-top:2px}
-.msg.me small{color:rgba(255,255,255,0.7)}
-.comp{display:flex;gap:10px;padding:10px 14px calc(env(safe-area-inset-bottom,0px) + 12px)}
-.comp .btn{width:48px;padding:0;display:grid;place-items:center;border-radius:50%}
-.av{padding:4px;border-radius:50%;background:var(--ring,transparent);width:112px;height:112px;margin:8px auto 12px;transition:0.3s}
+.av{padding:4px;border-radius:50%;width:112px;height:112px;margin:8px auto 12px;transition:0.3s}
 .av i{width:100%;height:100%;border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:44px;color:#fff;background:linear-gradient(145deg,#3bb5f5,#1c6fb0);border:3px solid var(--bg);font-style:normal}
 .prof{text-align:center}.prof h3{font-size:24px}
-.bal{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0 16px}
-.bal div{padding:16px;text-align:center}.bal b{display:block;font-size:26px}
 .sw{display:flex;gap:10px;margin:8px 0 16px;flex-wrap:wrap}
 .sw span{width:38px;height:38px;border-radius:50%;cursor:pointer;border:2px solid transparent;outline:1px solid var(--line);outline-offset:2px}
 .sw span.on{border-color:var(--txt)}
@@ -66,26 +46,24 @@ body{background:var(--bg);color:var(--txt);font:16px/1.4 -apple-system,BlinkMacS
 .sheet>div{width:100%;max-width:480px;padding:20px 18px calc(env(safe-area-inset-bottom,0px) + 20px);border-radius:28px 28px 0 0;background:var(--card);box-shadow:0 -10px 30px rgba(0,0,0,0.1)}
 .toast{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:50%;transform:translate(-50%,-90px);z-index:99;padding:11px 18px;border-radius:30px;transition:.3s;font-size:14px;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis;background:var(--txt);color:var(--bg)}
 .toast.on{transform:translate(-50%,0)}
-.gifts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.gift{padding:14px 6px 10px;border-radius:18px;text-align:center;color:#fff;background:linear-gradient(160deg,var(--a),var(--b));display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid rgba(255,255,255,0.25);cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.1)}
-.gift b{font-size:12px}.gift small{font-size:11px;background:rgba(0,0,0,0.28);padding:2px 9px;border-radius:12px}
-#admin{max-width:760px}
-.pl{margin-bottom:12px;overflow:hidden}
-.pl summary{display:flex;gap:12px;align-items:center;padding:12px 14px;cursor:pointer;list-style:none}
-.pl summary::-webkit-details-marker{display:none}
-.pl .body{padding:4px 14px 14px;display:grid;gap:12px;border-top:1px solid var(--line)}
-.badge{font-size:11px;padding:2px 8px;border-radius:20px;margin-left:6px;border:1px solid}
+/* КАЗИНО */
 .seg{display:flex;padding:4px;gap:4px;margin-bottom:14px;border-radius:16px;background:var(--line)}
 .seg button{flex:1;border:0;background:none;color:var(--dim);padding:9px;border-radius:12px;font:inherit;font-weight:600;cursor:pointer}
 .seg button.on{background:var(--card);color:var(--txt);box-shadow:0 2px 5px rgba(0,0,0,0.05)}
 .game-box{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:20px;text-align:center}
 .cbal{text-align:center;margin-bottom:12px;color:var(--gold);font-weight:600;font-size:18px}
+/* ПОДАРКИ */
+.gifts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-bottom:20px}
+.gift{padding:14px 6px 10px;border-radius:18px;text-align:center;color:#fff;background:linear-gradient(160deg,var(--a),var(--b));display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.1)}
+.gift b{font-size:12px}.gift small{font-size:11px;background:rgba(0,0,0,0.28);padding:2px 9px;border-radius:12px}
+.gift .ic{width:40px;height:40px;margin-bottom:5px}
 </style>
 </head>
 <body>
+
 <canvas id="starsCanvas"></canvas>
 
-<!-- ЭКРАН ВХОДА -->
+<!-- ВХОД -->
 <section id="auth" class="scr">
   <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 4L3 11l6 2.5L11.5 20l2.7-4.8L19 18z"/><path d="M9 13.5L21 4"/></svg></div>
   <h1>Pepegram</h1>
@@ -97,21 +75,18 @@ body{background:var(--bg);color:var(--txt);font:16px/1.4 -apple-system,BlinkMacS
   </div>
 </section>
 
-<!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
+<!-- ПРИЛОЖЕНИЕ -->
 <section id="app" class="scr hide" style="z-index:1;">
   <div class="top">
     <h1 id="title">Профиль</h1>
     <button id="adminBtn" class="g ib hide" style="background:var(--gold);color:#000" onclick="openAdmin()">A</button>
   </div>
   <div class="main">
-    <!-- Вкладки -->
     <div id="v-profile"></div>
     <div id="v-chats" class="hide"></div>
     <div id="v-casino" class="hide"></div>
     <div id="v-settings" class="hide"></div>
   </div>
-  
-  <!-- Нижнее меню -->
   <nav class="tabs g">
     <button class="tab on" data-tab="profile" onclick="setTab('profile', this)">Профиль</button>
     <button class="tab" data-tab="chats" onclick="setTab('chats', this)">Чаты</button>
@@ -120,11 +95,9 @@ body{background:var(--bg);color:var(--txt);font:16px/1.4 -apple-system,BlinkMacS
   </nav>
 </section>
 
-<!-- Всплывающие окна -->
 <div id="sheet" class="sheet hide"><div id="sheetBox"></div></div>
-<div id="toast" class="toast g"></div>
-
-<script>/* ================= ЛОГИКА ================= */
+<div id="toast" class="toast g"></div><script>
+/* ================= ЛОГИКА ================= */
 const SERVER_URL = "https://fame-api-bs11.onrender.com";
 let S = { user: null, tab: 'profile' };
 
@@ -145,10 +118,21 @@ for (let i = 0; i < 80; i++) stars.push(new Star());
 function animate() { ctx.clearRect(0, 0, w, h); stars.forEach(s => { s.update(); s.draw(); }); requestAnimationFrame(animate); }
 animate();
 
-// ВСПОМОГАТЕЛЬНЫЕ
 const $ = s => document.querySelector(s);
 const toast = t => { const e = $('#toast'); e.textContent = t; e.classList.add('on'); setTimeout(() => e.classList.remove('on'), 2500); };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+// СПИСОК ПОДАРКОВ (Стикеры)
+const GIFTS = [
+    {id:'heart', name:'Сердце', price:15, color1:'#ff5da8', color2:'#d4175f', icon:'❤️'},
+    {id:'bear', name:'Мишка', price:50, color1:'#9bbf5a', color2:'#f0873a', icon:'🧸'},
+    {id:'cake', name:'Торт', price:50, color1:'#f3d9b8', color2:'#c9885a', icon:'🎂'},
+    {id:'rocket', name:'Ракета', price:50, color1:'#7ab8ff', color2:'#2f5fd0', icon:'🚀'},
+    {id:'cup', name:'Кубок', price:100, color1:'#ffd65a', color2:'#b8790b', icon:'🏆'},
+    {id:'ring', name:'Кольцо', price:100, color1:'#9fd8ff', color2:'#4a6fa5', icon:'💍'},
+    {id:'gem', name:'Алмаз', price:100, color1:'#5ac8fa', color2:'#1c6fb0', icon:'💎'},
+    {id:'pepe', name:'Пепе', price:626336, color1:'#6fe08a', color2:'#1e8f43', icon:'🐸'}
+];
 
 function genPhone() {
     $('#phone').value = "+7 999 " + Math.floor(Math.random()*900+100) + "-" + Math.floor(Math.random()*90+10) + "-" + Math.floor(Math.random()*90+10);
@@ -193,9 +177,20 @@ function renderAll() {
     $('#adminBtn').classList.toggle('hide', S.user.role !== 'owner');
 }
 
+// ================= ПРОФИЛЬ (С ПАЛИТРОЙ) =================
+const COLORS = ['#1e293b','#0a84ff','#34c759','#ff453a','#bf5af2','#ffc53d','#ff9f0a','#5ac8fa','#ff2d55','#af52de'];
+const FRAMES = ['none', 'gold', 'neon', 'space'];
+
 function renderProfile() {
     const u = S.user;
-    const avClass = u.frame === 'gold' ? 'av frame-gold' : u.frame === 'neon' ? 'av frame-neon' : 'av';
+    const avClass = `av frame-${u.frame || 'none'}`;
+    
+    let colorPicker = '';
+    COLORS.forEach(c => colorPicker += `<span style="background:${c}" onclick="setColor('${c}',this)"></span>`);
+    
+    let framePicker = '';
+    FRAMES.forEach(f => framePicker += `<button class="btn sm ghost" onclick="setFrame('${f}',this)">${f === 'none' ? 'Нет' : f === 'gold' ? 'Золото' : f === 'neon' ? 'Неон' : 'Космос'}</button>`);
+
     $('#v-profile').innerHTML = `
         <div class="glass prof" style="margin-bottom:16px;padding:20px;">
             <div class="${avClass}"><i>${esc(u.name[0].toUpperCase())}</i></div>
@@ -208,19 +203,9 @@ function renderProfile() {
         </div>
         <div class="glass" style="padding:16px;margin-bottom:16px;">
             <h4 style="margin-bottom:10px;">Цвет ника</h4>
-            <div class="sw">
-                <span style="background:#1e293b" onclick="setColor('#1e293b',this)"></span>
-                <span style="background:#0a84ff" onclick="setColor('#0a84ff',this)"></span>
-                <span style="background:#34c759" onclick="setColor('#34c759',this)"></span>
-                <span style="background:#ff453a" onclick="setColor('#ff453a',this)"></span>
-                <span style="background:#bf5af2" onclick="setColor('#bf5af2',this)"></span>
-            </div>
+            <div class="sw">${colorPicker}</div>
             <h4 style="margin:15px 0 10px;">Рамка</h4>
-            <div style="display:flex;gap:10px;">
-                <button class="btn sm ghost" onclick="setFrame('none',this)">Нет</button>
-                <button class="btn sm ghost" onclick="setFrame('gold',this)">Золото</button>
-                <button class="btn sm ghost" onclick="setFrame('neon',this)">Неон</button>
-            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">${framePicker}</div>
         </div>
         <button class="btn red wide" onclick="logout()">Выйти из аккаунта</button>
     `;
@@ -245,11 +230,14 @@ async function saveProfile() {
             body: JSON.stringify(S.user)
         });
     } catch(e) {}
-}function renderChats() {
+}
+
+// ================= ЧАТЫ =================
+function renderChats() {
     $('#v-chats').innerHTML = `
         <div class="search"><span class="dim">🔍</span><input class="in" placeholder="Поиск"></div>
         <div class="glass grp">
-            <div class="it" onclick="openChat('chat')">
+            <div class="it">
                 <div class="cav">P</div>
                 <div class="tx"><b>Pepegram Chat</b><small>Общий чат</small></div>
             </div>
@@ -261,41 +249,152 @@ async function saveProfile() {
     `;
 }
 
+// ================= КАЗИНО =================
 function renderCasino() {
     $('#v-casino').innerHTML = `
         <div class="cbal">Баланс: ${S.user.stars} ⭐</div>
         <div class="seg g">
-            <button class="on">Краш</button>
-            <button>Мины</button>
-            <button>Апгрейдер</button>
+            <button class="on" onclick="switchCasino('crash', this)">Ракетка</button>
+            <button onclick="switchCasino('upg', this)">Апгрейдер</button>
+            <button onclick="switchCasino('mines', this)">Мины</button>
         </div>
-        <div class="game-box">
-            <h3>Краш</h3>
-            <p class="dim" style="margin:10px 0;">Запусти ракету и забери на x2!</p>
-            <input type="number" id="bet" class="in" placeholder="Ставка" style="margin-bottom:10px;">
-            <button class="btn green wide" onclick="playCrash()">Запустить</button>
+        
+        <!-- РАКЕТКА -->
+        <div id="c-crash">
+            <div class="game-box">
+                <h3>Ракетка</h3>
+                <div id="crashMult" style="font-size:40px;font-weight:800;color:var(--green);margin:20px 0;">1.00x</div>
+                <div id="crashMsg" class="dim" style="margin-bottom:15px;">Сделай ставку</div>
+                <input type="number" id="crashBet" class="in" placeholder="Ставка" style="margin-bottom:10px;">
+                <button class="btn green wide" id="crashBtn" onclick="startCrash()">Запустить</button>
+            </div>
+        </div>
+
+        <!-- АПГРЕЙДЕР -->
+        <div id="c-upg" class="hide">
+            <div class="game-box">
+                <h3>Апгрейдер</h3>
+                <p class="dim" style="margin-bottom:15px;">Шанс: 50% | Выигрыш: x2</p>
+                <input type="number" id="upgBet" class="in" placeholder="Ставка" style="margin-bottom:10px;">
+                <button class="btn wide" style="background:var(--blue)" onclick="playUpgrader()">Апгрейд</button>
+            </div>
+        </div>
+
+        <!-- МИНЫ -->
+        <div id="c-mines" class="hide">
+            <div class="game-box">
+                <h3>Мины</h3>
+                <p class="dim" style="margin-bottom:15px;">Открой 3 клетки без мин (шанс 60%)</p>
+                <input type="number" id="minesBet" class="in" placeholder="Ставка" style="margin-bottom:10px;">
+                <button class="btn wide" style="background:var(--gold);color:#000" onclick="playMines()">Играть</button>
+            </div>
         </div>
     `;
 }
 
-async function playCrash() {
-    const bet = parseInt($('#bet').value);
-    if (!bet || bet > S.user.stars) return toast('Проверьте ставку');
-    S.user.stars -= bet; 
-    document.querySelector('.cbal').innerText = `Баланс: ${S.user.stars} ⭐`;
-    toast('Ракета летит...');
-    setTimeout(() => {
-        const win = Math.random() < 0.6;
-        if (win) {
-            S.user.stars += bet * 2;
-            document.querySelector('.cbal').innerText = `Баланс: ${S.user.stars} ⭐`;
-            toast(`Победа! +${bet * 2} ⭐`);
-        } else {
-            toast('Ракета упала. Попробуйте еще.');
-        }
-    }, 2000);
+function switchCasino(type, el) {
+    document.querySelectorAll('.seg button').forEach(b => b.classList.remove('on'));
+    el.classList.add('on');
+    ['crash', 'upg', 'mines'].forEach(v => {
+        $('#c-' + v).classList.toggle('hide', v !== type);
+    });
 }
 
+let crashInt = null, crashMult = 1.0, isCrashing = false;
+
+function startCrash() {
+    if (isCrashing) return;
+    const bet = parseInt($('#crashBet').value);
+    if (!bet || bet > S.user.stars) return toast('Проверьте ставку');
+    
+    isCrashing = true;
+    S.user.stars -= bet;
+    $('.cbal').innerText = `Баланс: ${S.user.stars} ⭐`;
+    
+    $('#crashBtn').innerText = 'Забрать';
+    $('#crashBtn').className = 'btn red wide';
+    $('#crashBtn').onclick = cashoutCrash;
+    $('#crashMsg').innerText = 'Ракета летит!';
+    
+    crashMult = 1.00;
+    $('#crashMult').innerText = crashMult.toFixed(2) + 'x';
+    $('#crashMult').style.color = 'var(--green)';
+    
+    crashInt = setInterval(() => {
+        crashMult += 0.05;
+        $('#crashMult').innerText = crashMult.toFixed(2) + 'x';
+        
+        const explodeChance = Math.min(0.8, 0.05 + (crashMult - 1) * 0.1);
+        if (Math.random() < explodeChance) {
+            clearInterval(crashInt);
+            isCrashing = false;
+            $('#crashMult').innerText = 'ВЗРЫВ!';
+            $('#crashMult').style.color = 'var(--red)';
+            $('#crashMsg').innerText = 'Ракета взорвалась. Проигрыш.';
+            $('#crashBtn').innerText = 'Запустить';
+            $('#crashBtn').className = 'btn green wide';
+            $('#crashBtn').onclick = startCrash;
+        }
+    }, 100);
+}
+
+function cashoutCrash() {
+    if (!isCrashing) return;
+    clearInterval(crashInt);
+    isCrashing = false;
+    
+    const bet = parseInt($('#crashBet').value);
+    const win = Math.floor(bet * crashMult);
+    S.user.stars += win;
+    
+    $('.cbal').innerText = `Баланс: ${S.user.stars} ⭐`;
+    $('#crashMsg').innerText = `Вы забрали на ${crashMult.toFixed(2)}x`;
+    $('#crashBtn').innerText = 'Запустить';
+    $('#crashBtn').className = 'btn green wide';
+    $('#crashBtn').onclick = startCrash;
+    $('#crashMult').style.color = 'var(--gold)';
+    toast(`Выигрыш! +${win} ⭐`);
+}
+
+async function playUpgrader() {
+    const bet = parseInt($('#upgBet').value);
+    if (!bet || bet > S.user.stars) return toast('Проверьте ставку');
+    
+    S.user.stars -= bet;
+    $('.cbal').innerText = `Баланс: ${S.user.stars} ⭐`;
+    toast('Крутим...');
+    
+    setTimeout(() => {
+        if (Math.random() < 0.5) {
+            S.user.stars += bet * 2;
+            $('.cbal').innerText = `Баланс: ${S.user.stars} ⭐`;
+            toast(`Победа! +${bet * 2} ⭐`);
+        } else {
+            toast('Апгрейд не удался. Попробуйте еще.');
+        }
+    }, 1500);
+}
+
+async function playMines() {
+    const bet = parseInt($('#minesBet').value);
+    if (!bet || bet > S.user.stars) return toast('Проверьте ставку');
+    
+    S.user.stars -= bet;
+    $('.cbal').innerText = `Баланс: ${S.user.stars} ⭐`;
+    toast('Ищем мины...');
+    
+    setTimeout(() => {
+        if (Math.random() < 0.6) {
+            S.user.stars += bet * 2;
+            $('.cbal').innerText = `Баланс: ${S.user.stars} ⭐`;
+            toast(`Победа! +${bet * 2} ⭐`);
+        } else {
+            toast('Вы наткнулись на мину. Проигрыш.');
+        }
+    }, 1500);
+}
+
+// ================= НАСТРОЙКИ =================
 function renderSettings() {
     $('#v-settings').innerHTML = `
         <div class="glass grp">
@@ -306,6 +405,7 @@ function renderSettings() {
     `;
 }
 
+// ================= АДМИНКА =================
 function openAdmin() {
     $('#sheetBox').innerHTML = `
         <h3 style="margin-bottom:15px;">Админ-панель</h3>
@@ -318,11 +418,7 @@ function openAdmin() {
 }
 function closeSheet() { $('#sheet').classList.add('hide'); }
 
-function openChat(id) {
-    toast("Чат в разработке");
-}
-
-// ПРОВЕРКА ПРИ СТАРТЕ
+// ЗАПУСК ПРИ СТАРТЕ
 const savedId = localStorage.getItem('pepegram_id');
 if (savedId) {
     fetch(SERVER_URL + '/api/user/' + savedId)
