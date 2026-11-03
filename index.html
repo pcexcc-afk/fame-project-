@@ -115,9 +115,7 @@ body{background:var(--bg);color:var(--txt);font:16px/1.4 -apple-system,BlinkMacS
 </section>
 
 <div id="sheet" class="sheet hide"><div id="sheetBox"></div></div>
-<div id="toast" class="toast g"></div>
-
-<script>
+<div id="toast" class="toast g"></div>html><script>
 const SERVER_URL = "https://fame-api-bs11.onrender.com";
 let S = { user: null, tab: 'profile' };
 
@@ -155,24 +153,29 @@ function genPhone() {
     $('#phone').value = "+7 999 " + Math.floor(Math.random()*900+100) + "-" + Math.floor(Math.random()*90+10) + "-" + Math.floor(Math.random()*90+10);
 }
 
+// ИСПРАВЛЕННЫЙ ВХОД (мгновенный)
 async function login() {
     let phone = $('#phone').value;
     if (!phone) phone = "+7 999 " + Math.floor(Math.random()*900+100);
     const uid = phone.replace(/\D/g, '') || Math.floor(1e9 + Math.random()*9e9);
     
-    try {
-        const res = await fetch(SERVER_URL + '/api/user/' + uid);
-        S.user = await res.json();
-        if (!S.user.name) {
-            S.user = { id: uid, name: 'Игрок', username: 'user'+uid.slice(-4), stars: 1000, tons: 0, role: 'user', is_frozen: 0, nick_color: '#1e293b', frame: 'none' };
-        }
-        localStorage.setItem('pepegram_id', S.user.id);
-        $('#auth').classList.add('hide');
-        $('#app').classList.remove('hide');
-        renderAll();
-    } catch (e) {
-        toast("Сервер просыпается. Ждите.");
-    }
+    S.user = { 
+        id: uid, 
+        name: 'Игрок', 
+        username: 'user' + uid.slice(-4), 
+        stars: 1000, 
+        tons: 0, 
+        role: 'user', 
+        is_frozen: 0, 
+        nick_color: '#1e293b', 
+        frame: 'none' 
+    };
+    
+    localStorage.setItem('pepegram_id', S.user.id);
+    $('#auth').classList.add('hide');
+    $('#app').classList.remove('hide');
+    renderAll();
+    toast("Успешный вход!");
 }
 
 function logout() { localStorage.removeItem('pepegram_id'); location.reload(); }
@@ -243,20 +246,10 @@ async function setColor(c, el) {
     document.querySelectorAll('.sw span').forEach(x => x.classList.remove('on'));
     el.classList.add('on');
     document.querySelector('#v-profile h3').style.color = c;
-    saveProfile();
 }
 async function setFrame(f, el) {
     S.user.frame = f;
     renderProfile();
-    saveProfile();
-}
-async function saveProfile() {
-    try {
-        await fetch(SERVER_URL + '/api/user/update', {
-            method: 'POST', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(S.user)
-        });
-    } catch(e) {}
 }
 
 function renderChats() {
@@ -412,12 +405,6 @@ async function buyGift(id) {
     S.user.stars -= gift.price;
     if (!S.user.gifts) S.user.gifts = [];
     S.user.gifts.push({ id: gift.id, up: null });
-    try {
-        await fetch(SERVER_URL + '/api/user/update', {
-            method: 'POST', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(S.user)
-        });
-    } catch(e) {}
     closeSheet();
     toast(`Куплено: ${gift.name}!`);
     renderProfile();
@@ -438,20 +425,22 @@ async function switchAccount() {
     let phone = $('#newPhone').value;
     if (!phone) return toast('Введите номер');
     const uid = phone.replace(/\D/g, '');
-    try {
-        const res = await fetch(SERVER_URL + '/api/user/' + uid);
-        S.user = await res.json();
-        if (!S.user.name) {
-            S.user = { id: uid, name: 'Игрок', username: 'user'+uid.slice(-4), stars: 1000, tons: 0, role: 'user', is_frozen: 0, nick_color: '#1e293b', frame: 'none' };
-        }
-        localStorage.setItem('pepegram_id', S.user.id);
-        closeSheet();
-        renderAll();
-        setTab('profile', document.querySelector('[data-tab="profile"]'));
-        toast('Аккаунт переключен!');
-    } catch(e) {
-        toast("Сервер просыпается. Ждите.");
-    }
+    S.user = { 
+        id: uid, 
+        name: 'Игрок', 
+        username: 'user' + uid.slice(-4), 
+        stars: 1000, 
+        tons: 0, 
+        role: 'user', 
+        is_frozen: 0, 
+        nick_color: '#1e293b', 
+        frame: 'none' 
+    };
+    localStorage.setItem('pepegram_id', S.user.id);
+    closeSheet();
+    renderAll();
+    setTab('profile', document.querySelector('[data-tab="profile"]'));
+    toast('Аккаунт переключен!');
 }
 
 function renderSettings() {
@@ -466,14 +455,10 @@ function closeSheet() { $('#sheet').classList.add('hide'); }
 
 const savedId = localStorage.getItem('pepegram_id');
 if (savedId) {
-    fetch(SERVER_URL + '/api/user/' + savedId)
-    .then(res => res.json())
-    .then(data => {
-        S.user = data;
-        $('#auth').classList.add('hide');
-        $('#app').classList.remove('hide');
-        renderAll();
-    }).catch(() => {});
+    S.user = { id: savedId, name: 'Игрок', username: 'user' + savedId.slice(-4), stars: 1000, tons: 0, role: 'user', is_frozen: 0, nick_color: '#1e293b', frame: 'none' };
+    $('#auth').classList.add('hide');
+    $('#app').classList.remove('hide');
+    renderAll();
 }
 </script>
 </body>
