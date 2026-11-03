@@ -1,250 +1,365 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pepegram</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root {
-            --bg: #f0f4f8; --card: #ffffff; --text: #1e293b; --muted: #64748b; 
-            --accent: #0a84ff; --gold: #ffc53d; --green: #34c759; --red: #ff453a;
-            --shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: 0.3s; }
-        
-        /* Темная тема (по желанию) */
-        body.dark { --bg: #0e1621; --card: #17212b; --text: #ffffff; --muted: #8e8e93; --shadow: 0 4px 15px rgba(0,0,0,0.3); }
-
-        .glass { background: var(--card); box-shadow: var(--shadow); border-radius: 16px; border: 1px solid rgba(0,0,0,0.05); }
-
-        /* АНИМАЦИЯ ЗВЕЗДОПАДА */
-        #starsCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-        
-        #appScreen { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; }
-
-        /* ЭКРАН ВХОДА */
-        #authScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
-        .logo { font-size: 60px; margin-bottom: 20px; color: var(--accent); }
-        .auth-title { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
-        .auth-subtitle { color: var(--muted); margin-bottom: 30px; }
-        .input-group { width: 100%; max-width: 300px; }
-        .input-group input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--muted); background: var(--card); color: var(--text); font-size: 18px; text-align: center; outline: none; margin-bottom: 15px; }
-        .btn { width: 100%; padding: 15px; border-radius: 12px; border: none; background: var(--accent); color: white; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-        .btn:active { transform: scale(0.98); }
-
-        /* ПРОФИЛЬ */
-        .header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { font-size: 22px; font-weight: 700; }
-        
-        .profile-card { margin: 15px; padding: 20px; text-align: center; }
-        .avatar { width: 100px; height: 100px; border-radius: 50%; background: var(--accent); margin: 0 auto 15px; display: flex; justify-content: center; align-items: center; font-size: 40px; font-weight: bold; color: white; border: 4px solid transparent; }
-        .avatar.frame-gold { border-color: var(--gold); box-shadow: 0 0 20px var(--gold); }
-        .avatar.frame-neon { border-color: #bf5af2; box-shadow: 0 0 20px #bf5af2; }
-        
-        .profile-name { font-size: 24px; font-weight: 700; margin-bottom: 5px; }
-        .premium-badge { background: var(--gold); color: #000; font-size: 12px; font-weight: bold; padding: 3px 8px; border-radius: 10px; margin-left: 5px; }
-        
-        .info-row { display: flex; justify-content: space-between; padding: 15px; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 16px; }
-        .info-row:last-child { border-bottom: none; }
-        .info-label { color: var(--muted); }
-        .info-value { font-weight: 600; }
-
-        /* БАЛАНС TON */
-        .ton-balance { display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, #0098EA, #0077B5); color: white; padding: 15px; border-radius: 16px; margin: 15px; }
-        .ton-balance img { width: 30px; height: 30px; }
-        .ton-balance b { font-size: 20px; }
-        
-        /* КАСТОМИЗАЦИЯ */
-        .customization { margin: 15px; padding: 20px; }
-        .color-picker { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0 20px; }
-        .color-circle { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; }
-        .color-circle.active { border-color: var(--text); }
-        
-        .frame-picker { display: flex; gap: 10px; }
-        .frame-btn { padding: 10px 15px; border-radius: 10px; border: 2px solid var(--muted); background: none; color: var(--text); cursor: pointer; }
-        .frame-btn.active { border-color: var(--accent); background: rgba(10,132,255,0.1); }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pepegram</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+/* ================= ТЕМЫ ================= */
+:root {
+    --bg: #f0f4f8; --card: #ffffff; --txt: #1e293b; --dim: #64748b; --line: rgba(0,0,0,0.08);
+    --blue: #0a84ff; --gold: #ffc53d; --green: #34c759; --red: #ff453a;
+    --r: 20px; --shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+body.dark {
+    --bg: #0e1621; --card: #17212b; --txt: #ffffff; --dim: #8e8e93; --line: rgba(255,255,255,0.1);
+    --shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+* { box-sizing: border-box; margin: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; }
+body { background: var(--bg); color: var(--txt); font: 16px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; transition: 0.3s; }
+.hide { display: none !important; }
+.ic { width: 22px; height: 22px; flex: none; }
+.g { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); }
+.scr { position: fixed; inset: 0; margin: auto; max-width: 480px; display: flex; flex-direction: column; }
+.over { z-index: 20; background: var(--bg); backdrop-filter: blur(10px); }
+.top { display: flex; align-items: center; gap: 10px; padding: calc(env(safe-area-inset-top, 0px) + 14px) 18px 8px; }
+.top h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; flex: 1; }
+.top h2 { font-size: 17px; font-weight: 600; flex: 1; }
+.ib { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: var(--txt); cursor: pointer; border: 1px solid var(--line); background: var(--card); }
+.main { flex: 1; overflow-y: auto; padding: 6px 16px 120px; }
+.tabs { position: absolute; left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); display: flex; padding: 6px; border-radius: 28px; z-index: 5; background: var(--card); box-shadow: var(--shadow); }
+.tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0; border-radius: 22px; color: var(--dim); font-size: 11px; font-weight: 600; background: none; border: 0; cursor: pointer; transition: 0.2s; }
+.tab.on { color: var(--blue); background: rgba(10, 132, 255, 0.1); }
+.in { width: 100%; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--txt); padding: 13px 14px; font: inherit; outline: 0; }
+.in:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.15); }
+.btn { border: 0; border-radius: 14px; padding: 13px 16px; font: inherit; font-weight: 600; color: #fff; background: var(--blue); cursor: pointer; transition: 0.15s; }
+.btn:active { transform: scale(0.97); }
+.btn.green { background: var(--green); }
+.btn.red { background: var(--red); }
+.btn.ghost { background: var(--card); border: 1px solid var(--line); color: var(--txt); }
+.btn.sm { padding: 9px 12px; font-size: 14px; border-radius: 12px; }
+.btn.wide { width: 100%; }
+.dim { color: var(--dim); }
+/* АНИМАЦИЯ */
+#starsCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+/* АВТОРИЗАЦИЯ */
+#auth { justify-content: center; padding: 28px; gap: 14px; text-align: center; z-index: 1000; background: var(--bg); }
+.logo { width: 92px; height: 92px; margin: 0 auto 6px; border-radius: 28px; display: grid; place-items: center; color: #fff; background: linear-gradient(145deg, #3bb5f5, #1d8fd6); box-shadow: 0 10px 20px rgba(10, 132, 255, 0.3); }
+#auth h1 { font-size: 36px; font-weight: 800; letter-spacing: -0.03em; }
+/* СПИСКИ */
+.search { position: relative; margin-bottom: 14px; }
+.search .ic { position: absolute; left: 13px; top: 13px; color: var(--dim); width: 20px; height: 20px; }
+.search .in { padding-left: 42px; border-radius: 16px; }
+.grp { overflow: hidden; margin-bottom: 18px; }
+.it { display: flex; gap: 12px; align-items: center; padding: 12px 14px; cursor: pointer; transition: 0.15s; }
+.it:active { background: rgba(0, 0, 0, 0.03); }
+.it + .it { border-top: 1px solid var(--line); }
+.it .tx { flex: 1; min-width: 0; }
+.it b { display: block; font-weight: 600; }
+.it small { display: block; color: var(--dim); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cav { width: 50px; height: 50px; border-radius: 50%; display: grid; place-items: center; color: #fff; flex: none; font-weight: bold; font-size: 20px; background: linear-gradient(145deg, #3bb5f5, #1c6fb0); }
+.lbl { color: var(--dim); font-size: 13px; margin: 0 6px 7px; text-transform: uppercase; }
+/* ЧАТЫ */
+.msgs { flex: 1; overflow-y: auto; padding: 10px 14px; display: flex; flex-direction: column; }
+.msg { max-width: 78%; padding: 9px 13px; border-radius: 18px; margin: 4px 0; background: var(--card); border: 1px solid var(--line); word-break: break-word; }
+.msg.me { margin-left: auto; background: var(--blue); color: #fff; border-color: transparent; }
+.msg b { display: block; font-size: 13px; color: var(--blue); }
+.msg.me b { color: rgba(255, 255, 255, 0.8); }
+.msg small { display: block; color: var(--dim); font-size: 11px; text-align: right; margin-top: 2px; }
+.msg.me small { color: rgba(255, 255, 255, 0.7); }
+.comp { display: flex; gap: 10px; padding: 10px 14px calc(env(safe-area-inset-bottom, 0px) + 12px); }
+.comp .btn { width: 48px; padding: 0; display: grid; place-items: center; border-radius: 50%; }
+/* ПРОФИЛЬ */
+.av { padding: 4px; border-radius: 50%; background: var(--ring, transparent); width: 112px; height: 112px; margin: 8px auto 12px; transition: 0.3s; }
+.av i { width: 100%; height: 100%; border-radius: 50%; display: grid; place-items: center; font-weight: 600; font-size: 44px; color: #fff; background: linear-gradient(145deg, #3bb5f5, #1c6fb0); border: 3px solid var(--bg); font-style: normal; }
+.prof { text-align: center; }
+.prof h3 { font-size: 24px; }
+.bal { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0 16px; }
+.bal div { padding: 16px; text-align: center; }
+.bal b { display: block; font-size: 26px; }
+.sw { display: flex; gap: 10px; margin: 8px 0 16px; flex-wrap: wrap; }
+.sw span { width: 38px; height: 38px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; outline: 1px solid var(--line); outline-offset: 2px; }
+.sw span.on { border-color: var(--txt); }
+/* МОДАЛКИ */
+.sheet { position: fixed; inset: 0; z-index: 30; display: flex; align-items: flex-end; justify-content: center; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); }
+.sheet > div { width: 100%; max-width: 480px; padding: 20px 18px calc(env(safe-area-inset-bottom, 0px) + 20px); border-radius: 28px 28px 0 0; background: var(--card); box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1); }
+.toast { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 12px); left: 50%; transform: translate(-50%, -90px); z-index: 99; padding: 11px 18px; border-radius: 30px; transition: 0.3s; font-size: 14px; white-space: nowrap; max-width: 92vw; overflow: hidden; text-overflow: ellipsis; background: var(--txt); color: var(--bg); }
+.toast.on { transform: translate(-50%, 0); }
+/* ПОДАРКИ */
+.gifts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.gift { padding: 14px 6px 10px; border-radius: 18px; text-align: center; color: #fff; background: linear-gradient(160deg, var(--a), var(--b)); display: flex; flex-direction: column; align-items: center; gap: 4px; border: 1px solid rgba(255, 255, 255, 0.25); cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.gift b { font-size: 12px; }
+.gift small { font-size: 11px; background: rgba(0, 0, 0, 0.28); padding: 2px 9px; border-radius: 12px; }
+/* АДМИНКА */
+#admin { max-width: 760px; }
+.pl { margin-bottom: 12px; overflow: hidden; }
+.pl summary { display: flex; gap: 12px; align-items: center; padding: 12px 14px; cursor: pointer; list-style: none; }
+.pl summary::-webkit-details-marker { display: none; }
+.pl .body { padding: 4px 14px 14px; display: grid; gap: 12px; border-top: 1px solid var(--line); }
+.badge { font-size: 11px; padding: 2px 8px; border-radius: 20px; margin-left: 6px; border: 1px solid; }
+.seg { display: flex; padding: 4px; gap: 4px; margin-bottom: 14px; border-radius: 16px; background: var(--line); }
+.seg button { flex: 1; border: 0; background: none; color: var(--dim); padding: 9px; border-radius: 12px; font: inherit; font-weight: 600; cursor: pointer; }
+.seg button.on { background: var(--card); color: var(--txt); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); }
+.game-box { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 20px; margin-bottom: 20px; text-align: center; }
+.cbal { text-align: center; margin-bottom: 12px; color: var(--gold); font-weight: 600; font-size: 18px; }
+</style>
 </head>
 <body>
 
-    <canvas id="starsCanvas"></canvas>
+<canvas id="starsCanvas"></canvas>
 
-    <!-- ЭКРАН ВХОДА -->
-    <div id="authScreen">
-        <div class="logo">P</div>
-        <div class="auth-title">Pepegram</div>
-        <div class="auth-subtitle">Войдите по номеру телефона</div>
-        <div class="input-group">
-            <input type="text" id="phoneInput" placeholder="+7 999 123-45-67" readonly>
-            <button class="btn" style="background: var(--muted); margin-bottom: 10px;" onclick="genPhone()">Сгенерировать номер</button>
-            <button class="btn" onclick="login()">Войти</button>
-        </div>
-    </div>
+<!-- АВТОРИЗАЦИЯ -->
+<section id="auth" class="scr">
+  <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 4L3 11l6 2.5L11.5 20l2.7-4.8L19 18z"/><path d="M9 13.5L21 4"/></svg></div>
+  <h1>Pepegram</h1>
+  <p class="dim">Войдите по номеру</p>
+  <div style="display:grid;gap:12px;margin-top:10px;width:100%;max-width:300px">
+    <input id="phone" class="in" type="tel" placeholder="+7 999 123-45-67">
+    <button class="btn" style="background:var(--line);color:var(--txt)" onclick="genPhone()">Сгенерировать</button>
+    <button class="btn" onclick="login()">Войти</button>
+  </div>
+</section>
 
-    <!-- ОСНОВНОЙ ЭКРАН -->
-    <div id="appScreen" style="display: none;">
-        <div class="header">
-            <h1>Профиль</h1>
-            <button class="btn" style="width: auto; padding: 10px 15px; background: var(--muted);" onclick="logout()">Выйти</button>
-        </div>
+<!-- ПРИЛОЖЕНИЕ -->
+<section id="app" class="scr hide" style="z-index:1;">
+  <div class="top">
+    <h1 id="title">Профиль</h1>
+    <button id="adminBtn" class="g ib hide" style="background:var(--gold);color:#000" onclick="openAdmin()">A</button>
+  </div>
+  <div class="main">
+    <div id="v-chats" class="hide"></div>
+    <div id="v-casino" class="hide"></div>
+    <div id="v-settings" class="hide"></div>
+    <div id="v-profile"></div>
+  </div>
+  <nav class="tabs g">
+    <button class="tab on" data-tab="profile">Профиль</button>
+    <button class="tab" data-tab="chats">Чаты</button>
+    <button class="tab" data-tab="casino">Казино</button>
+    <button class="tab" data-tab="settings">Настройки</button>
+  </nav>
+</section>
 
-        <div class="profile-card glass">
-            <div class="avatar" id="avatarBox">U</div>
-            <div class="profile-name">
-                <span id="userName">Игрок</span>
-                <span class="premium-badge">PREMIUM</span>
-            </div>
-            <div style="color: var(--muted); font-size: 14px; margin-top: 5px;" id="userId">ID: 000000</div>
-        </div>
-
-        <div class="ton-balance glass">
-            <img src="https://cryptologos.cc/logos/toncoin-ton-logo.png" alt="TON">
-            <b id="tonBalance">0 TON</b>
-        </div>
-
-        <div class="profile-card glass">
-            <div class="info-row"><span class="info-label">Звезды</span><span class="info-value" id="starBalance">1000 ⭐</span></div>
-            <div class="info-row"><span class="info-label">О себе</span><span class="info-value" id="userBio">-</span></div>
-        </div>
-
-        <div class="customization glass">
-            <h3 style="margin-bottom: 10px;">Кастомизация</h3>
-            <div style="font-size: 14px; color: var(--muted);">Цвет ника:</div>
-            <div class="color-picker" id="colorPicker">
-                <div class="color-circle" style="background: #1e293b;" onclick="setColor('#1e293b', this)"></div>
-                <div class="color-circle" style="background: #0a84ff;" onclick="setColor('#0a84ff', this)"></div>
-                <div class="color-circle" style="background: #34c759;" onclick="setColor('#34c759', this)"></div>
-                <div class="color-circle" style="background: #ff453a;" onclick="setColor('#ff453a', this)"></div>
-                <div class="color-circle" style="background: #bf5af2;" onclick="setColor('#bf5af2', this)"></div>
-                <div class="color-circle" style="background: #ffc53d;" onclick="setColor('#ffc53d', this)"></div>
-            </div>
-            
-            <div style="font-size: 14px; color: var(--muted);">Рамка аватарки:</div>
-            <div class="frame-picker">
-                <button class="frame-btn active" onclick="setFrame('none', this)">Нет</button>
-                <button class="frame-btn" onclick="setFrame('gold', this)">Золото</button>
-                <button class="frame-btn" onclick="setFrame('neon', this)">Неон</button>
-            </div>
-        </div>
-    </div>
+<div id="sheet" class="sheet hide"><div id="sheetBox"></div></div>
+<div id="toast" class="toast g"></div>
 
 <script>
-    const API_URL = "https://fame-api-bs11.onrender.com";
-    let currentUser = null;
+/* ================= ЛОГИКА ================= */
+const SERVER_URL = "https://fame-api-bs11.onrender.com";
+let S = { user: null, tab: 'profile' };
 
-    // АНИМАЦИЯ ЗВЕЗДОПАДА
-    const canvas = document.getElementById('starsCanvas');
-    const ctx = canvas.getContext('2d');
-    let w, h, stars = [];
-    function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
-    window.addEventListener('resize', resize); resize();
+// АНИМАЦИЯ
+const canvas = document.getElementById('starsCanvas');
+const ctx = canvas.getContext('2d');
+let w, h, stars = [];
+function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+window.addEventListener('resize', resize); resize();
+class Star {
+    constructor() { this.reset(); this.y = Math.random() * h; }
+    reset() { this.x = Math.random() * w; this.y = -10; this.size = Math.random() * 2 + 1; this.speed = Math.random() * 1.5 + 0.5; }
+    update() { this.y += this.speed; if (this.y > h) this.reset(); }
+    draw() { ctx.fillStyle = "rgba(10, 132, 255, 0.4)"; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+}
+for (let i = 0; i < 80; i++) stars.push(new Star());
+function animate() { ctx.clearRect(0, 0, w, h); stars.forEach(s => { s.update(); s.draw(); }); requestAnimationFrame(animate); }
+animate();
 
-    class Star {
-        constructor() { this.reset(); this.y = Math.random() * h; }
-        reset() {
-            this.x = Math.random() * w; this.y = -10;
-            this.size = Math.random() * 2 + 1;
-            this.speed = Math.random() * 1.5 + 0.5;
-            this.opacity = Math.random() * 0.6 + 0.4;
+const $ = s => document.querySelector(s);
+const toast = t => { const e = $('#toast'); e.textContent = t; e.classList.add('on'); setTimeout(() => e.classList.remove('on'), 2500); };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function genPhone() {
+    $('#phone').value = "+7 999 " + Math.floor(Math.random()*900+100) + "-" + Math.floor(Math.random()*90+10) + "-" + Math.floor(Math.random()*90+10);
+}
+
+async function login() {
+    let phone = $('#phone').value;
+    if (!phone) phone = "+7 999 " + Math.floor(Math.random()*900+100);
+    const uid = phone.replace(/\D/g, '') || Math.floor(1e9 + Math.random()*9e9);
+    
+    try {
+        const res = await fetch(SERVER_URL + '/api/user/' + uid);
+        S.user = await res.json();
+        if (!S.user.name) {
+            S.user = { id: uid, name: 'Игрок', username: 'user'+uid.slice(-4), stars: 1000, tons: 0, role: 'user', is_frozen: 0, nick_color: '#1e293b', frame: 'none' };
         }
-        update() { this.y += this.speed; if (this.y > h) this.reset(); }
-        draw() {
-            ctx.fillStyle = `rgba(255, 215, 0, ${this.opacity})`;
-            ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+        localStorage.setItem('pepegram_id', S.user.id);
+        $('#auth').classList.add('hide');
+        $('#app').classList.remove('hide');
+        renderAll();
+    } catch (e) {
+        toast("Сервер просыпается. Ждите.");
+    }
+}
+
+function logout() { localStorage.removeItem('pepegram_id'); location.reload(); }
+
+// ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
+document.querySelectorAll('.tab').forEach(t => {
+    t.onclick = () => {
+        document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+        t.classList.add('on');
+        const tab = t.dataset.tab;
+        ['profile', 'chats', 'casino', 'settings'].forEach(v => {
+            $('#v-' + v).classList.toggle('hide', v !== tab);
+        });
+        $('#title').innerText = { profile: 'Профиль', chats: 'Чаты', casino: 'Казино', settings: 'Настройки' }[tab];
+        if (tab === 'chats') renderChats();
+        if (tab === 'casino') renderCasino();
+        if (tab === 'settings') renderSettings();
+    };
+});
+
+function renderAll() {
+    renderProfile();
+    $('#adminBtn').classList.toggle('hide', S.user.role !== 'owner');
+}
+
+// ================= ПРОФИЛЬ =================
+function renderProfile() {
+    const u = S.user;
+    const avClass = u.frame === 'gold' ? 'av frame-gold' : u.frame === 'neon' ? 'av frame-neon' : 'av';
+    $('#v-profile').innerHTML = `
+        <div class="glass prof" style="margin-bottom:16px;padding:20px;">
+            <div class="${avClass}"><i>${esc(u.name[0].toUpperCase())}</i></div>
+            <h3 style="color:${u.nick_color}">${esc(u.name)} ${u.role === 'owner' ? '<span class="badge" style="background:var(--gold);color:#000">Владелец</span>' : ''}</h3>
+            <p class="dim" style="font-size:14px;margin-top:4px;">ID: ${u.id}</p>
+            <div style="display:flex;justify-content:center;gap:20px;margin-top:20px;">
+                <div><b style="font-size:20px;color:var(--gold)">${u.stars}</b><br><small class="dim">Звезды</small></div>
+                <div><b style="font-size:20px;color:#0098EA">${u.tons || 0}</b><br><small class="dim">TON</small></div>
+            </div>
+        </div>
+        <div class="glass" style="padding:16px;margin-bottom:16px;">
+            <h4 style="margin-bottom:10px;">Цвет ника</h4>
+            <div class="sw">
+                <span style="background:#1e293b" onclick="setColor('#1e293b',this)"></span>
+                <span style="background:#0a84ff" onclick="setColor('#0a84ff',this)"></span>
+                <span style="background:#34c759" onclick="setColor('#34c759',this)"></span>
+                <span style="background:#ff453a" onclick="setColor('#ff453a',this)"></span>
+                <span style="background:#bf5af2" onclick="setColor('#bf5af2',this)"></span>
+            </div>
+            <h4 style="margin:15px 0 10px;">Рамка</h4>
+            <div style="display:flex;gap:10px;">
+                <button class="btn sm ghost" onclick="setFrame('none',this)">Нет</button>
+                <button class="btn sm ghost" onclick="setFrame('gold',this)">Золото</button>
+                <button class="btn sm ghost" onclick="setFrame('neon',this)">Неон</button>
+            </div>
+        </div>
+        <button class="btn red wide" onclick="logout()">Выйти из аккаунта</button>
+    `;
+}
+
+async function setColor(c, el) {
+    S.user.nick_color = c;
+    document.querySelectorAll('.sw span').forEach(x => x.classList.remove('on'));
+    el.classList.add('on');
+    document.querySelector('#v-profile h3').style.color = c;
+    saveProfile();
+}
+async function setFrame(f, el) {
+    S.user.frame = f;
+    renderProfile();
+    saveProfile();
+}
+async function saveProfile() {
+    try {
+        await fetch(SERVER_URL + '/api/customize', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ user_id: S.user.id, color: S.user.nick_color, frame: S.user.frame })
+        });
+    } catch(e) {}
+}
+
+// ================= ЧАТЫ =================
+function renderChats() {
+    $('#v-chats').innerHTML = `
+        <div class="search"><span class="dim">🔍</span><input class="in" placeholder="Поиск"></div>
+        <div class="glass grp">
+            <div class="it">
+                <div class="cav">P</div>
+                <div class="tx"><b>Pepegram Chat</b><small>Общий чат</small></div>
+            </div>
+            <div class="it">
+                <div class="cav" style="background:linear-gradient(145deg,#ffcf5a,#c98a10)">C</div>
+                <div class="tx"><b>Pepegram Channel</b><small>Новости</small></div>
+            </div>
+        </div>
+    `;
+}
+
+// ================= КАЗИНО =================
+function renderCasino() {
+    $('#v-casino').innerHTML = `
+        <div class="cbal">Баланс: ${S.user.stars} ⭐</div>
+        <div class="seg g">
+            <button class="on">Краш</button>
+            <button>Мины</button>
+            <button>Апгрейдер</button>
+        </div>
+        <div class="game-box">
+            <h3>Краш</h3>
+            <p class="dim" style="margin:10px 0;">Запусти ракету и забери на x2!</p>
+            <input type="number" id="bet" class="in" placeholder="Ставка" style="margin-bottom:10px;">
+            <button class="btn green wide" onclick="playCrash()">Запустить</button>
+        </div>
+    `;
+}
+async function playCrash() {
+    const bet = parseInt($('#bet').value);
+    if (!bet || bet > S.user.stars) return toast('Проверьте ставку');
+    S.user.stars -= bet; 
+    document.querySelector('.cbal').innerText = `Баланс: ${S.user.stars} ⭐`;
+    toast('Ракета летит...');
+    setTimeout(() => {
+        const win = Math.random() < 0.6;
+        if (win) {
+            S.user.stars += bet * 2;
+            document.querySelector('.cbal').innerText = `Баланс: ${S.user.stars} ⭐`;
+            toast(`Победа! +${bet * 2} ⭐`);
+        } else {
+            toast('Ракета упала. Попробуйте еще.');
         }
-    }
-    for (let i = 0; i < 100; i++) stars.push(new Star());
-    function animate() {
-        ctx.clearRect(0, 0, w, h);
-        stars.forEach(s => { s.update(); s.draw(); });
-        requestAnimationFrame(animate);
-    }
-    animate();
+    }, 2000);
+}
 
-    // ЛОГИКА
-    function genPhone() {
-        document.getElementById('phoneInput').value = "+7 999 " + Math.floor(Math.random()*900+100) + "-" + Math.floor(Math.random()*90+10) + "-" + Math.floor(Math.random()*90+10);
-    }
+// ================= НАСТРОЙКИ =================
+function renderSettings() {
+    $('#v-settings').innerHTML = `
+        <div class="glass grp">
+            <div class="it"><div class="tx"><b>Конфиденциальность</b></div></div>
+            <div class="it"><div class="tx"><b>Оформление</b></div></div>
+            <div class="it"><div class="tx"><b>Premium</b></div></div>
+        </div>
+    `;
+}
 
-    async function login() {
-        let phone = document.getElementById('phoneInput').value;
-        if (!phone) phone = "+7 999 " + Math.floor(Math.random()*900+100); // Если пусто, генерим
-        const uid = phone.replace(/\D/g, '') || Math.floor(1e9 + Math.random()*9e9);
-        
-        try {
-            const res = await fetch(API_URL + '/api/user/' + uid);
-            currentUser = await res.json();
-            localStorage.setItem('pepegram_user_id', currentUser.id); // СОХРАНЯЕМ ID!
-            showProfile();
-        } catch (e) {
-            alert("Сервер просыпается. Подождите 30 секунд и нажмите снова.");
-        }
-    }
+// ================= АДМИНКА =================
+function openAdmin() {
+    $('#sheetBox').innerHTML = `
+        <h3 style="margin-bottom:15px;">Админ-панель</h3>
+        <div class="it" style="border:1px solid var(--line);border-radius:12px;margin-bottom:10px;">
+            <div class="tx"><b>@ruslan</b><small>Главный владелец</small></div>
+        </div>
+        <button class="btn wide" onclick="closeSheet()">Закрыть</button>
+    `;
+    $('#sheet').classList.remove('hide');
+}
+function closeSheet() { $('#sheet').classList.add('hide'); }
 
-    function showProfile() {
-        document.getElementById('authScreen').style.display = 'none';
-        document.getElementById('appScreen').style.display = 'flex';
-        
-        document.getElementById('userName').innerText = currentUser.name;
-        document.getElementById('userName').style.color = currentUser.nick_color;
-        document.getElementById('avatarBox').innerText = currentUser.name[0].toUpperCase();
-        document.getElementById('userId').innerText = "ID: " + currentUser.id;
-        document.getElementById('starBalance').innerText = currentUser.stars + " ⭐";
-        document.getElementById('tonBalance').innerText = currentUser.tons + " TON";
-        
-        // Рамка
-        const av = document.getElementById('avatarBox');
-        av.className = 'avatar';
-        if (currentUser.frame === 'gold') av.classList.add('frame-gold');
-        if (currentUser.frame === 'neon') av.classList.add('frame-neon');
-    }
-
-    let selColor = '#1e293b', selFrame = 'none';
-    function setColor(c, el) {
-        selColor = c;
-        document.querySelectorAll('.color-circle').forEach(x => x.classList.remove('active'));
-        el.classList.add('active');
-        document.getElementById('userName').style.color = c;
-        saveProfile();
-    }
-    function setFrame(f, el) {
-        selFrame = f;
-        document.querySelectorAll('.frame-btn').forEach(x => x.classList.remove('active'));
-        el.classList.add('active');
-        const av = document.getElementById('avatarBox');
-        av.className = 'avatar';
-        if (f === 'gold') av.classList.add('frame-gold');
-        if (f === 'neon') av.classList.add('frame-neon');
-        saveProfile();
-    }
-
-    async function saveProfile() {
-        if (!currentUser) return;
-        currentUser.nick_color = selColor;
-        currentUser.frame = selFrame;
-        try {
-            await fetch(API_URL + '/api/user/update', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(currentUser)
-            });
-        } catch(e) {}
-    }
-
-    function logout() {
-        localStorage.removeItem('pepegram_user_id');
-        location.reload();
-    }
-
-    // ПРИ ЗАГРУЗКЕ ПРОВЕРЯЕМ, ЕСТЬ ЛИ СОХРАНЕННЫЙ ID
-    const savedId = localStorage.getItem('pepegram_user_id');
-    if (savedId) {
-        fetch(API_URL + '/api/user/' + savedId)
-        .then(res => res.json())
-        .then(data => { currentUser = data; showProfile(); })
-        .catch(() => {});
-    }
+// ПРОВЕРКА ПРИ СТАРТЕ
+const savedId = localStorage.getItem('pepegram_id');
+if (savedId) {
+    fetch(SERVER_URL + '/api/user/' + savedId)
+    .then(res => res.json())
+    .then(data => {
+        S.user = data;
+        $('#auth').classList.add('hide');
+        $('#app').classList.remove('hide');
+        renderAll();
+    }).catch(() => {});
+}
 </script>
 </body>
 </html>
