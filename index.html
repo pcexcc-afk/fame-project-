@@ -776,7 +776,33 @@ window.Pepegram = {
   setBalance(stars, grams){ S.user.stars = stars; if(grams != null) S.user.grams = grams; renderProfile(); },
   loginAs(id){ S.user.id = id; renderAll(); }
 };
+// --- ВОССТАНОВЛЕНИЕ ИКОНОК И ДАННЫХ ---
 restore();
+
+// Принудительно отрисовываем иконки для всех элементов с data-ic
+document.querySelectorAll('[data-ic]').forEach(el => {
+    const iconName = el.dataset.ic;
+    if (ICONS[iconName]) {
+        // Если иконки нет внутри, добавляем
+        if (!el.querySelector('svg')) {
+            el.insertAdjacentHTML('afterbegin', ic(iconName));
+        }
+    }
+});
+
+// Отрисовываем нижнее меню
+document.querySelectorAll('.tab').forEach(tab => {
+    const iconName = tab.dataset.ic;
+    if (iconName && ICONS[iconName]) {
+        // Вставляем иконку перед текстом в span
+        const span = tab.querySelector('span');
+        if (span) {
+            span.insertAdjacentHTML('beforebegin', ic(iconName));
+        } else {
+            tab.insertAdjacentHTML('afterbegin', ic(iconName));
+        }
+    }
+});
 </script>
 </body>
 </html>
