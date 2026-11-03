@@ -187,18 +187,89 @@ body{background-color:#000;background-image:radial-gradient(120% 70% at 50% -10%
 const ADMIN_ID = 1780245651;
 const START_STARS = 1000;
 
-/* ============ API-ЗАГЛУШКИ: замените тела функций на fetch() к вашему Python-серверу ============ */
+/* ============ API ============ */
+const SERVER_URL = "https://fame-api-bs11.onrender.com";
+
 const API = {
-  async sendCode(phone){ API._c = String(1000 + Math.floor(Math.random()*9000)); setTimeout(() => push('Pepegram', 'Ваш код подтверждения: ' + API._c), 1200); return {ok:true}; },
-  async verifyCode(phone, code){
-    return {ok: code === API._c, user:{id: phone.replace(/\D/g,'') === OWNER_PHONE ? ADMIN_ID : Math.floor(1e9 + Math.random()*9e9), phone, name:'Пользователь', stars:START_STARS, grams:0, nickColor:'#f5f7fa', frame:'transparent'}};
+  _c: null,
+  async sendCode(phone) {
+    this._c = "1234"; 
+    setTimeout(() => push('Pepegram', 'Ваш код подтверждения: 1234'), 1000);
+    return {ok: true};
   },
-  async sendMessage(chatId, text){ return {ok:true}; },
-  async saveProfile(profile){ return {ok:true}; },
-  async upgrade(p){ const g = GIFTS.find(x => x.id === p.giftId), ch = p.mode === 'x2' ? 47.5 : Math.min(95, p.bet / g.v * 95), roll = Math.random()*100; return {roll, win: roll < ch}; },
-  async pvpBet(amount){ return {ok:true}; },
-  async pvpDraw(bets){ const e = Object.entries(bets), t = e.reduce((s, x) => s + x[1], 0); let r = Math.random()*t; for(const [n, b] of e){ if((r -= b) < 0) return n; } return e[0][0]; },
-  async getPlayers(){ return PLAYERS; },
+  async verifyCode(phone, code) {
+    if (code !== this._c) return {ok: false};
+    const uid = phone.replace(/\D/g, '') || Math.floor(1e9 + Math.random()*9e9);
+    try {
+      const res = await fetch(SERVER_URL + '/api/user/' + uid);
+      const user = await res.json();
+      return {
+        ok: true,
+        user: {
+          id: user.user_id,
+          name: user.name || 'Игрок',
+          phone: phone,
+          stars: user.stars,
+          grams: user.grams,
+          role: user.role,
+          frozen: user.is_frozen === 1,
+          gifts: [],
+          names: [],
+          nums: []
+        }
+      };
+    } catch (e) {
+      return {ok: false, error: "Сервер просыпается. Подождите."};
+    }
+  },
+  async sendMessage(chatId, text) {
+    try {
+      await fetch(SERVER_URL + '/api/send_message', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({chat_id: chatId, sender: S.user.name, text: text})
+      });
+      return {ok: true};
+    } catch(e) { return {ok: false}; }
+  },
+  async saveProfile(profile) { return {ok: true}; },
+  async upgrade(p) {
+    const g = GIFTS.find(x => x.id === p.giftId);
+    const ch = p.mode === 'x2' ? 47.5 : Math.min(95, p.bet / g.v * 95);
+    const roll = Math.random()*100;
+    return {roll, win: roll < ch};
+  },
+  async pvpBet(amount) { return {ok: true}; },
+  async pvpDraw(bets) {
+    const e = Object.entries(bets), t = e.reduce((s, x) => s + x[1], 0); 
+    let r = Math.random()*t; 
+    for(const [n, b] of e){ if((r -= b) < 0) return n; } 
+    return e[0][0];
+  },
+  async getPlayers() {
+    try {
+      const res = await fetch(SERVER_URL + '/api/admin/get_all');
+      return await res.json();
+    } catch(e) {
+      return PLAYERS;
+    }
+  },
+  async adminAction(type, playerId, payload) {
+    try {
+      const actionMap = {
+        'freeze': 'freeze',
+        'giveStars': 'give_stars',
+        'takeStars': 'take_stars',
+        'giveAdmin': 'set_role'
+      };
+      const act = actionMap[type] || type;
+      await fetch(SERVER_URL + '/api/admin/action', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({action: act, target: playerId, value: payload.value || payload})
+      });
+      return {ok: true};
+    } catch(e) { return {ok: false}; }
+  }
+};
   async adminAction(type, playerId, payload){ return {ok:true}; }
 };
 
