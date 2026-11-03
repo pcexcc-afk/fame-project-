@@ -1,294 +1,711 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pepegram</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root {
-            --glass: rgba(255, 255, 255, 0.08); --glass-border: rgba(255, 255, 255, 0.15);
-            --text: #ffffff; --accent: #0a84ff; --gold: #ffd60a; --green: #30d158; --red: #ff453a;
-            --bg: #000000; --muted: #8e8e93; --msg-out: #0a84ff; --msg-in: rgba(255,255,255,0.15);
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; }
-        body { background-color: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; background-image: radial-gradient(circle at top right, #1a1a2e, #000000); }
-        .glass { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 14px; }
-
-        #mainApp { display: flex; height: 100%; flex-direction: column; }
-        .header { padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; background: var(--glass); border-bottom: 1px solid var(--glass-border); }
-        .header-title { font-size: 20px; font-weight: 700; }
-        
-        .content { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 100px; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-
-        /* ЧАТЫ */
-        .chat-item { display: flex; align-items: center; padding: 12px; cursor: pointer; border-radius: 12px; margin-bottom: 5px; border-bottom: 1px solid var(--glass-border); }
-        .chat-avatar { width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; font-weight: bold; margin-right: 15px; background: var(--accent); }
-        .chat-info { flex: 1; }
-        .chat-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
-        .chat-msg { font-size: 14px; color: var(--muted); }
-
-        /* ЭКРАН ЧАТА */
-        #chatScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 1000; display: none; flex-direction: column; }
-        .chat-header { padding: 15px; display: flex; align-items: center; background: var(--glass); border-bottom: 1px solid var(--glass-border); }
-        .back-btn { font-size: 22px; cursor: pointer; margin-right: 15px; color: var(--accent); }
-        .chat-title { font-size: 16px; font-weight: 600; }
-        .messages-area { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .msg { padding: 10px 14px; border-radius: 14px; max-width: 80%; font-size: 15px; }
-        .msg.out { background: var(--msg-out); align-self: flex-end; border-bottom-right-radius: 4px; }
-        .msg.in { background: var(--msg-in); align-self: flex-start; border-bottom-left-radius: 4px; }
-        .input-area { padding: 10px; display: flex; gap: 10px; background: var(--glass); border-top: 1px solid var(--glass-border); }
-        .msg-input { flex: 1; padding: 12px; border-radius: 20px; border: none; background: rgba(255,255,255,0.1); color: white; outline: none; font-size: 15px; }
-        .send-btn { background: var(--accent); border: none; color: white; width: 45px; height: 45px; border-radius: 50%; font-size: 16px; cursor: pointer; }
-
-        /* ПРОФИЛЬ */
-        .profile-card { padding: 20px; text-align: center; margin-bottom: 20px; }
-        .profile-avatar { width: 90px; height: 90px; border-radius: 50%; background: var(--accent); margin: 0 auto 15px; display: flex; justify-content: center; align-items: center; font-size: 36px; font-weight: bold; }
-        .info-row { display: flex; justify-content: space-between; padding: 14px; border-bottom: 1px solid var(--glass-border); font-size: 15px; }
-        .info-row:last-child { border-bottom: none; }
-        .info-label { color: var(--muted); }
-
-        /* КАЗИНО */
-        .casino-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .casino-tab { flex: 1; padding: 12px; text-align: center; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 10px; background: rgba(255,255,255,0.05); color: var(--muted); }
-        .casino-tab.active { background: var(--accent); color: white; }
-        .game-box { padding: 20px; margin-bottom: 20px; text-align: center; }
-        .modal-input { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 10px; color: white; margin-bottom: 10px; outline: none; text-align: center; font-size: 15px;}
-        .btn { width: 100%; padding: 14px; background: var(--accent); border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 10px; }
-
-        /* НИЖНЕЕ МЕНЮ */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--glass); backdrop-filter: blur(20px); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid var(--glass-border); z-index: 10; }
-        .nav-item { text-align: center; color: var(--muted); font-size: 11px; cursor: pointer; flex: 1; font-weight: 500; }
-        .nav-item.active { color: var(--accent); }
-
-        /* АДМИНКА */
-        #adminPanel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); z-index: 9999; flex-direction: column; }
-        .admin-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); }
-        .admin-list { flex: 1; overflow-y: auto; padding: 15px; }
-        .user-card { padding: 15px; margin-bottom: 15px; }
-        .role-badge { padding: 3px 8px; border-radius: 5px; font-size: 12px; font-weight: bold; background: #333; }
-        .admin-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 10px; }
-        .admin-btn { padding: 8px; font-size: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: white; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pepegram</title>
+<style>
+:root{--blue:#2AABEE;--gold:#FFC53D;--green:#34C759;--red:#FF453A;--glass:rgba(255,255,255,.07);--line:rgba(255,255,255,.13);--txt:#f5f7fa;--dim:rgba(235,240,255,.55);--r:20px}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background-color:#000;background-image:radial-gradient(120% 70% at 50% -10%,#12395b 0%,#07111c 45%,#000 80%),radial-gradient(60% 40% at 100% 100%,rgba(42,171,238,.12),transparent);background-attachment:fixed;color:var(--txt);font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;overflow:hidden}
+.hide{display:none!important}
+.ic{width:22px;height:22px;flex:none}
+.g{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);-webkit-backdrop-filter:blur(24px) saturate(170%);backdrop-filter:blur(24px) saturate(170%)}
+.scr{position:fixed;inset:0;margin:auto;max-width:480px;display:flex;flex-direction:column}
+.over{z-index:20;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px)}
+.top{display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 14px) 18px 8px}
+.top h1{font-size:30px;font-weight:700;letter-spacing:-.02em;flex:1}
+.top h2{font-size:17px;font-weight:600;flex:1}
+.ib{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--txt);cursor:pointer;font-weight:600;font-size:16px;font-family:inherit;border-color:var(--line)}
+.main{flex:1;overflow-y:auto;padding:6px 16px 120px}
+.tabs{position:absolute;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);display:flex;padding:6px;border-radius:28px;z-index:5}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0;border-radius:22px;color:var(--dim);font-weight:500;font-size:11px;font-family:inherit;background:none;border:0;cursor:pointer;transition:.2s}
+.tab.on{color:var(--blue);background:rgba(42,171,238,.15)}
+.fab{position:absolute;right:20px;bottom:calc(env(safe-area-inset-bottom,0px) + 94px);width:56px;height:56px;border-radius:50%;border:0;color:#fff;display:grid;place-items:center;cursor:pointer;background:linear-gradient(180deg,#3bb5f5,#1d8fd6);box-shadow:0 8px 24px rgba(42,171,238,.4);z-index:4}
+.in{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:14px;color:var(--txt);padding:13px 14px;font:inherit;outline:0}
+.in:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(42,171,238,.25)}
+.btn{border:0;border-radius:14px;padding:13px 16px;font:inherit;font-weight:600;color:#fff;background:linear-gradient(180deg,#3bb5f5,#1d8fd6);cursor:pointer;transition:.15s}
+.btn:active{transform:scale(.97)}
+.btn.green{background:linear-gradient(#3fd868,#25a244)}.btn.red{background:linear-gradient(#ff6a60,#d63a30)}
+.btn.ghost{background:var(--glass);border:1px solid var(--line)}
+.btn.sm{padding:9px 12px;font-size:14px;border-radius:12px}.btn.wide{width:100%}
+.dim{color:var(--dim)}
+/* auth */
+#auth{justify-content:center;padding:28px;gap:14px;text-align:center}
+.logo{width:92px;height:92px;margin:0 auto 6px;border-radius:28px;display:grid;place-items:center;color:#fff;background:linear-gradient(145deg,rgba(59,181,245,.9),rgba(29,143,214,.55))}
+.logo svg{width:46px;height:46px}
+#auth h1{font-size:36px;letter-spacing:-.03em}
+.row{display:flex;gap:10px;align-items:center}
+.codes{display:flex;gap:12px;justify-content:center;margin:6px 0}
+.codes input{width:60px;height:68px;text-align:center;font-weight:600;font-size:28px;font-family:inherit;padding:0}
+.err{color:var(--red);font-size:14px;min-height:20px}
+/* lists */
+.search{position:relative;margin-bottom:14px}
+.search .ic{position:absolute;left:13px;top:13px;color:var(--dim);width:20px;height:20px}
+.search .in{padding-left:42px;border-radius:16px}
+.grp{overflow:hidden;margin-bottom:18px}
+.it{display:flex;gap:12px;align-items:center;padding:12px 14px;cursor:pointer;transition:background .15s}
+.it:active{background:rgba(255,255,255,.06)}
+.it+.it{border-top:1px solid var(--line)}
+.it .tx{flex:1;min-width:0}.it b{display:block;font-weight:600}
+.it small{display:block;color:var(--dim);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it time{color:var(--dim);font-size:12px;align-self:flex-start}
+.cav{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;color:#fff;flex:none}
+.cav.a{background:linear-gradient(145deg,#3bb5f5,#1c6fb0)}.cav.b{background:linear-gradient(145deg,#ffcf5a,#c98a10)}
+.lbl{color:var(--dim);font-size:13px;margin:0 6px 7px}
+.sic{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:#fff;flex:none}
+.sic .ic{width:19px;height:19px}.chev{color:var(--dim);width:18px;height:18px;margin-left:auto}
+/* chat */
+.msgs{flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column}
+.msg{max-width:78%;padding:9px 13px;border-radius:18px;margin:4px 0;background:var(--glass);border:1px solid var(--line);word-break:break-word}
+.msg.me{margin-left:auto;background:linear-gradient(#2fa7ec,#1d85c8);border-color:transparent}
+.msg b{display:block;font-size:13px;color:var(--blue)}
+.msg small{display:block;color:var(--dim);font-size:11px;text-align:right;margin-top:2px}.msg.me small{color:rgba(255,255,255,.75)}
+.comp{display:flex;gap:10px;padding:10px 14px calc(env(safe-area-inset-bottom,0px) + 12px)}
+.comp .btn{width:48px;padding:0;display:grid;place-items:center;border-radius:50%}
+/* profile */
+.av{padding:4px;border-radius:50%;background:var(--ring,transparent);width:112px;height:112px;margin:8px auto 12px}
+.av i{width:100%;height:100%;border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:44px;font-family:inherit;font-style:normal;color:#fff;background:linear-gradient(145deg,#1c4a70,#0a1a2a);border:3px solid #050b12}
+.prof{text-align:center}.prof h3{font-size:24px}
+.bal{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0 16px}
+.bal div{padding:16px;text-align:center}.bal b{display:block;font-size:26px}
+.sw{display:flex;gap:10px;margin:8px 0 16px;flex-wrap:wrap}
+.sw span{width:38px;height:38px;border-radius:50%;cursor:pointer;border:2px solid transparent;outline:1px solid var(--line);outline-offset:2px}
+.sw span.on{border-color:#fff}
+/* sheet */
+.sheet{position:fixed;inset:0;z-index:30;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.45)}
+.sheet>div{width:100%;max-width:480px;padding:20px 18px calc(env(safe-area-inset-bottom,0px) + 20px);border-radius:28px 28px 0 0;background:rgba(18,26,36,.8)}
+.sheet h3{margin-bottom:10px}
+.toast{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:50%;transform:translate(-50%,-90px);z-index:99;padding:11px 18px;border-radius:30px;transition:.3s;font-size:14px;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
+.toast.on{transform:translate(-50%,0)}
+/* admin */
+.pl{margin-bottom:12px;overflow:hidden}
+.pl summary{display:flex;gap:12px;align-items:center;padding:12px 14px;cursor:pointer;list-style:none}
+.pl summary::-webkit-details-marker{display:none}
+.pl .body{padding:4px 14px 14px;display:grid;gap:12px;border-top:1px solid var(--line)}
+.pl .body label{font-size:13px;color:var(--dim);display:block;margin:10px 0 5px}
+.badge{font-size:11px;padding:2px 8px;border-radius:20px;margin-left:6px;border:1px solid}
+.badge.r{color:var(--red)}.badge.y{color:var(--gold)}
+.pl select{background:rgba(255,255,255,.06);color:var(--txt)}.pl option{color:#000}
+.hold{font-size:12px;color:var(--dim);margin-top:5px}
+.push{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);left:50%;width:min(92vw,440px);transform:translate(-50%,-160px);z-index:100;display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:22px;cursor:pointer;transition:transform .45s cubic-bezier(.2,.9,.3,1.1);background:rgba(30,40,54,.72);box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.push.on{transform:translate(-50%,0)}
+.push b{display:block;font-size:14px}.push span{color:var(--dim);font-size:14px}
+.sheet>div{max-height:90vh;overflow:auto}
+.tgp{padding:6px 0 18px}.tgp .st{color:var(--blue);font-size:14px;margin-top:2px}
+.gifts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.gift{padding:14px 6px 10px;border-radius:18px;text-align:center;color:#fff;background:linear-gradient(160deg,var(--a),var(--b));display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid rgba(255,255,255,.25)}
+.gift .ic{width:34px;height:34px}.gift b{font-size:12px}.gift small{font-size:11px;opacity:.85}
+.seg{display:flex;padding:4px;gap:4px;margin-bottom:14px;border-radius:16px}
+.seg button{flex:1;border:0;background:none;color:var(--dim);padding:9px;border-radius:12px;font:inherit;font-weight:600;cursor:pointer}
+.seg button.on{background:rgba(42,171,238,.22);color:#fff}
+.dial{width:210px;height:210px;display:block;margin:4px auto 10px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px}
+.chips .gift{min-width:98px;opacity:.5;cursor:pointer}.chips .gift.on{opacity:1;outline:2px solid #fff}
+.cbal{text-align:center;margin-bottom:12px;color:var(--gold);font-weight:600}
+.res{text-align:center;min-height:24px;margin:8px 0;font-weight:600}
+.pr{position:relative;padding:11px 14px;display:flex;justify-content:space-between;overflow:hidden;border-top:1px solid var(--line)}
+.pr i{position:absolute;left:0;top:0;bottom:0;background:rgba(42,171,238,.22)}.pr span{position:relative}
+.pr.hl{background:rgba(255,255,255,.14)}.pr.win{background:rgba(52,199,89,.38)}
+#admin{max-width:760px}
+.gift{box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 18px rgba(0,0,0,.35);cursor:pointer}
+.gift .ic{width:40px;height:40px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))}
+.gift small{background:rgba(0,0,0,.28);padding:2px 9px;border-radius:12px;opacity:1}
+.gift b{line-height:1.15;min-height:28px;display:flex;align-items:center}
+.gw{position:relative;display:grid;place-items:center;width:64px;height:64px}
+.gw img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.reel{position:relative;overflow:hidden;border-radius:18px;margin:6px 0 12px;padding:10px 0;background:rgba(0,0,0,.25);border:1px solid var(--line)}
+.reel::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:3px;margin-left:-1.5px;background:#fff;box-shadow:0 0 12px #fff;border-radius:2px}
+.strip{display:flex;gap:10px;will-change:transform}
+.rt{flex:none;width:110px;padding:10px 4px 8px;border-radius:16px;text-align:center;color:#fff;background:linear-gradient(160deg,var(--a),var(--b));display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px}
+.art{width:64px;height:64px;filter:drop-shadow(0 3px 5px rgba(0,0,0,.4))}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
 </head>
 <body>
 
-    <div id="chatScreen">
-        <div class="chat-header">
-            <div class="back-btn" onclick="closeChat()">←</div>
-            <div class="chat-title" id="chatTitle">Чат</div>
-        </div>
-        <div class="messages-area" id="messagesArea"></div>
-        <div class="input-area">
-            <input type="text" class="msg-input" id="msgInput" placeholder="Написать сообщение...">
-            <button class="send-btn" onclick="sendMessage()">→</button>
-        </div>
+<!-- РЕГИСТРАЦИЯ -->
+<section id="auth" class="scr">
+  <div class="logo g"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M21 4L3 11l6 2.5L11.5 20l2.7-4.8L19 18z"/><path d="M9 13.5L21 4"/></svg></div>
+  <h1>Pepegram</h1>
+  <p class="dim">Войдите по номеру телефона</p>
+  <div id="step1" style="display:grid;gap:12px;margin-top:10px">
+    <div class="row"><input id="phone" class="in" type="tel" inputmode="tel" placeholder="+1 202 555 0123" autocomplete="tel"><button class="g ib" id="dice" title="Случайный тестовый номер" data-ic="dice" style="flex:none"></button></div>
+    <button class="btn" id="getCode">Получить код</button>
+    <div class="err" id="e1"></div>
+  </div>
+  <div id="step2" class="hide" style="display:grid;gap:12px;margin-top:10px">
+    <p class="dim">Код отправлен на <span id="phoneShow"></span></p>
+    <div class="codes"><input class="in" maxlength="1" inputmode="numeric"><input class="in" maxlength="1" inputmode="numeric"><input class="in" maxlength="1" inputmode="numeric"><input class="in" maxlength="1" inputmode="numeric"></div>
+    <div class="err" id="e2"></div>
+    <button class="btn ghost" id="back1">Изменить номер</button>
+  </div>
+</section>
+
+<!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
+<section id="app" class="scr hide">
+  <div class="top"><h1 id="title">Чаты</h1><button id="adminBtn" class="g ib hide" title="Админ-панель">A</button></div>
+  <div class="main">
+    <div id="v-chats">
+      <div class="search"><span data-ic="search"></span><input id="q" class="in" placeholder="Поиск"></div>
+      <div id="chatList" class="g grp"></div>
     </div>
+    <div id="v-contacts" class="hide"></div>
+    <div id="v-casino" class="hide"></div>
+    <div id="v-settings" class="hide"></div>
+    <div id="v-profile" class="hide"></div>
+  </div>
+  <button class="fab" id="fab" data-ic="pencil" title="Создать"></button>
+  <nav class="tabs g">
+    <button class="tab on" data-tab="chats" data-ic="chat"><span>Чаты</span></button>
+    <button class="tab" data-tab="contacts" data-ic="user"><span>Контакты</span></button>
+    <button class="tab" data-tab="settings" data-ic="gear"><span>Настройки</span></button>
+    <button class="tab" data-tab="casino" data-ic="dice"><span>Казино</span></button>
+  </nav>
+</section>
 
-    <div id="mainApp">
-        <div class="header">
-            <div class="header-title">Pepegram</div>
-            <div id="adminBtn" style="cursor:pointer; font-size:20px; display:none; color:var(--gold);" onclick="openAdmin()">A</div>
-        </div>
+<!-- ПЕРЕПИСКА -->
+<section id="chat" class="scr over hide">
+  <div class="top"><button class="g ib" id="chatBack" data-ic="back"></button><h2 id="chatTitle"></h2></div>
+  <div class="msgs" id="msgs"></div>
+  <div class="comp"><input id="msgIn" class="in" placeholder="Сообщение" autocomplete="off"><button class="btn" id="send" data-ic="send"></button></div>
+</section>
 
-        <div class="content">
-            <div class="tab-content active" id="tab-chats">
-                <div class="chat-item glass" onclick="openChat('pepegram_chat')">
-                    <div class="chat-avatar">P</div>
-                    <div class="chat-info"><div class="chat-name">Pepegram Chat</div><div class="chat-msg">Общий чат</div></div>
-                </div>
-                <div class="chat-item glass" onclick="openChat('pepegram_channel')">
-                    <div class="chat-avatar" style="background:var(--gold);">C</div>
-                    <div class="chat-info"><div class="chat-name">Pepegram Channel</div><div class="chat-msg">Канал</div></div>
-                </div>
-            </div>
+<!-- АДМИН-ПАНЕЛЬ -->
+<section id="admin" class="scr over hide">
+  <div class="top"><button class="g ib" id="adminBack" data-ic="back"></button><h2>Админ-панель</h2></div>
+  <div class="main"><div id="adminTop"></div><input id="adminQ" class="in" placeholder="Поиск игрока: имя или ID" style="margin-bottom:12px"><div id="adminList"></div></div>
+</section>
 
-            <div class="tab-content" id="tab-profile">
-                <div class="glass profile-card">
-                    <div class="profile-avatar" id="profAvatar">D</div>
-                    <h2 id="profileName">Загрузка...</h2>
-                    <div id="roleText" style="color: var(--gold); font-size: 14px; font-weight: bold; margin-bottom: 15px;"></div>
-                    <div class="info-row"><span class="info-label">ID</span><span id="profileId">...</span></div>
-                    <div class="info-row"><span class="info-label">Звезды</span><span id="profileStars">0</span></div>
-                    <div class="info-row"><span class="info-label">Граммы</span><span id="profileGrams">0</span></div>
-                </div>
-            </div>
+<div id="sheet" class="sheet hide"><div class="g" id="sheetBox"></div></div>
+<div id="toast" class="toast g"></div>
+<div id="push" class="push g"></div>
 
-            <div class="tab-content" id="tab-casino">
-                <div class="casino-tabs">
-                    <div class="casino-tab active" onclick="switchCasinoTab('crash')">Краш</div>
-                    <div class="casino-tab" onclick="switchCasinoTab('roulette')">Рулетка</div>
-                    <div class="casino-tab" onclick="switchCasinoTab('rocket')">Ракетка</div>
-                </div>
-                <div id="casino-crash" class="game-box glass">
-                    <div style="font-size:18px; font-weight:bold; margin-bottom:15px;">Краш</div>
-                    <input type="number" id="crashAmount" class="modal-input" placeholder="Сумма ставки">
-                    <button class="btn" style="background:var(--green); color:#000;" onclick="playCrash()">Ставка</button>
-                </div>
-                <div id="casino-roulette" class="game-box glass" style="display:none;">
-                    <div style="font-size:18px; font-weight:bold; margin-bottom:15px;">Рулетка</div>
-                    <input type="number" id="rouletteAmount" class="modal-input" placeholder="Сумма ставки">
-                    <button class="btn" style="background:var(--gold); color:#000;" onclick="playRoulette()">Крутить</button>
-                </div>
-                <div id="casino-rocket" class="game-box glass" style="display:none;">
-                    <div style="font-size:18px; font-weight:bold; margin-bottom:15px;">Ракетка</div>
-                    <input type="number" id="rocketAmount" class="modal-input" placeholder="Сумма ставки">
-                    <button class="btn" style="background:var(--accent); color:#fff;" onclick="playRocket()">Запуск</button>
-                </div>
-            </div>
-        </div>
+<script>
+/* ============ КОНФИГ ============ */
+const ADMIN_ID = 1780245651;
+const START_STARS = 1000;
 
-        <div class="bottom-nav">
-            <div class="nav-item active" onclick="switchTab('chats', this)">Чаты</div>
-            <div class="nav-item" onclick="switchTab('casino', this)">Казино</div>
-            <div class="nav-item" onclick="switchTab('profile', this)">Профиль</div>
-        </div>
-    </div>
+/* ============ API-ЗАГЛУШКИ: замените тела функций на fetch() к вашему Python-серверу ============ */
+const API = {
+  async sendCode(phone){ API._c = String(1000 + Math.floor(Math.random()*9000)); setTimeout(() => push('Pepegram', 'Ваш код подтверждения: ' + API._c), 1200); return {ok:true}; },
+  async verifyCode(phone, code){
+    return {ok: code === API._c, user:{id: phone.replace(/\D/g,'') === OWNER_PHONE ? ADMIN_ID : Math.floor(1e9 + Math.random()*9e9), phone, name:'Пользователь', stars:START_STARS, grams:0, nickColor:'#f5f7fa', frame:'transparent'}};
+  },
+  async sendMessage(chatId, text){ return {ok:true}; },
+  async saveProfile(profile){ return {ok:true}; },
+  async upgrade(p){ const g = GIFTS.find(x => x.id === p.giftId), ch = p.mode === 'x2' ? 47.5 : Math.min(95, p.bet / g.v * 95), roll = Math.random()*100; return {roll, win: roll < ch}; },
+  async pvpBet(amount){ return {ok:true}; },
+  async pvpDraw(bets){ const e = Object.entries(bets), t = e.reduce((s, x) => s + x[1], 0); let r = Math.random()*t; for(const [n, b] of e){ if((r -= b) < 0) return n; } return e[0][0]; },
+  async getPlayers(){ return PLAYERS; },
+  async adminAction(type, playerId, payload){ return {ok:true}; }
+};
 
-    <!-- АДМИН ПАНЕЛЬ -->
-    <div id="adminPanel">
-        <div class="admin-header">
-            <div style="font-weight:bold; font-size:18px;">Панель Владельца</div>
-            <button style="background:var(--red); color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;" onclick="document.getElementById('adminPanel').style.display='none'">Закрыть</button>
-        </div>
-        <div class="admin-list" id="adminList"></div>
-    </div>
+/* ============ ДАННЫЕ ============ */
+const S = {user:null, tab:'chats', chat:null};
+const CHATS = [
+  {id:'chat', name:'Pepegram Chat', sub:'Общий чат', ic:'chat', cls:'a', msgs:[{from:'Pepegram', t:'Добро пожаловать в общий чат!', time:'12:00'}]},
+  {id:'channel', name:'Pepegram Channel', sub:'Канал', ic:'mega', cls:'b', readonly:true, msgs:[{from:'Pepegram', t:'Здесь публикуются новости проекта.', time:'12:00'}]}
+];
+let PLAYERS = [
+  {id:ADMIN_ID, name:'Владелец', phone:'+7 000 000-00-00', stars:5000, frozen:false, admin:null, gifts:['Плюш Пепе'], names:[], nums:[]},
+  {id:2048117350, name:'Алекс', stars:1000, frozen:false, admin:null, gifts:['Сердце с бантом'], names:[], nums:[]},
+  {id:3391820045, name:'Мария', stars:250, frozen:true, admin:null, gifts:[], names:['@maria'], nums:[]},
+  {id:4172006618, name:'Дмитрий', stars:0, frozen:false, admin:'Обычная', gifts:[], names:[], nums:['+888 0123 4567']}
+];
+const COLORS = ['#f5f7fa','#2AABEE','#FFC53D','#34C759','#FF453A','#BF5AF2'];
+const FRAMES = ['transparent','#2AABEE','#FFC53D','#34C759','#FF453A','conic-gradient(#2AABEE,#FFC53D,#FF453A,#34C759,#2AABEE)'];
 
-    <script>
-        const API_URL = "https://fame-api-bs11.onrender.com";
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        const MY_TELEGRAM_ID = "1780245651"; 
-        let currentUsername = "doctor";
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.username) {
-            currentUsername = tg.initDataUnsafe.user.username;
-        }
-        let currentChat = "";
+/* ============ ИКОНКИ ============ */
+const ICONS = {
+  bear:'<circle cx="7" cy="6" r="2.500"/><circle cx="17" cy="6" r="2.500"/><circle cx="12" cy="13" r="7"/><circle cx="12" cy="15" r="2"/>',
+  rose:'<path d="M12 3c-3 0-5 2-5 5s2 5 5 5 5-2 5-5-2-5-5-5z"/><path d="M12 13v8M12 17c-3 0-4-2-4-3M12 18c2 0 4-1 4-3"/>',
+  cake:'<path d="M4 20h16v-7H4z"/><path d="M4 16c3 2 5-2 8 0s5-2 8 0M9 13V9M15 13V9"/>',
+  rocket:'<path d="M12 3c4 2 6 6 5 11l-3 3h-4l-3-3c-1-5 1-9 5-11z"/><circle cx="12" cy="10" r="1.500"/><path d="M7 14l-3 3 3 1M17 14l3 3-3 1M10 21l2-2 2 2"/>',
+  cup:'<path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3M12 14v4M8 20h8"/>',
+  heart:'<path d="M12 20s-8-5-8-11a4.500 4.500 0 0 1 8-2.500A4.500 4.500 0 0 1 20 9c0 6-8 11-8 11z"/>',
+  bottle:'<path d="M10 3h4v4l2 3v10H8V10l2-3z"/><path d="M8 14h8"/>',
+  skull:'<path d="M5 12a7 7 0 0 1 14 0v3h-2v3H7v-3H5z"/><circle cx="9.500" cy="12" r="1.500"/><circle cx="14.500" cy="12" r="1.500"/>',
+  cat:'<path d="M5 20V8l3 2h8l3-2v12z"/><circle cx="9.500" cy="14" r="1"/><circle cx="14.500" cy="14" r="1"/>',
+  pop:'<circle cx="10" cy="10" r="6"/><path d="M14 14l6 6M10 4a6 6 0 0 1 6 6"/>',
+  book:'<path d="M5 4h12a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2z"/><path d="M5 18a2 2 0 0 1 2-2h12"/>',
+  pepe:'<circle cx="8" cy="7.5" r="3.2"/><circle cx="16" cy="7.5" r="3.2"/><path d="M3 14c0-3 2-5 4-5h10c2 0 4 2 4 5 0 4-4 7-9 7s-9-3-9-7z"/><path d="M7.5 16.5c3 1.7 6 1.7 9 0"/><circle cx="8" cy="7.5" r=".7" fill="currentColor"/><circle cx="16" cy="7.5" r=".7" fill="currentColor"/>',
+  cap:'<path d="M4 15a8 8 0 0 1 16 0z"/><path d="M20 15c2 0 3 .6 3 2H11"/><path d="M12 7v8"/>',
+  locket:'<path d="M12 21s-7-4.4-7-10a4 4 0 0 1 7-2.4A4 4 0 0 1 19 11c0 5.600-7 10-7 10z"/><path d="M8 3l4 4 4-4"/>',
+  ring:'<circle cx="12" cy="15" r="6"/><path d="M9 4h6l2 3-5 3-5-3z"/>',
+  bag:'<path d="M8 3h8l-2 4h-4z"/><path d="M10 7C5 10 4 14 4 17a4 4 0 0 0 4 4h8a4 4 0 0 0 4-4c0-3-1-7-6-10"/><path d="M12 12v5M10 14h4"/>',
+  watch:'<rect x="7" y="6" width="10" height="12" rx="3"/><path d="M9 6l1-3h4l1 3M9 18l1 3h4l1-3M12 9v3l2 1"/>',
+  hat:'<rect x="7" y="4" width="10" height="11"/><path d="M3 18c0-2 4-3 9-3s9 1 9 3-4 2-9 2-9 0-9-2zM7 11h10"/>',
+  peach:'<path d="M12 7c-5-1-8 2-8 6 0 4 3 8 8 8s8-4 8-8c0-4-3-7-8-6z"/><path d="M12 7c0-2 1-4 4-4M12 10c-1 2-1 5 0 8"/>',
+  gem:'<path d="M6 4h12l4 6-10 11L2 10z"/><path d="M2 10h20M9 4l-2 6 5 11 5-11-2-6"/>',
+  chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',
+  mega:'<path d="M3 10v4a1 1 0 0 0 1 1h3l9 5V4L7 9H4a1 1 0 0 0-1 1z"/><path d="M19.5 9a4 4 0 0 1 0 6"/>',
+  gear:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
+  pencil:'<path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/>',
+  dice:'<rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="15" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/>',
+  send:'<path d="M4 12l16-8-6 16-3-7z"/>',
+  back:'<path d="M15 5l-7 7 7 7"/>',
+  chev:'<path d="M9 5l7 7-7 7"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
+  lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+  db:'<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/>',
+  brush:'<path d="M4 20c3 0 5-1 5-3a2.5 2.5 0 0 0-5 0c0 1.5-1 2.5-1 3zM9 15L20 4l-1-1L8 14"/>',
+  crown:'<path d="M4 18l-1-10 5 4 4-7 4 7 5-4-1 10z"/>',
+  star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+  swap:'<path d="M4 8h14l-3-3M20 16H6l3 3"/>',
+  gift:'<rect x="4" y="9" width="16" height="11" rx="2"/><path d="M12 9v11M3 9h18M12 9c-3 0-5-1-5-3s3-2 5 3c2-5 5-5 5-3s-2 3-5 3z"/>',
+  help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 1-1 1.7M12 17h0"/>'
+};
+const ic = n => `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]}</svg>`;
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const now = () => new Date().toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+$$('[data-ic]').forEach(e => e.insertAdjacentHTML('afterbegin', ic(e.dataset.ic)));
 
-        function switchTab(tabId, element) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.add('active');
-            if (element) element.classList.add('active');
-        }
+let pt;
+function push(title, text){
+  const e = $('#push');
+  e.innerHTML = `<div class="cav a" style="width:40px;height:40px">${ic('send')}</div><div><b>${title}</b><span>${text}</span></div>`;
+  e.classList.add('on'); clearTimeout(pt); pt = setTimeout(() => e.classList.remove('on'), 10000);
+}
+$('#push').onclick = () => $('#push').classList.remove('on');
+let tt;
+function toast(t){ const e = $('#toast'); e.textContent = t; e.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => e.classList.remove('on'), 2200); }
+function sheet(html){ $('#sheetBox').innerHTML = html; $('#sheet').classList.remove('hide'); }
+function closeSheet(){ $('#sheet').classList.add('hide'); }
+$('#sheet').onclick = e => { if(e.target.id === 'sheet') closeSheet(); };
+const RANK = {owner:3, main:2, mod:1, none:0};
+const ROLE_NAME = {owner:'владелец', main:'главный админ', mod:'админ'};
+const PERM = {mod:['freeze','Stars'], main:['freeze','Stars','Grams','Gift','Name','Num','Admin'], owner:['freeze','Stars','Grams','Gift','Name','Num','Admin','Del','Mass']};
+const roleOf = p => p.id === ADMIN_ID ? 'owner' : p.admin === 'Главная' ? 'main' : p.admin === 'Обычная' ? 'mod' : 'none';
+const can = k => (PERM[roleOf(S.user)] || []).includes(k);
+const canTarget = p => p.id === S.user.id ? roleOf(S.user) === 'owner' : RANK[roleOf(S.user)] > RANK[roleOf(p)];
+const isAdmin = () => !!S.user && roleOf(S.user) !== 'none';
+const blocked = () => S.user.frozen ? (toast('Аккаунт заморожен администратором'), true) : false;
+const KEY = 'pepegram_v2';
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify({players:PLAYERS, uid:S.user && S.user.id, chats:CHATS.map(c => c.msgs)})); }catch(e){} }
+function restore(){
+  try{
+    const d = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if(d){ PLAYERS = d.players; (d.chats || []).forEach((m, i) => CHATS[i] && (CHATS[i].msgs = m)); }
+    PLAYERS.forEach(norm);
+    const u = d && PLAYERS.find(p => p.id === d.uid); if(u) login(u, true);
+  }catch(e){ PLAYERS.forEach(norm); }
+}
+function logout(){ S.user = null; save(); location.reload(); }
+const OWNER_PHONE = '70000000000'; 
 
-        function openChat(chatName) {
-            currentChat = chatName;
-            document.getElementById('chatScreen').style.display = 'flex';
-            document.getElementById('chatTitle').innerText = chatName === 'pepegram_chat' ? 'Pepegram Chat' : 'Pepegram Channel';
-            loadMessages();
-        }
-        function closeChat() { document.getElementById('chatScreen').style.display = 'none'; }
-        function loadMessages() {
-            const area = document.getElementById('messagesArea');
-            area.innerHTML = "Загрузка...";
-            fetch(API_URL + '/api/get_messages', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user1: currentUsername, user2: currentChat })
-            }).then(res => res.json()).then(messages => {
-                area.innerHTML = "";
-                if (messages.length === 0) area.innerHTML = "Нет сообщений.";
-                messages.forEach(m => {
-                    const div = document.createElement('div');
-                    div.className = 'msg ' + (m.sender === currentUsername ? 'out' : 'in');
-                    div.innerText = m.text;
-                    area.appendChild(div);
-                });
-                area.scrollTop = area.scrollHeight;
-            });
-        }
-        function sendMessage() {
-            const input = document.getElementById('msgInput');
-            const text = input.value.trim();
-            if (!text) return;
-            fetch(API_URL + '/api/send_message', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sender: currentUsername, receiver: currentChat, text: text })
-            }).then(() => { input.value = ""; loadMessages(); });
-        }
+/* ============ РЕГИСТРАЦИЯ ============ */
+const show2 = on => { $('#step1').classList.toggle('hide', on); $('#step2').classList.toggle('hide', !on); };
+show2(false);
+const CC = [{c:'+1',g:[3,3,4]},{c:'+7',g:[3,3,2,2]},{c:'+44',g:[4,6]},{c:'+49',g:[3,8]},{c:'+33',g:[1,2,2,2,2]},{c:'+380',g:[2,3,2,2]},{c:'+375',g:[2,3,2,2]},{c:'+81',g:[2,4,4]},{c:'+91',g:[5,5]},{c:'+55',g:[2,5,4]},{c:'+90',g:[3,3,4]},{c:'+86',g:[3,4,4]},{c:'+971',g:[2,3,4]},{c:'+39',g:[3,3,4]}];
+$('#dice').onclick = () => {
+  const r = n => Array.from({length:n}, () => Math.floor(Math.random()*10)).join('');
+  const k = CC[Math.floor(Math.random()*CC.length)];
+  $('#phone').value = k.c + ' ' + k.g.map((n, i) => i ? r(n) : (1 + Math.floor(Math.random()*9)) + r(n-1)).join(' ');
+};
+$('#getCode').onclick = async () => {
+  const p = $('#phone').value.trim();
+  if(p.replace(/\D/g,'').length < 7){ $('#e1').textContent = 'Введите номер полностью'; return; }
+  $('#e1').textContent = '';
+  await API.sendCode(p);
+  $('#phoneShow').textContent = p; show2(true);
+  $$('.codes input').forEach(i => i.value = ''); $('.codes input').focus();
+};
+$('#back1').onclick = () => show2(false);
+$$('.codes input').forEach((inp, i, all) => {
+  inp.oninput = () => {
+    inp.value = inp.value.replace(/\D/g,'');
+    if(inp.value && all[i+1]) all[i+1].focus();
+    if(all.every(x => x.value)) checkCode(all.map(x => x.value).join(''));
+  };
+  inp.onkeydown = e => { if(e.key === 'Backspace' && !inp.value && all[i-1]) all[i-1].focus(); };
+});
+async function checkCode(code){
+  const r = await API.verifyCode($('#phoneShow').textContent, code);
+  if(!r.ok){ $('#e2').textContent = 'Неверный код. Попробуйте ещё раз'; $$('.codes input').forEach(i => i.value = ''); $('.codes input').focus(); return; }
+  login(r.user);
+}
+function login(user, quiet){
+  const ex = PLAYERS.find(p => p.id === user.id || (user.phone && p.phone === user.phone));
+  if(ex) user = ex; else PLAYERS.push(user);
+  norm(user); S.user = user;
+  $('#auth').classList.add('hide'); $('#app').classList.remove('hide');
+  renderAll(); setTab('chats'); pvpNew(); save();
+  if(!quiet) toast(ex ? 'С возвращением!' : `Добро пожаловать! Начислено ${START_STARS} ⭐`);
+}
 
-        function loadProfile() {
-            fetch(API_URL + '/api/profile/' + currentUsername)
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('profileName').innerText = data.username;
-                document.getElementById('profileId').innerText = data.user_id;
-                document.getElementById('profileStars').innerText = data.stars;
-                document.getElementById('profileGrams').innerText = data.grams;
-                const roleMap = { 'owner': 'Владелец', 'head_admin': 'Гл. Админ', 'admin': 'Админ', 'user': 'Игрок' };
-                document.getElementById('roleText').innerText = roleMap[data.role] || 'Игрок';
-                const myTgId = tg.initDataUnsafe.user ? String(tg.initDataUnsafe.user.id) : MY_TELEGRAM_ID;
-                if (myTgId === MY_TELEGRAM_ID || data.user_id === MY_TELEGRAM_ID) {
-                    document.getElementById('adminBtn').style.display = 'block';
-                } else {
-                    document.getElementById('adminBtn').style.display = 'none';
-                }
-            });
-        }
+/* ============ НАВИГАЦИЯ ============ */
+function setTab(t){
+  S.tab = t;
+  $$('.tab').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+  ['chats','contacts','casino','settings','profile'].forEach(v => $('#v-'+v).classList.toggle('hide', v !== t));
+  $('#title').textContent = {chats:'Чаты', contacts:'Контакты', casino:'Казино', settings:'Настройки', profile:'Профиль'}[t];
+  $('#fab').classList.toggle('hide', t !== 'chats');
+}
+$$('.tab').forEach(b => b.onclick = () => setTab(b.dataset.tab));
 
-        function playCrash() {
-            const amount = parseInt(document.getElementById('crashAmount').value);
-            if (!amount) return alert("Введите сумму");
-            fetch(API_URL + '/api/casino/upgrader', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: currentUsername, amount: amount }) })
-            .then(res => res.json()).then(data => { alert(data.message || data.error); loadProfile(); });
-        }
-        function playRoulette() { alert("Рулетка (имитация)"); }
-        function playRocket() { alert("Ракетка (имитация)"); }
-        function switchCasinoTab(tab) {
-            document.querySelectorAll('.casino-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.game-box').forEach(t => t.style.display = 'none');
-            if (tab === 'crash') { document.getElementById('casino-crash').style.display = 'block'; event.target.classList.add('active'); }
-            if (tab === 'roulette') { document.getElementById('casino-roulette').style.display = 'block'; event.target.classList.add('active'); }
-            if (tab === 'rocket') { document.getElementById('casino-rocket').style.display = 'block'; event.target.classList.add('active'); }
-        }
+/* ============ ЧАТЫ И КОНТАКТЫ ============ */
+function renderChats(f = ''){
+  const l = CHATS.filter(c => c.name.toLowerCase().includes(f.toLowerCase()));
+  $('#chatList').innerHTML = l.length ? l.map(c => {
+    const m = c.msgs[c.msgs.length-1];
+    return `<div class="it" data-id="${c.id}"><div class="cav ${c.cls}">${ic(c.ic)}</div><div class="tx"><b>${c.name}</b><small>${m ? esc(m.from + ': ' + m.t) : c.sub}</small></div><time>${m ? m.time : ''}</time></div>`;
+  }).join('') : '<div class="it dim">Ничего не найдено</div>';
+}
+function renderContacts(){
+  const others = PLAYERS.filter(p => p.id !== S.user.id);
+  $('#v-contacts').innerHTML = `<div class="search"><span data-ic="search"></span><input id="cq" class="in" placeholder="Поиск контактов"></div><div class="g grp" id="contactList">${others.map(p => `<div class="it" data-cid="${p.id}"><div class="cav a">${esc(p.name[0])}</div><div class="tx"><b>${esc(p.name)}</b><small>${p.id === ADMIN_ID ? 'Владелец' : 'Игрок'}</small></div></div>`).join('')}</div>`;
+  $('#cq').oninput = e => {
+    const f = e.target.value.toLowerCase();
+    const list = others.filter(p => p.name.toLowerCase().includes(f));
+    $('#contactList').innerHTML = list.map(p => `<div class="it" data-cid="${p.id}"><div class="cav a">${esc(p.name[0])}</div><div class="tx"><b>${esc(p.name)}</b></div></div>`).join('') || '<div class="it dim">Не найдено</div>';
+  };
+  $('#contactList').onclick = e => {
+    const it = e.target.closest('[data-cid]'); if(!it) return;
+    const p = PLAYERS.find(x => x.id == it.dataset.cid);
+    if(p) { toast(`Чат с ${p.name} (в разработке)`); }
+  };
+}
+$('#q').oninput = e => renderChats(e.target.value);
+$('#chatList').onclick = e => { const it = e.target.closest('.it[data-id]'); if(it) openChat(it.dataset.id); };
+function openChat(id){
+  S.chat = CHATS.find(c => c.id === id);
+  if(!S.chat) return;
+  $('#chatTitle').textContent = S.chat.name;
+  const ro = S.chat.readonly && !isAdmin();
+  $('#msgIn').disabled = $('#send').disabled = ro;
+  $('#msgIn').placeholder = ro ? 'Писать в канал могут только администраторы' : 'Сообщение';
+  $('#chat').classList.remove('hide'); renderMsgs();
+}
+function renderMsgs(){
+  const box = $('#msgs');
+  box.innerHTML = S.chat.msgs.map(m => `<div class="msg ${m.me ? 'me' : ''}">${m.me ? '' : `<b>${esc(m.from)}</b>`}${esc(m.t)}<small>${m.time}</small></div>`).join('');
+  box.scrollTop = box.scrollHeight;
+}
+$('#chatBack').onclick = () => { $('#chat').classList.add('hide'); S.chat = null; renderChats($('#q').value); };
+async function sendMsg(){
+  const t = $('#msgIn').value.trim(); if(!t || !S.chat || blocked()) return;
+  S.chat.msgs.push({from:S.user.name, t, time:now(), me:true});
+  $('#msgIn').value = ''; renderMsgs();
+  save(); await API.sendMessage(S.chat.id, t);
+}
+$('#send').onclick = sendMsg;
+$('#msgIn').onkeydown = e => { if(e.key === 'Enter') sendMsg(); };
+$('#fab').onclick = () => {
+  sheet(`<h3>Создать</h3><div style="display:grid;gap:10px"><button class="btn ghost" data-new="группу">Новая группа</button><button class="btn ghost" data-new="историю">Новая история</button></div>`);
+  $$('[data-new]').forEach(b => b.onclick = () => { closeSheet(); toast(`Создание: ${b.dataset.new} — подключите к серверу`); });
+};
 
-        // АДМИНКА
-        function openAdmin() {
-            document.getElementById('adminPanel').style.display = 'flex';
-            loadAdminUsers();
-        }
-        function loadAdminUsers() {
-            const list = document.getElementById('adminList');
-            list.innerHTML = "Загрузка...";
-            fetch(API_URL + '/api/admin/get_all')
-            .then(res => res.json())
-            .then(users => {
-                list.innerHTML = "";
-                users.forEach(u => {
-                    const card = document.createElement('div');
-                    card.className = 'glass user-card';
-                    card.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                            <div style="font-weight:bold;">@${u.username}</div>
-                            <div class="role-badge" style="background:${u.role === 'owner' ? 'var(--gold)' : 'var(--accent)'};">${u.role}</div>
-                        </div>
-                        <div style="font-size:13px; color:#aaa; margin-bottom:10px;">ID: ${u.user_id} | Звезды: ${u.stars} | Заморожен: ${u.is_frozen ? 'Да' : 'Нет'}</div>
-                        <div class="admin-buttons">
-                            <button class="admin-btn" style="background:var(--red);" onclick="adminAction('freeze', '${u.username}')">Заморозить</button>
-                            <button class="admin-btn" style="background:var(--green);" onclick="adminAction('unfreeze', '${u.username}')">Разморозить</button>
-                            <button class="admin-btn" style="background:var(--accent);" onclick="adminAction('give_stars', '${u.username}', 1000)">+1000 Звезд</button>
-                            <button class="admin-btn" style="background:#555;" onclick="adminAction('set_role', '${u.username}', 'admin')">Дать Админа</button>
-                            <button class="admin-btn" style="background:var(--gold); color: #000;" onclick="adminAction('set_role', '${u.username}', 'head_admin')">Дать Гл. Админа</button>
-                            <button class="admin-btn" style="background:#333;" onclick="adminAction('set_role', '${u.username}', 'user')">Снять</button>
-                        </div>
-                    `;
-                    list.appendChild(card);
-                });
-            });
-        }
-        function adminAction(action, target, value = 0) {
-            fetch(API_URL + '/api/admin/action', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: action, target: target, value: value })
-            }).then(res => res.json()).then(data => {
-                alert(data.msg);
-                loadAdminUsers();
-            });
-        }
+/* ============ НАСТРОЙКИ ============ */
+const SETTINGS = [
+  ['Аккаунт', [['user','Профиль','','#2AABEE'],['lock','Конфиденциальность','','#8E8E93'],['db','Данные и память','','#34C759'],['brush','Оформление','','#BF5AF2']]],
+  ['СтатиГрамм', [['crown','Premium','','#FFC53D'],['star','Мои звезды','','#FF9F0A'],['swap','Fragment','Обмен валют','#2AABEE'],['gift','Отправить подарок','','#FF453A']]],
+  ['Помощь', [['help','Задать вопрос','','#2AABEE']]]
+];
+function renderSettings(){
+  $('#v-settings').innerHTML = SETTINGS.map(([h, items]) => `<div class="lbl">${h}</div><div class="g grp">${items.map(([i, n, hint, c]) =>
+    `<div class="it" data-s="${n}"><div class="sic" style="background:${c}">${ic(i)}</div><span>${n}${hint ? ` <span class="dim">· ${hint}</span>` : ''}</span>${ic('chev').replace('class="ic"','class="ic chev"')}</div>`).join('')}</div>`).join('');
+}
+$('#v-settings').onclick = e => {
+  const it = e.target.closest('[data-s]'); if(!it) return;
+  const n = it.dataset.s;
+  if(n === 'Отправить подарок') openStore();
+  else if(n === 'Профиль') setTab('profile');
+  else if(n === 'Мои звезды') toast(`Ваш баланс: ${S.user.stars} ⭐`);
+  else toast(`«${n}» — подключите к серверу`);
+};
 
-        loadProfile();
-    </script>
+/* ============ ПРОФИЛЬ ============ */
+const GIFTS = [
+['hbow','Сердце с бантом','heart',15,'#FF5DA8','#D4175F'],['box','Подарок','gift',25,'#FF6A60','#B0281F'],['rose','Роза','rose',25,'#FF5A5A','#A01818'],
+['bear','Тыквенный мишка','bear',50,'#9BBF5A','#F0873A'],['cake','Торт','cake',50,'#F3D9B8','#C9885A'],['rocket','Ракета','rocket',50,'#7AB8FF','#2F5FD0'],
+['champ','Шампанское','bottle',50,'#8DBF5A','#3C5A28'],['cup','Кубок','cup',100,'#FFD65A','#B8790B'],['ring','Кольцо','ring',100,'#9FD8FF','#4A6FA5'],['gem','Алмаз','gem',100,'#5AC8FA','#1C6FB0'],
+['lolly','Леденец','pop',450,'#FF9AD5','#7A3FD1'],['jester','Шут','crown',470,'#FF6AA8','#F2B01E'],['lantern','Фонарь','star',499,'#E0A85A','#7A4A1E'],['book','Блокнот','book',500,'#B07A5A','#5A2E1E'],
+['flam','Фламинго','heart',460,'#FF8FB5','#D13A78'],['medal','Медаль','star',532,'#FFD65A','#C98A10'],['statue','Статуя Свободы','crown',565,'#6FD9B0','#1E8F6E'],['ginger','Пряничное сердце','heart',565,'#D9955A','#8A4A1E'],
+['monkey','Обезьянка','cat',697,'#C98A5A','#6B3E1E'],['lovecats','Влюблённые коты','heart',1451,'#FFC0D8','#E87A3A'],['pacifier','Пустышка','ring',2338,'#FFD65A','#C98A10'],['skull','Череп','skull',2777,'#C9B8FF','#6A4AD0'],
+['helm','Мото-шлем','hat',3451,'#FF6AA8','#A01E6A'],['sigil','Перстень','ring',4031,'#FFD65A','#8E8E93'],['lips','Губы','heart',4672,'#FF4A4A','#9A1010'],['frog','Лягушка','pepe',4747,'#6FE08A','#1E8F43'],
+['watchg','Золотые часы','watch',5494,'#FFD65A','#2F7A4A'],['potion','Зелье','bottle',5877,'#7CE86A','#1E7A2E'],['perfume','Духи','bottle',7417,'#FFD9A0','#B8863A'],['hand','Золотая рука','star',10077,'#FFD65A','#B8790B'],
+['crystal','Кристалл','gem',11763,'#CFF4FF','#7A9AFF'],['shades','Очки','watch',11529,'#4A4A4C','#1C1C1E'],['purse','Сумка','bag',12633,'#FF8A4A','#B84A10'],['spart','Шлем спартанца','hat',17500,'#FFD65A','#C0392B'],
+['blackcat','Чёрный кот','cat',24992,'#3A3A3C','#1C1C1E'],['plum','Слива','peach',24097,'#7A5A9A','#2A1A3A'],['cap','Кепка','cap',38601,'#4A4A4C','#1C1C1E'],['hoodbear','Мишка в капюшоне','bear',43535,'#4A4A4C','#111'],
+['brooch','Брошь','gem',116818,'#FF6AA8','#F2B01E'],['trophy','Кубок чемпиона','cup',125767,'#7AB8FF','#E0B030'],['icecup','Ледяной кубок','cup',161240,'#9FE7FF','#3A6FD0'],['pepe','Плюш Пепе','pepe',626336,'#6FE08A','#1E8F43'],['jason','Маска Джейсона','skull',4030993,'#E8DCC0','#8A7A5A']
+].map(([id, n, ic, v, a, b]) => ({id, n, ic, v, c:[a, b]})).sort((x, y) => x.v - y.v);
+const MODELS = [['Классика',40],['Неон',25],['Золото',15],['Призрак',10],['Космос',6],['Лава',4]];
+const SYMS = [['Звезда',30],['Молния',25],['Сердце',20],['Корона',15],['Глаз',10]];
+const BGS = [['Полночь',30,'#1c2b4a','#0a1224'],['Океан',25,'#1b6fae','#0a3555'],['Изумруд',20,'#1f8f5a','#0b3a26'],['Закат',15,'#d9622b','#5a1a2e'],['Аметист',10,'#7a3fd1','#2a1050']];
+const wp = L => { let r = Math.random()*100; for(const x of L){ if((r -= x[1]) < 0) return x; } return L[0]; };
+const mkGift = n => { const g = GIFTS.find(x => x.n === n || x.id === n); return g ? {id:g.id, up:null} : {id:'x', name:n, up:null}; };
+const rnd = n => Array.from({length:n}, () => Math.floor(Math.random()*10)).join('');
+function norm(p){
+  p.username = p.username || 'user' + String(p.id).slice(-5); p.bio = p.bio || ''; p.phone = p.phone || '';
+  p.gifts = (p.gifts || []).map(g => typeof g === 'string' ? mkGift(g) : g); p.names = p.names || []; p.nums = p.nums || [];
+  p.grams = p.grams || 0; p.stars = p.stars || 0; p.nickColor = p.nickColor || '#f5f7fa'; p.frame = p.frame || 'transparent';
+}
+const giftOf = it => GIFTS.find(g => g.id === it.id) || {n:it.name || 'Подарок', ic:'gift', v:0, c:['#8E8E93','#48484A']};
+const ART = {
+  heart:(a,b)=>`<path d="M32 56S8 42 8 24a13 13 0 0 1 24-6 13 13 0 0 1 24 6c0 18-24 32-24 32z" fill="${b}"/><path d="M32 52S12 40 12 25a10 10 0 0 1 17-6c-9 3-13 10-11 18 3 7 9 12 14 15z" fill="${a}"/><ellipse cx="21" cy="21" rx="5" ry="3" transform="rotate(-35 21 21)" fill="#fff" opacity=".5"/>`,
+  gift:(a,b)=>`<rect x="8" y="26" width="48" height="30" rx="4" fill="${b}"/><rect x="6" y="18" width="52" height="12" rx="4" fill="${a}"/><rect x="28" y="18" width="8" height="38" fill="#fff" opacity=".85"/><path d="M32 18C24 6 14 10 20 18zM32 18C40 6 50 10 44 18z" fill="#fff"/>`,
+  bear:(a,b)=>`<circle cx="14" cy="16" r="8" fill="${b}"/><circle cx="50" cy="16" r="8" fill="${b}"/><circle cx="32" cy="34" r="22" fill="${a}"/><ellipse cx="32" cy="42" rx="10" ry="8" fill="#fff" opacity=".6"/><circle cx="24" cy="30" r="3" fill="#222"/><circle cx="40" cy="30" r="3" fill="#222"/><ellipse cx="32" cy="39" rx="4" ry="3" fill="#222"/>`,
+  cup:(a,b)=>`<path d="M16 8h32v16a16 16 0 0 1-32 0z" fill="${a}"/><path d="M16 12H6v6c0 6 5 10 11 10M48 12h10v6c0 6-5 10-11 10" fill="none" stroke="${b}" stroke-width="4"/><rect x="28" y="38" width="8" height="10" fill="${b}"/><rect x="18" y="48" width="28" height="9" rx="2" fill="${b}"/><path d="M22 12v12" stroke="#fff" stroke-width="3" opacity=".5" stroke-linecap="round"/>`,
+  ring:(a,b)=>`<ellipse cx="32" cy="42" rx="18" ry="15" fill="none" stroke="${b}" stroke-width="6"/><path d="M22 12h20l6 8-16 14-16-14z" fill="${a}"/><path d="M22 12l10 22 10-22M16 20h32" fill="none" stroke="#fff" stroke-width="2" opacity=".7"/>`,
+  gem:(a,b)=>`<path d="M16 8h32l12 16-28 34L4 24z" fill="${a}"/><path d="M4 24h56M22 8l-6 16 16 34 16-34-6-16" fill="none" stroke="${b}" stroke-width="2.5"/><path d="M16 8l6 16h20l6-16z" fill="#fff" opacity=".3"/>`,
+  skull:(a,b)=>`<path d="M10 30C10 16 20 6 32 6s22 10 22 24c0 6-3 9-6 11v10H16V41c-3-2-6-5-6-11z" fill="${a}"/><ellipse cx="23" cy="30" rx="6" ry="7" fill="${b}"/><ellipse cx="41" cy="30" rx="6" ry="7" fill="${b}"/><path d="M32 38l-3 6h6zM24 51v-7M32 51v-4M40 51v-7" stroke="${b}" stroke-width="2.500" fill="none"/>`,
+  jason:()=>`<path d="M32 4c14 0 22 10 22 25 0 15-8 28-22 31C18 57 10 44 10 29 10 14 18 4 32 4z" fill="#EFE6CF"/><ellipse cx="22" cy="28" rx="5" ry="6.500" fill="#222"/><ellipse cx="42" cy="28" rx="5" ry="6.500" fill="#222"/><path d="M32 8v12M37 10l-4 10M15 20l-3 8" stroke="#C0392B" stroke-width="3" stroke-linecap="round"/><path d="M32 33l-4 9h8z" fill="#cfc3a6"/><g fill="#8A7A5A"><circle cx="20" cy="46" r="1.600"/><circle cx="26" cy="50" r="1.600"/><circle cx="32" cy="52" r="1.600"/><circle cx="38" cy="50" r="1.600"/><circle cx="44" cy="46" r="1.600"/></g>`,
+  pepe:(a,b)=>`<ellipse cx="32" cy="40" rx="24" ry="18" fill="${a}"/><circle cx="20" cy="22" r="11" fill="${a}"/><circle cx="44" cy="22" r="11" fill="${a}"/><circle cx="20" cy="22" r="7" fill="#fff"/><circle cx="44" cy="22" r="7" fill="#fff"/><circle cx="22" cy="23" r="3.200" fill="#1b2a1f"/><circle cx="42" cy="23" r="3.200" fill="#1b2a1f"/><path d="M12 42c12 9 28 9 40 0v4c-12 10-28 10-40 0z" fill="#E0475B"/><path d="M12 42c12 6 28 6 40 0" stroke="${b}" stroke-width="2.500" fill="none"/>`,
+  cap:(a,b)=>`<path d="M8 40C8 22 18 10 32 10s24 12 24 30z" fill="${a}"/><path d="M6 40h50c5 0 7 2 7 4s-2 4-7 4H12c-4 0-6-4-6-8z" fill="${b}"/><circle cx="32" cy="10" r="3" fill="${b}"/><circle cx="30" cy="28" r="6" fill="#fff" opacity=".85"/>`,
+  rose:(a,b)=>`<path d="M32 28v28M32 46c-8 0-12-4-12-8M32 50c6 0 10-3 10-7" fill="none" stroke="#3FA45B" stroke-width="3.500" stroke-linecap="round"/><path d="M32 6c-10 0-18 6-18 14s8 14 18 14 18-6 18-14S42 6 32 6z" fill="${a}"/><path d="M32 12c-6 0-10 3-10 8s4 8 10 8 10-3 10-8-4-8-10-8z" fill="${b}"/><path d="M32 16c-3 0-5 2-5 4s2 4 5 4" fill="none" stroke="#fff" stroke-width="2" opacity=".6"/>`,
+  star:(a,b)=>`<path d="M32 4l8 18 20 2-15 13 5 20-18-10-18 10 5-20L4 24l20-2z" fill="${a}" stroke="${b}" stroke-width="3" stroke-linejoin="round"/>`,
+  crown:(a,b)=>`<path d="M6 48L4 18l16 14 12-22 12 22 16-14-2 30z" fill="${a}"/><rect x="6" y="48" width="52" height="8" rx="2" fill="${b}"/><circle cx="32" cy="38" r="3.500" fill="#fff" opacity=".8"/>`,
+  rocket:(a,b)=>`<path d="M32 4c12 8 16 22 12 36H20C16 26 20 12 32 4z" fill="${a}"/><circle cx="32" cy="22" r="6" fill="#fff"/><circle cx="32" cy="22" r="3.500" fill="${b}"/><path d="M20 32L8 46l12-2zM44 32l12 14-12-2z" fill="${b}"/><path d="M26 44h12l-6 14z" fill="#FFB347"/>`
+};
+const gImg = g => { const f = ART[g.id] || ART[g.ic]; return `<span class="gw">${f ? `<svg class="art" viewBox="0 0 64 64">${f(g.c[0], g.c[1])}</svg>` : ic(g.ic)}<img src="gifts/${g.id}.png" alt="" onload="this.previousElementSibling.style.visibility='hidden'" onerror="this.remove()"></span>`; };
+const giftTile = (it, x = '', c = '') => { const g = giftOf(it), u = it.up; return `<div class="gift ${c}" ${x} style="--a:${u ? u.bg[2] : g.c[0]};--b:${u ? u.bg[3] : g.c[1]}">${gImg(g)}<b>${esc(g.n)}</b><small>${u ? '#' + u.num : g.v ? g.v.toLocaleString('ru') + ' ⭐' : 'NFT'}</small></div>`; };
+function openStore(){
+  sheet(`<h3>Купить подарок <span class="dim" style="float:right;font-size:14px">${S.user.stars} ⭐</span></h3><div class="gifts" id="store">${GIFTS.map(g => giftTile({id:g.id}, `data-b="${g.id}"`)).join('')}</div>`);
+  $('#store').onclick = e => { const t = e.target.closest('[data-b]'); if(t) buyGift(t.dataset.b); };
+}
+function buyGift(id){
+  const g = GIFTS.find(x => x.id === id); if(blocked()) return;
+  if(S.user.stars < g.v) return toast('Недостаточно звезд');
+  S.user.stars -= g.v; S.user.gifts.push({id, up:null}); refreshBal(); closeSheet(); toast(`Куплено: ${g.n}. Подарок в профиле`);
+}
+function giftSheet(i){
+  const it = S.user.gifts[i], g = giftOf(it), u = it.up, pc = a => `${a[0]} · ${a[1]}%`;
+  sheet(`<div id="gHero" style="max-width:170px;margin:0 auto 12px">${giftTile(it)}</div><h3 style="text-align:center" id="gT">${esc(g.n)}${u ? ' #' + u.num : ''}</h3>
+  <div class="g grp" style="margin:12px 0">${u ? [['Модель', pc(u.model)], ['Фон', pc(u.bg)], ['Символ', pc(u.sym)], ['Выпуск', `${u.num} из ${u.supply.toLocaleString('ru')}`]].map(([l, v]) => `<div class="it" style="cursor:default"><span class="dim">${l}</span><b style="margin-left:auto">${v}</b></div>`).join('') : '<div class="it dim" style="cursor:default">Улучшите подарок до коллекционного: он получит уникальный номер, модель, фон и символ. Номер выпадает один раз и больше не меняется.</div>'}</div>
+  ${u ? '<button class="btn ghost wide" disabled>Уже улучшен</button>' : '<button class="btn wide" id="upgBtn">Улучшить</button>'}`);
+  const b = $('#upgBtn'); if(b) b.onclick = () => upgradeGift(i);
+}
+function upgradeGift(i){
+  const it = S.user.gifts[i]; if(it.up || blocked()) return;
+  const g = giftOf(it), supply = g.v < 600 ? 50000 : g.v < 6000 ? 20000 : g.v < 50000 ? 5000 : 1000, t = $('#gT'), hero = $('#gHero');
+  $('#upgBtn').disabled = true;
+  let num; do { num = 1 + Math.floor(Math.random()*supply); } while(PLAYERS.some(p => p.gifts.some(x => x.id === it.id && x.up && x.up.num === num)));
+  const res = {num, supply, model:wp(MODELS), sym:wp(SYMS), bg:wp(BGS)}, WIN = 28;
+  const tile = (bg, m) => `<div class="rt" style="--a:${bg[2]};--b:${bg[3]}">${gImg(g)}<span>${m[0]}</span></div>`;
+  hero.style.maxWidth = 'none';
+  hero.innerHTML = `<div class="reel"><div class="strip" id="strip">${Array.from({length:WIN + 6}, (_, k) => k === WIN ? tile(res.bg, res.model) : tile(wp(BGS), wp(MODELS))).join('')}</div></div>`;
+  const strip = $('#strip'), off = WIN*120 + 55 - hero.firstChild.clientWidth/2 + (Math.random()*60 - 30);
+  strip.getBoundingClientRect();
+  strip.style.transition = 'transform 4.5s cubic-bezier(.12,.7,.1,1)'; strip.style.transform = `translateX(${-off}px)`;
+  const iv = setInterval(() => t.textContent = g.n + ' #' + (1 + Math.floor(Math.random()*supply)), 60);
+  setTimeout(() => {
+    clearInterval(iv); it.up = res; renderProfile();
+    if(document.body.contains(hero)) giftSheet(i);
+    toast(`Подарок улучшен: №${num}`);
+  }, 4800);
+}
+const copy = t => { if(navigator.clipboard) navigator.clipboard.writeText(t).catch(() => {}); toast('Скопировано'); };
+function refreshBal(){ renderProfile(); const e = $('#cBal'); if(e) e.textContent = `Баланс: ${S.user.stars} ⭐`; }
+function renderProfile(){
+  const u = S.user, r = roleOf(u);
+  const row = (v, l, c, x = '') => `<div class="it" ${c ? `data-c="${esc(c)}"` : 'style="cursor:default"'}><div class="tx"><b style="${x}">${esc(v)}</b><small>${l}</small></div></div>`;
+  $('#v-profile').innerHTML = `<div class="prof tgp"><div class="av" style="--ring:${u.frame}"><i>${esc(u.name[0].toUpperCase())}</i></div>
+  <h3 style="color:${u.nickColor}">${esc(u.name)}${r !== 'none' ? `<span class="badge y">${ROLE_NAME[r]}</span>` : ''}${u.frozen ? '<span class="badge r">заморожен</span>' : ''}</h3>
+  <p class="st">в сети</p><div style="margin-top:14px"><button class="btn sm" id="editBtn">Изменить профиль</button></div></div>
+  <div class="g grp">${row(u.phone, 'Телефон', u.phone)}${row('@' + u.username, 'Имя пользователя', '@' + u.username, 'color:var(--blue)')}${u.names.map(n => row('@' + n, 'NFT-юзернейм', '@' + n, 'color:var(--blue)')).join('')}${u.nums.map(n => row(n, 'Анонимный номер', n)).join('')}${u.bio ? row(u.bio, 'О себе', '', 'white-space:normal') : ''}${row(String(u.id), 'ID', String(u.id))}</div>
+  <div class="bal" style="margin-top:0"><div class="g"><b style="color:var(--gold)">${u.stars} ⭐</b><span class="dim">Звезды</span></div><div class="g"><b style="color:var(--green)">${u.grams} G</b><span class="dim">Граммы</span></div></div>
+  <div class="lbl">Подарки · ${u.gifts.length}</div>
+  ${u.gifts.length ? `<div class="gifts">${u.gifts.map((g, i) => giftTile(g, `data-gi="${i}"`)).join('')}</div>` : '<div class="g grp it dim" style="cursor:default">Пока нет подарков. Купите их в «Настройки → Отправить подарок» или выиграйте в «Казино».</div>'}`;
+  save();
+}
+$('#v-profile').onclick = e => { const c = e.target.closest('[data-c]'), t = e.target.closest('[data-gi]'); if(t) giftSheet(+t.dataset.gi); else if(c) copy(c.dataset.c); else if(e.target.closest('#editBtn')) editProfile(); };
+function editProfile(){
+  const u = S.user; let col = u.nickColor, fr = u.frame;
+  const sw = (arr, cur) => arr.map(c => `<span style="background:${c === 'transparent' ? 'rgba(255,255,255,.08)' : c}" data-v="${c}" class="${c === cur ? 'on' : ''}"></span>`).join('');
+  sheet(`<h3>Изменить профиль</h3>
+  <input id="nm" class="in" maxlength="24" placeholder="Имя" value="${esc(u.name)}" style="margin:6px 0 10px">
+  <input id="un" class="in" maxlength="32" placeholder="Имя пользователя" value="${esc(u.username)}" style="margin-bottom:10px">
+  <input id="bio" class="in" maxlength="70" placeholder="О себе" value="${esc(u.bio)}" style="margin-bottom:14px">
+  <label class="dim">Цвет ника</label><div class="sw" id="sc">${sw(COLORS, col)}</div>
+  <label class="dim">Рамка аватарки</label><div class="sw" id="sf">${sw(FRAMES, fr)}</div>
+  <button class="btn wide" id="saveP">Сохранить</button>`);
+  const pick = (id, set) => $(id).onclick = e => { const s = e.target.closest('span'); if(!s) return; set(s.dataset.v); $$(id + ' span').forEach(x => x.classList.toggle('on', x === s)); };
+  pick('#sc', v => col = v); pick('#sf', v => fr = v);
+  $('#saveP').onclick = async () => {
+    Object.assign(u, {name: $('#nm').value.trim() || u.name, username: $('#un').value.replace(/\W/g, '') || u.username, bio: $('#bio').value.trim(), nickColor: col, frame: fr});
+    await API.saveProfile({name:u.name, username:u.username, bio:u.bio, nickColor:col, frame:fr});
+    closeSheet(); renderProfile(); toast('Профиль сохранён');
+  };
+}
+
+/* ============ АДМИН-ПАНЕЛЬ ============ */
+function renderAdmin(openId, q = ''){
+  const r = roleOf(S.user), tot = PLAYERS.reduce((a, p) => a + p.stars, 0), fr = PLAYERS.filter(p => p.frozen).length;
+  $('#adminTop').innerHTML = `<div class="g grp"><div class="it" style="cursor:default"><div class="tx"><b>Ваша роль: ${ROLE_NAME[r]}</b><small>Игроков ${PLAYERS.length} · в обороте ${tot} ⭐ · заморожено ${fr}</small></div></div></div>
+  <div class="g" style="padding:14px;margin-bottom:14px;display:grid;gap:10px"><b>Объявление в канал</b><input id="bc" class="in" placeholder="Текст объявления"><button class="btn sm" id="bcGo">Опубликовать</button>
+  ${can('Mass') ? '<b style="margin-top:6px">Массовая выдача звезд всем</b><div class="row"><input id="mass" class="in" type="number" placeholder="Сумма (минус — забрать)" style="flex:1"><button class="btn green sm" id="massGo">Всем</button></div>' : ''}</div>`;
+  const sec = (k, lbl, list, ph) => `<div><label>${lbl}</label><div class="row" style="flex-wrap:wrap"><input class="in" style="flex:1;min-width:140px" placeholder="${ph}" ${k === 'Gift' ? 'list="giftlist"' : ''}><button class="btn green sm" data-a="give${k}">Выдать</button><button class="btn red sm" data-a="take${k}">Забрать</button></div><div class="hold">Сейчас: ${list.length ? esc(list.join(', ')) : 'нет'}</div></div>`;
+  const f = q.toLowerCase();
+  $('#adminList').innerHTML = PLAYERS.filter(p => !f || p.name.toLowerCase().includes(f) || String(p.id).includes(f)).map(p => {
+    const pr = roleOf(p), ok = canTarget(p);
+    return `<details class="g pl" data-id="${p.id}" ${String(p.id) === String(openId) ? 'open' : ''}>
+    <summary><div class="cav a" style="width:42px;height:42px">${esc(p.name[0])}</div><div class="tx" style="flex:1"><b>${esc(p.name)}${pr !== 'none' ? `<span class="badge y">${ROLE_NAME[pr]}</span>` : ''}${p.frozen ? '<span class="badge r">заморожен</span>' : ''}</b><small class="dim">ID ${p.id} · ${p.stars} ⭐ · ${p.grams} G</small></div>${ic('chev').replace('class="ic"', 'class="ic chev"')}</summary>
+    <div class="body">${!ok ? '<p class="dim" style="margin-top:12px">Недостаточно прав для действий над этим игроком</p>' : `
+      ${can('freeze') ? `<button class="btn sm ${p.frozen ? 'green' : 'red'}" data-a="freeze" style="margin-top:12px">${p.frozen ? 'Разморозить аккаунт' : 'Заморозить аккаунт'}</button>` : ''}
+      ${can('Stars') ? `<div><label>Звезды (любая сумма)</label><div class="row"><input class="in" type="number" min="1" placeholder="Сумма" style="flex:1"><button class="btn green sm" data-a="giveStars">Выдать</button><button class="btn red sm" data-a="takeStars">Забрать</button></div></div>` : ''}
+      ${can('Grams') ? `<div><label>Граммы (G)</label><div class="row"><input class="in" type="number" min="1" placeholder="Сумма" style="flex:1"><button class="btn green sm" data-a="giveGrams">Выдать</button><button class="btn red sm" data-a="takeGrams">Забрать</button></div></div>` : ''}
+      ${can('Gift') ? sec('Gift', 'NFT-подарок', p.gifts.map(g => giftOf(g).n + (g.up ? ' #' + g.up.num : '')), 'Название подарка') : ''}
+      ${can('Name') ? sec('Name', 'NFT-юзернейм', p.names.map(n => '@' + n), 'username без @') : ''}
+      ${can('Num') ? sec('Num', 'Анонимный номер (пусто — случайный)', p.nums, '+888 0000 0000') : ''}
+      ${can('Admin') ? `<div><label>Администратор</label><div class="row" style="flex-wrap:wrap"><select class="in" style="flex:1;min-width:120px"><option>Обычная</option>${r === 'owner' ? '<option>Главная</option>' : ''}</select><button class="btn green sm" data-a="giveAdmin">Выдать админку</button><button class="btn red sm" data-a="revokeAdmin">Снять админку</button></div></div>` : ''}
+      ${can('Del') && p.id !== S.user.id ? '<button class="btn red sm" data-a="del">Удалить игрока</button>' : ''}`}
+    </div></details>`;
+  }).join('') || '<p class="dim">Никого не найдено</p>';
+  save();
+}
+$('#adminQ').oninput = e => renderAdmin(null, e.target.value);
+$('#adminList').onclick = async e => {
+  const b = e.target.closest('button[data-a]'); if(!b) return;
+  const box = b.closest('details'), p = PLAYERS.find(x => String(x.id) === box.dataset.id), a = b.dataset.a;
+  const k = a.replace(/^(give|take)/, ''), give = a.startsWith('give');
+  if(!canTarget(p) || !can(a === 'freeze' ? 'freeze' : a === 'del' ? 'Del' : /Admin$/.test(a) ? 'Admin' : k)) return toast('Недостаточно прав');
+  const row = b.closest('.row'), inp = row && row.querySelector('input'), sel = row && row.querySelector('select'), v = inp ? inp.value.trim() : '';
+  if(a === 'freeze') p.frozen = !p.frozen;
+  else if(k === 'Stars' || k === 'Grams'){
+    const n = parseInt(v); if(!n || n <= 0) return toast('Введите сумму больше нуля');
+    const f = k === 'Stars' ? 'stars' : 'grams'; p[f] = Math.max(0, p[f] + (give ? n : -n));
+  } else if(k === 'Gift'){
+    if(!v) return toast('Введите название подарка');
+    if(give) p.gifts.push(mkGift(v)); else { const i = p.gifts.findIndex(g => giftOf(g).n.toLowerCase() === v.toLowerCase()); if(i < 0) return toast('У игрока нет такого подарка'); p.gifts.splice(i, 1); }
+  } else if(k === 'Name'){
+    const n = v.replace(/^@/, ''); if(!n) return toast('Введите username');
+    if(give) p.names.push(n); else { const i = p.names.indexOf(n); if(i < 0) return toast('Не найдено'); p.names.splice(i, 1); }
+  } else if(k === 'Num'){
+    if(give) p.nums.push(v || `+888 ${rnd(4)} ${rnd(4)}`); else { const i = v ? p.nums.indexOf(v) : p.nums.length - 1; if(i < 0) return toast('Номер не найден'); p.nums.splice(i, 1); }
+  } else if(a === 'giveAdmin'){ if(sel.value === 'Главная' && roleOf(S.user) !== 'owner') return toast('Недостаточно прав'); p.admin = sel.value; }
+  else if(a === 'revokeAdmin') p.admin = null;
+  else if(a === 'del'){ if(!confirm('Удалить игрока ' + p.name + '?')) return; PLAYERS.splice(PLAYERS.indexOf(p), 1); }
+  await API.adminAction(a, p.id, {value: v || (sel && sel.value) || null});
+  renderAdmin(a === 'del' ? null : p.id, $('#adminQ').value); refreshBal(); toast('Готово');
+};
+$('#adminTop').onclick = async e => {
+  if(e.target.id === 'bcGo'){
+    const t = $('#bc').value.trim(); if(!t) return toast('Введите текст');
+    CHATS[1].msgs.push({from:'Pepegram', t, time:now()}); await API.adminAction('broadcast', null, {text:t}); $('#bc').value = ''; renderChats(); save(); toast('Опубликовано в канале');
+  } else if(e.target.id === 'massGo' && can('Mass')){
+    const n = parseInt($('#mass').value); if(!n) return toast('Введите сумму');
+    PLAYERS.forEach(p => p.stars = Math.max(0, p.stars + n)); await API.adminAction('massStars', null, {amount:n}); renderAdmin(null, $('#adminQ').value); refreshBal(); toast('Готово');
+  }
+};
+$('#adminBtn').onclick = async () => { PLAYERS = await API.getPlayers(); renderAdmin(); $('#admin').classList.remove('hide'); };
+$('#adminBack').onclick = () => $('#admin').classList.add('hide');
+
+/* ============ КАЗИНО ============ */
+document.body.insertAdjacentHTML('beforeend', `<datalist id="giftlist">${GIFTS.map(g => `<option value="${g.n}">`).join('')}</datalist>`);
+const up = {mode:'x2', gift:'cup', busy:false};
+const pvp = {bets:{}, t:20, busy:false, fin:false, hl:null, timer:null};
+const BOTS = ['Алекс','Мария','Дмитрий','Ник','Лея','Тим'];
+function renderCasino(){
+  $('#v-casino').innerHTML = `<div class="cbal" id="cBal">Баланс: ${S.user.stars} ⭐</div>
+  <div class="seg g"><button class="on" data-m="up">Апгрейдер</button><button data-m="pvp">PvP</button></div>
+  <div id="c-up">
+    <svg class="dial" viewBox="0 0 200 200"><circle cx="100" cy="100" r="80" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="14"/>
+    <circle id="arc" cx="100" cy="100" r="80" fill="none" stroke="#34C759" stroke-width="14" stroke-dasharray="0 502.65" transform="rotate(-90 100 100)"/>
+    <g id="ptr" style="transform-origin:100px 100px"><path d="M91 2h18l-9 20z" fill="#fff"/></g>
+    <text id="dTxt" x="100" y="110" text-anchor="middle" fill="#fff" font-size="30" font-weight="700">0%</text></svg>
+    <div class="seg g"><button class="on" data-u="x2">X2</button><button data-u="nft">NFT-подарок</button></div>
+    <div class="chips hide" id="upG">${GIFTS.map(g => giftTile({id:g.id}, `data-g="${g.id}"`, g.id === up.gift ? 'on' : '')).join('')}</div>
+    <div class="row"><input id="upBet" class="in" type="number" min="1" placeholder="Ставка, ⭐" style="flex:1"><button class="btn ghost" id="upMax">Макс</button></div>
+    <div class="res dim" id="upInfo"></div><button class="btn wide" id="upGo">Апгрейд</button><div class="res" id="upRes"></div>
+  </div>
+  <div id="c-pvp" class="hide">
+    <div class="g grp"><div class="it" style="cursor:default"><div class="tx"><b id="pvpPot"></b><small id="pvpT"></small></div></div><div id="pvpList"></div></div>
+    <div class="row"><input id="pvpBet" class="in" type="number" min="1" placeholder="Ставка, ⭐" style="flex:1"><button class="btn" id="pvpGo">Поставить</button></div>
+    <p class="dim" style="font-size:13px;margin-top:10px">Шанс победы равен доле вашей ставки в банке. Победитель забирает банк за вычетом 5%.</p>
+  </div>`;
+  updUp(); renderPvp();
+}
+$('#v-casino').onclick = e => {
+  const m = e.target.closest('[data-m]'), u = e.target.closest('[data-u]'), g = e.target.closest('[data-g]');
+  if(m){ $$('[data-m]').forEach(b => b.classList.toggle('on', b === m)); $('#c-up').classList.toggle('hide', m.dataset.m !== 'up'); $('#c-pvp').classList.toggle('hide', m.dataset.m !== 'pvp'); }
+  else if(u){ up.mode = u.dataset.u; $$('[data-u]').forEach(b => b.classList.toggle('on', b === u)); $('#upG').classList.toggle('hide', up.mode !== 'nft'); updUp(); }
+  else if(g){ up.gift = g.dataset.g; $$('[data-g]').forEach(b => b.classList.toggle('on', b === g)); updUp(); }
+  else if(e.target.id === 'upMax'){ $('#upBet').value = S.user.stars; updUp(); }
+  else if(e.target.id === 'upGo') doUpgrade();
+  else if(e.target.id === 'pvpGo') pvpBet();
+};
+$('#v-casino').oninput = e => { if(e.target.id === 'upBet') updUp(); };
+function upCalc(){
+  const bet = Math.floor(+$('#upBet').value) || 0; let tgt, ch;
+  if(up.mode === 'x2'){ tgt = bet*2; ch = 47.5; } else { tgt = GIFTS.find(g => g.id === up.gift).v; ch = Math.min(95, bet/tgt*95); }
+  return {bet, tgt, ch: Math.round(ch*10)/10};
+}
+function updUp(){
+  const c = upCalc();
+  $('#arc').setAttribute('stroke-dasharray', `${c.ch/100*502.65} 502.65`); $('#dTxt').textContent = c.ch + '%';
+  $('#upInfo').textContent = up.mode === 'x2' ? `Выигрыш: ${c.tgt} ⭐` : `Цель: ${c.tgt} ⭐ · шанс ${c.ch}%`;
+}
+async function doUpgrade(){
+  if(up.busy || blocked()) return;
+  const c = upCalc();
+  if(c.bet < 1 || c.bet > S.user.stars) return toast('Проверьте ставку');
+  if(c.ch < 0.1) return toast('Шанс меньше 0.1% — увеличьте ставку');
+  up.busy = true; S.user.stars -= c.bet; refreshBal(); $('#upRes').textContent = '';
+  const r = await API.upgrade({mode:up.mode, bet:c.bet, giftId:up.gift}), p = $('#ptr');
+  p.style.transition = 'none'; p.style.transform = 'rotate(0deg)'; p.getBoundingClientRect();
+  p.style.transition = 'transform 3.5s cubic-bezier(.1,.7,.1,1)'; p.style.transform = `rotate(${1800 + r.roll*3.6}deg)`;
+  setTimeout(() => {
+    const el = $('#upRes'); up.busy = false;
+    if(r.win){
+      if(up.mode === 'x2'){ S.user.stars += c.bet*2; el.textContent = `Победа! +${c.bet*2} ⭐`; }
+      else { const g = GIFTS.find(x => x.id === up.gift); S.user.gifts.push({id:g.id, up:null}); el.textContent = `Победа! Получен подарок «${g.n}»`; }
+      el.style.color = 'var(--green)';
+    } else { el.textContent = 'Не повезло, попробуйте ещё'; el.style.color = 'var(--red)'; }
+    refreshBal();
+  }, 3600);
+}
+/* PvP */
+function pvpNew(){ clearInterval(pvp.timer); Object.assign(pvp, {bets:{}, t:20, busy:false, fin:false, hl:null}); renderPvp(); pvp.timer = setInterval(pvpTick, 1000); }
+function pvpTick(){
+  if(pvp.busy) return;
+  if(--pvp.t <= 0) return pvpEnd();
+  if(Math.random() < .55){ const b = BOTS[Math.floor(Math.random()*BOTS.length)]; pvp.bets[b] = (pvp.bets[b] || 0) + Math.ceil(Math.random()*8)*50; }
+  renderPvp();
+}
+function renderPvp(){
+  if(!$('#pvpList')) return;
+  const e = Object.entries(pvp.bets).sort((a, b) => b[1] - a[1]), tot = e.reduce((s, x) => s + x[1], 0);
+  $('#pvpPot').textContent = `Банк: ${tot} ⭐`;
+  $('#pvpT').textContent = pvp.busy ? 'Определяем победителя…' : `До розыгрыша: ${pvp.t} с`;
+  $('#pvpList').innerHTML = e.length ? e.map(([n, b]) => `<div class="pr ${pvp.hl === n ? (pvp.fin ? 'win' : 'hl') : ''}"><i style="width:${b/tot*100}%"></i><span>${n === 'me' ? 'Вы' : esc(n)}</span><span>${b} ⭐ · ${(b/tot*100).toFixed(1)}%</span></div>`).join('') : '<div class="it dim" style="border-top:1px solid var(--line);cursor:default">Ставок пока нет</div>';
+}
+async function pvpBet(){
+  if(blocked()) return;
+  if(pvp.busy) return toast('Идёт розыгрыш');
+  const a = Math.floor(+$('#pvpBet').value);
+  if(a < 1 || a > S.user.stars) return toast('Проверьте ставку');
+  S.user.stars -= a; pvp.bets.me = (pvp.bets.me || 0) + a; $('#pvpBet').value = '';
+  await API.pvpBet(a); refreshBal(); renderPvp();
+}
+async function pvpEnd(){
+  pvp.busy = true; clearInterval(pvp.timer);
+  const e = Object.entries(pvp.bets), tot = e.reduce((s, x) => s + x[1], 0);
+  if(e.length < 2){ if(pvp.bets.me){ S.user.stars += pvp.bets.me; refreshBal(); toast('Нет соперников — ставка возвращена'); } return setTimeout(pvpNew, 1500); }
+  const w = await API.pvpDraw(pvp.bets), names = e.map(x => x[0]); let i = 0;
+  const iv = setInterval(() => { pvp.hl = names[i++ % names.length]; renderPvp(); }, 110);
+  setTimeout(() => {
+    clearInterval(iv); pvp.hl = w; pvp.fin = true; renderPvp();
+    const pay = Math.floor(tot*.95);
+    if(w === 'me'){ S.user.stars += pay; refreshBal(); toast(`Вы выиграли ${pay} ⭐`); } else toast(`Победил ${w}`);
+    setTimeout(pvpNew, 4000);
+  }, 2600);
+}
+
+/* ============ ОБЩЕЕ ============ */
+function renderAll(){
+  renderChats(); renderSettings(); renderContacts(); renderProfile(); renderCasino();
+  $('#adminBtn').classList.toggle('hide', !isAdmin());
+}
+
+window.Pepegram = {
+  API, receiveMessage,
+  setBalance(stars, grams){ S.user.stars = stars; if(grams != null) S.user.grams = grams; renderProfile(); },
+  loginAs(id){ S.user.id = id; renderAll(); }
+};
+restore();
+</script>
 </body>
 </html>
