@@ -185,7 +185,7 @@ button,input{font-family:inherit}
 <div class="toast" id="toast"></div>
 
 <script>
-const API=''; /* для APK/другого хоста впиши сюда адрес сервера, напр. 'https://my-server.com' */
+const API='https://fame-api-bs11.onrender.com';
 let TOKEN=localStorage.getItem('pg_token'),me=null,gifts=[],inv=[],shopT='all',selGift=null,selItem=null,editKey=null,lastMsg=0,page='profile';
 const $=id=>document.getElementById(id),v=id=>$(id).value.trim();
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
