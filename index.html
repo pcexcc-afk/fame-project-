@@ -2,534 +2,322 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Pepegram</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#f0f2f5;--card:#fff;--text:#1c2733;--sub:#7a8c9a;
-  --blue:#2ca5e0;--green:#4caf50;--red:#ff453a;--gold:#f8b400;
-  --border:rgba(0,0,0,.08);--r:16px;
-  color-scheme:light dark;
-  padding-top:env(safe-area-inset-top,0px);
-  padding-bottom:env(safe-area-inset-bottom,0px);
-}
-@media(prefers-color-scheme:dark){:root{--bg:#17212b;--card:#232e3c;--text:#e8edf2;--sub:#8a9bab;--border:rgba(255,255,255,.07)}}
+:root{--bg:#efeff4;--card:#fff;--text:#1c2733;--sub:#7a8c9a;--blue:#2ca5e0;--green:#4caf50;--red:#ff453a;--gold:#f8b400;--line:rgba(0,0,0,.08)}
 html,body{height:100%;overflow:hidden}
-body{font-family:Inter,-apple-system,sans-serif;background:var(--bg);color:var(--text)}
-
-.app{height:100dvh;display:flex;flex-direction:column;max-width:480px;margin:0 auto}
-.pages{flex:1;overflow:hidden;position:relative}
-.page{position:absolute;inset:0;overflow-y:auto;display:none;padding-bottom:70px;-webkit-overflow-scrolling:touch}
+body{font-family:-apple-system,"SF Pro Text",Inter,system-ui,sans-serif;background:var(--bg);color:var(--text)}
+button,input{font-family:inherit}
+.app{height:100%;display:flex;flex-direction:column;max-width:480px;margin:0 auto;background:var(--bg);padding-top:env(safe-area-inset-top,0)}
+.pages{flex:1;position:relative;overflow:hidden}
+.page{position:absolute;inset:0;overflow-y:auto;display:none;padding-bottom:16px}
 .page.show{display:block}
-
-.tabbar{height:58px;background:var(--card);border-top:1px solid var(--border);display:flex;align-items:center;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0px)}
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:7px 0;color:var(--sub);font-size:10px;font-weight:600;-webkit-tap-highlight-color:transparent;transition:color .15s;user-select:none}
+.tabbar{display:flex;background:rgba(255,255,255,.95);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0)}
+.tab{flex:1;text-align:center;padding:7px 0 6px;color:var(--sub);font-size:10px;font-weight:600;cursor:pointer}
+.tab i{display:block;font-style:normal;font-size:22px;margin-bottom:1px}
 .tab.on{color:var(--blue)}
-.tab-ic{font-size:22px}
-
-.ph{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:1px solid var(--border);padding:13px 16px;display:flex;align-items:center;justify-content:space-between}
-.ph-title{font-size:17px;font-weight:700;letter-spacing:-.3px}
-.ph-bal{font-size:14px;font-weight:700;color:var(--gold)}
-
-.pf-hero{background:linear-gradient(150deg,#2ca5e0,#0a60c4);padding:36px 20px 24px;text-align:center;color:#fff}
-.pf-av{width:84px;height:84px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 12px;border:3px solid rgba(255,255,255,.35);font-weight:800;letter-spacing:-.5px}
-.pf-name{font-size:21px;font-weight:800;letter-spacing:-.4px}
-.pf-status{font-size:12px;opacity:.75;margin-top:4px}
-
-.bal-row{display:flex;gap:10px;padding:12px 14px 2px}
-.bal-card{flex:1;background:var(--card);border-radius:var(--r);padding:13px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-.bal-num{font-size:19px;font-weight:800;color:var(--blue)}
-.bal-lbl{font-size:11px;color:var(--sub);margin-top:3px;font-weight:500}
-
-.sec-title{padding:16px 16px 10px;font-size:12px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.6px}
-
-.ggrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 12px 12px}
-.gcard{background:var(--card);border-radius:var(--r);padding:13px 7px 10px;text-align:center;position:relative;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.05);transition:transform .15s;-webkit-tap-highlight-color:transparent}
-.gcard:active{transform:scale(.95)}
-.gem{font-size:40px;line-height:1;margin-bottom:7px;display:block;filter:drop-shadow(0 2px 4px rgba(0,0,0,.12))}
-.gnm{font-size:10px;font-weight:500;color:var(--sub);min-height:24px;line-height:1.3;margin-bottom:6px;display:flex;align-items:center;justify-content:center;text-align:center}
-.gprc{display:inline-flex;align-items:center;gap:3px;background:rgba(248,180,0,.12);border-radius:20px;padding:3px 8px;font-size:11px;font-weight:700;color:#a07800}
-@media(prefers-color-scheme:dark){.gprc{background:rgba(248,180,0,.2);color:#ffd740}}
-.gprc.view{background:rgba(76,175,80,.12);color:var(--green);font-size:10px}
-.gprc.sold-prc{background:rgba(255,67,58,.1);color:var(--red);font-size:10px}
-
-.rb{position:absolute;top:0;right:0;width:52px;height:52px;overflow:hidden;border-radius:0 var(--r) 0 0;pointer-events:none}
-.rb::after{content:attr(data-t);position:absolute;top:10px;right:-16px;transform:rotate(45deg);font-size:7px;font-weight:800;color:#fff;letter-spacing:.4px;text-transform:uppercase;padding:3px 18px;width:72px;text-align:center}
-.rb.m::after{background:var(--green)}
-.rb.s::after{background:var(--red)}
-
-.shop-hd{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:1px solid var(--border)}
-.sbar{display:flex;align-items:center;gap:8px;margin:10px 12px;background:var(--bg);border-radius:12px;padding:9px 12px}
-.sbar input{flex:1;border:none;background:none;outline:none;font:inherit;font-size:15px;color:var(--text)}
-.sbar input::placeholder{color:var(--sub)}
-.stabs{display:flex;padding:0 12px}
-.stab{flex:1;text-align:center;padding:9px 0;font-size:12.5px;font-weight:500;color:var(--sub);cursor:pointer;border-bottom:2.5px solid transparent;transition:.15s;user-select:none}
-.stab.on{color:var(--blue);border-bottom-color:var(--blue)}
-
-.ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .2s}
+.ph{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.95);border-bottom:1px solid var(--line);padding:13px 16px;font-size:17px;font-weight:700;text-align:center}
+.card{background:var(--card);border-radius:14px;box-shadow:0 1px 6px rgba(0,0,0,.07);margin:12px}
+/* профиль */
+.hero{padding:34px 20px 22px;text-align:center;color:#fff}
+.bg-blue{background:linear-gradient(150deg,#2ca5e0,#0a60c4)}.bg-purple{background:linear-gradient(150deg,#a695e7,#5b3fb5)}
+.bg-sunset{background:linear-gradient(150deg,#faa774,#e17076)}.bg-green{background:linear-gradient(150deg,#7bc862,#2e8b57)}
+.av{width:88px;height:88px;border-radius:50%;margin:0 auto 12px;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800}
+.fr-gold{box-shadow:0 0 0 3px #fff,0 0 0 6px #f8b400}.fr-blue{box-shadow:0 0 0 3px #fff,0 0 0 6px #2ca5e0}.fr-rainbow{box-shadow:0 0 0 3px #fff,0 0 0 6px #e17076,0 0 0 9px #7bc862}
+.hname{font-size:22px;font-weight:800;background:rgba(255,255,255,.92);display:inline-block;padding:1px 12px;border-radius:12px}
+.hst{font-size:13px;opacity:.85;margin-top:6px}
+.acts{display:flex;gap:10px;margin:-22px 12px 0;position:relative}
+.act{flex:1;background:var(--card);border:none;border-radius:14px;padding:11px 0 9px;box-shadow:0 1px 6px rgba(0,0,0,.1);color:var(--blue);font-size:11px;font-weight:600;cursor:pointer}
+.act i{display:block;font-style:normal;font-size:20px;margin-bottom:2px}
+.bal{display:flex;padding:14px 4px}
+.bal div{flex:1;text-align:center;border-right:1px solid var(--line)}.bal div:last-child{border:none}
+.bal b{display:block;font-size:18px;color:var(--blue)}.bal span{font-size:11px;color:var(--sub)}
+.sec{padding:16px 16px 4px;font-size:12px;font-weight:700;color:var(--sub);text-transform:uppercase}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:8px 12px}
+.gc{background:var(--card);border-radius:14px;padding:12px 6px 10px;text-align:center;position:relative;overflow:hidden;cursor:pointer;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.gem{font-size:40px;line-height:1;margin-bottom:6px}
+.gn{font-size:11px;color:var(--sub);min-height:15px}.gnum{font-size:10px;color:var(--sub);margin-bottom:5px}
+.pr{display:inline-block;background:rgba(248,180,0,.14);border-radius:20px;padding:3px 9px;font-size:11px;font-weight:700;color:#a07800}
+.pr.g{background:rgba(76,175,80,.12);color:var(--green)}.pr.r{background:rgba(255,69,58,.1);color:var(--red)}
+.rb{position:absolute;top:0;right:0;width:50px;height:50px;overflow:hidden;pointer-events:none}
+.rb::after{content:attr(data-t);position:absolute;top:9px;right:-17px;transform:rotate(45deg);font-size:7px;font-weight:800;color:#fff;width:70px;text-align:center;padding:3px 0}
+.rb.m::after{background:var(--green)}.rb.s::after{background:var(--red)}
+.star{position:absolute;top:5px;left:7px;font-size:12px}
+.empty{grid-column:1/-1;text-align:center;color:var(--sub);padding:36px 16px;font-size:14px}
+/* сегменты и поиск */
+.seg{display:flex;margin:10px 12px 0;background:rgba(118,118,128,.14);border-radius:10px;padding:2px}
+.seg div{flex:1;text-align:center;padding:7px 0;font-size:13px;font-weight:600;border-radius:8px;cursor:pointer;color:var(--sub)}
+.seg div.on{background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.sbar{margin:10px 12px 0}.sbar input{width:100%;border:none;background:rgba(118,118,128,.12);border-radius:10px;padding:9px 12px;font-size:15px;outline:none}
+.chips{display:flex;gap:6px;padding:10px 12px 0;overflow-x:auto}
+.chip{padding:6px 13px;border-radius:16px;background:#fff;font-size:12.5px;font-weight:600;color:var(--sub);cursor:pointer;white-space:nowrap}
+.chip.on{background:var(--blue);color:#fff}
+/* чат */
+#pg-chat{display:none;flex-direction:column;overflow:hidden;padding:0;background:#dfe8ef}
+#pg-chat.show{display:flex}
+#msgs{flex:1;overflow-y:auto;padding:10px 10px 4px;display:flex;flex-direction:column;gap:5px}
+.m{max-width:80%;padding:6px 11px 5px;border-radius:16px;background:#fff;font-size:15px;line-height:1.35;word-wrap:break-word;align-self:flex-start;border-bottom-left-radius:5px}
+.m.me{align-self:flex-end;background:#d6f0ff;border-radius:16px;border-bottom-right-radius:5px}
+.m b{display:block;font-size:12.5px;margin-bottom:1px}.m small{display:block;text-align:right;font-size:10px;color:var(--sub)}
+.cin{display:flex;gap:8px;padding:8px 10px;background:#fff;border-top:1px solid var(--line)}
+.cin input{flex:1;border:1.5px solid var(--line);border-radius:20px;padding:9px 14px;font-size:15px;outline:none}
+.cin button{width:40px;border:none;border-radius:50%;background:var(--blue);color:#fff;font-size:18px;cursor:pointer}
+/* настройки */
+.row{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--line);cursor:pointer;gap:10px}
+.row:last-child{border:none}.row s{text-decoration:none;font-size:13px;color:var(--sub);max-width:55%;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cust{padding:12px 16px;border-bottom:1px solid var(--line)}.cust:last-child{border:none}
+.cust p{font-size:13px;color:var(--sub);margin-bottom:8px}
+.opts{display:flex;gap:10px;flex-wrap:wrap}
+.sw{width:34px;height:34px;border-radius:50%;border:3px solid transparent;cursor:pointer}.sw.on{border-color:var(--blue)}
+.ob{padding:6px 12px;border-radius:14px;background:var(--bg);font-size:12.5px;cursor:pointer;border:2px solid transparent}.ob.on{border-color:var(--blue);color:var(--blue);font-weight:700}
+.tg{width:44px;height:26px;appearance:none;background:#ccd;border-radius:13px;position:relative;cursor:pointer;outline:none;transition:.2s}
+.tg::after{content:"";position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
+.tg:checked{background:var(--green)}.tg:checked::after{left:20px}
+.abox{background:#1a2535;border-radius:14px;padding:14px;margin:12px;display:none}
+.abox h3{color:#ffc53d;font-size:15px;margin-bottom:10px}.abox hr{border:none;border-top:1px solid rgba(255,255,255,.1);margin:10px 0}
+.ai{width:100%;padding:10px 12px;border-radius:10px;border:none;background:#243348;color:#e8edf2;font-size:14px;margin-bottom:7px;outline:none}
+.ab{padding:10px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;background:var(--blue);color:#fff;flex:1}
+.ab.r{background:var(--red)}.ab.g{background:var(--green)}.ab.y{background:var(--gold);color:#000}
+.ar{display:flex;gap:7px;margin-bottom:7px}.ar .ai{margin:0}
+/* модалки */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .2s}
 .ov.show{opacity:1;pointer-events:all}
-.mbox{width:100%;max-width:480px;margin:0 auto;background:var(--card);border-radius:24px 24px 0 0;padding:24px 20px calc(28px + env(safe-area-inset-bottom,0px));transform:translateY(100%);transition:transform .22s cubic-bezier(.4,0,.2,1)}
-.ov.show .mbox{transform:translateY(0)}
-.mem{font-size:72px;text-align:center;margin-bottom:14px;line-height:1}
-.mtitle{font-size:20px;font-weight:800;text-align:center;margin-bottom:4px}
-.msub{font-size:14px;color:var(--sub);text-align:center;margin-bottom:16px}
-.mbtn{width:100%;padding:14px;border-radius:14px;border:none;background:var(--blue);color:#fff;font:inherit;font-size:15px;font-weight:700;cursor:pointer;margin-top:10px;-webkit-tap-highlight-color:transparent}
-.mbtn:active{opacity:.85}
-.mbtn.red{background:var(--red)}
-.mbtn.grey{background:var(--border);color:var(--sub)}
-.minput{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font:inherit;font-size:15px;background:var(--bg);color:var(--text);outline:none;margin-top:8px}
-.minput:focus{border-color:var(--blue)}
-
-.sset{margin:14px 14px 0}
-.sset h3{font-size:12px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
-.srow{background:var(--card);border-radius:14px;overflow:hidden;margin-bottom:12px}
-.sitem{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer}
-.sitem:last-child{border-bottom:none}
-.sitem-l{display:flex;flex-direction:column;gap:2px}
-.sitem-t{font-size:15px;font-weight:500}
-.sitem-s{font-size:12px;color:var(--sub)}
-
-.abox{background:#1a2535;border-radius:16px;padding:16px;margin:14px}
-.abox h3{color:#ffc53d;font-size:15px;font-weight:700;margin-bottom:14px}
-.ainput{width:100%;padding:10px 12px;border-radius:10px;border:none;background:#243348;color:#e8edf2;font:inherit;font-size:14px;margin-bottom:8px;outline:none}
-.ainput:focus{background:#2d3f52}
-.abtn{width:100%;padding:11px;border-radius:10px;border:none;font:inherit;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:6px}
-.abtn.b{background:var(--blue);color:#fff}
-.abtn.r{background:var(--red);color:#fff}
-.abtn.g{background:var(--green);color:#fff}
-.abtn.y{background:#f8b400;color:#000}
-.arow{display:flex;gap:8px;margin-bottom:6px}
-.arow .abtn{margin-bottom:0}
-.admin-sep{border-top:1px solid rgba(255,255,255,.08);margin:12px 0;padding-top:12px}
-.admin-sep-title{color:#9ab;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
-
-.toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%);background:rgba(10,20,30,.88);backdrop-filter:blur(8px);color:#fff;padding:10px 20px;border-radius:20px;font-size:13.5px;font-weight:500;z-index:999;opacity:0;transition:opacity .2s;white-space:nowrap;pointer-events:none}
+.mb{width:100%;max-width:480px;margin:0 auto;background:#fff;border-radius:22px 22px 0 0;padding:22px 20px calc(24px + env(safe-area-inset-bottom,0));transform:translateY(100%);transition:transform .22s}
+.ov.show .mb{transform:none}
+.me{font-size:70px;text-align:center;line-height:1;margin-bottom:10px}.mt{font-size:20px;font-weight:800;text-align:center}.ms{font-size:14px;color:var(--sub);text-align:center;margin:4px 0 8px}
+.mbtn{width:100%;padding:14px;border-radius:13px;border:none;background:var(--blue);color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-top:10px}
+.mbtn.gr{background:var(--bg);color:var(--sub)}
+.mi{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:15px;outline:none;margin-top:8px}
+.toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:rgba(10,20,30,.9);color:#fff;padding:10px 18px;border-radius:20px;font-size:13.5px;z-index:999;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90%;text-align:center}
 .toast.show{opacity:1}
-
-.empty{padding:52px 20px;text-align:center;color:var(--sub);grid-column:1/-1}
-.empty-em{font-size:52px;margin-bottom:12px}
-.empty-t{font-size:15px;font-weight:600;color:var(--text);margin-bottom:5px}
-.empty-s{font-size:12px}
-.spin{text-align:center;padding:40px;grid-column:1/-1;font-size:28px;animation:sp 1s linear infinite}
-@keyframes sp{to{transform:rotate(360deg)}}
-
-.si{width:12px;height:12px;vertical-align:-1px}
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="pages">
+<div class="pages">
 
-    <div id="pg-profile" class="page show">
-      <div class="pf-hero">
-        <div class="pf-av" id="pfAv">?</div>
-        <div class="pf-name" id="pfName">Загрузка…</div>
-        <div class="pf-status">🟢 в сети</div>
-      </div>
-      <div class="bal-row">
-        <div class="bal-card"><div class="bal-num" id="pfStars">0</div><div class="bal-lbl">⭐ Звёзды</div></div>
-        <div class="bal-card"><div class="bal-num" id="pfGiftCount">0</div><div class="bal-lbl">🎁 Подарков</div></div>
-      </div>
-      <div class="sec-title">Мои подарки</div>
-      <div class="ggrid" id="pfGrid"></div>
-    </div>
-
-    <div id="pg-shop" class="page">
-      <div class="shop-hd">
-        <div class="ph"><div class="ph-title">Купить подарок</div><div class="ph-bal" id="shopBal">⭐ 0</div></div>
-        <div class="sbar">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--sub);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input type="search" placeholder="Поиск подарка…" id="shopQ" oninput="filterShop()">
-        </div>
-        <div class="stabs" id="stabs">
-          <div class="stab on" data-t="all">Все</div>
-          <div class="stab" data-t="regular">Обычные</div>
-          <div class="stab" data-t="market">Маркет</div>
-          <div class="stab" data-t="sold">Продан</div>
-        </div>
-      </div>
-      <div class="ggrid" id="shopGrid" style="margin-top:12px"></div>
-    </div>
-
-    <div id="pg-inv" class="page">
-      <div class="ph"><div class="ph-title">Инвентарь</div></div>
-      <div class="ggrid" id="invGrid" style="margin-top:12px"></div>
-    </div>
-
-    <div id="pg-settings" class="page">
-      <div class="ph"><div class="ph-title">Настройки</div></div>
-      <div class="sset">
-        <h3>Аккаунт</h3>
-        <div class="srow">
-          <div class="sitem" onclick="openEditName()">
-            <div class="sitem-l"><span class="sitem-t">Имя</span><span class="sitem-s" id="setName">—</span></div>
-            <span style="color:var(--sub);font-size:18px">›</span>
-          </div>
-          <div class="sitem" onclick="openEditBio()">
-            <div class="sitem-l"><span class="sitem-t">О себе</span><span class="sitem-s" id="setBio">—</span></div>
-            <span style="color:var(--sub);font-size:18px">›</span>
-          </div>
-        </div>
-        <h3>Мой ID</h3>
-        <div class="srow">
-          <div class="sitem" onclick="toast('ID скопирован 📋');navigator.clipboard&&navigator.clipboard.writeText(uid)">
-            <div class="sitem-l"><span class="sitem-t" id="myIdDisplay">—</span><span class="sitem-s">Нажми для копирования</span></div>
-            <span style="color:var(--sub);font-size:18px">›</span>
-          </div>
-        </div>
-      </div>
-      <div class="abox" id="adminBox" style="display:none">
-        <h3>⚡ Админ-панель</h3>
-        <input class="ainput" id="aId" placeholder="ID пользователя">
-        <div class="arow">
-          <input class="ainput" id="aAmt" type="number" placeholder="Звёзд" style="margin-bottom:0">
-          <button class="abtn b" style="flex:0 0 auto;padding:10px 14px;border-radius:10px;margin-bottom:0" onclick="giveStars()">Выдать ⭐</button>
-        </div>
-        <div class="arow" style="margin-top:8px">
-          <button class="abtn r" onclick="freezeUser(1)">🔒 Заморозить</button>
-          <button class="abtn g" onclick="freezeUser(0)">🔓 Разморозить</button>
-        </div>
-        <div class="admin-sep">
-          <div class="admin-sep-title">Добавить подарок</div>
-          <input class="ainput" id="agName" placeholder="Название">
-          <div class="arow">
-            <input class="ainput" id="agEmoji" placeholder="Эмодзи" style="margin-bottom:0;flex:0 0 80px">
-            <input class="ainput" id="agPrice" type="number" placeholder="Цена" style="margin-bottom:0">
-          </div>
-          <select class="ainput" id="agType" style="margin-top:8px;margin-bottom:0">
-            <option value="regular">Обычный</option>
-            <option value="market">Маркет (коллекционный)</option>
-            <option value="sold">Продан</option>
-          </select>
-          <button class="abtn y" style="margin-top:10px" onclick="addGift()">Добавить подарок</button>
-        </div>
-      </div>
-    </div>
-
+<div id="pg-profile" class="page show">
+  <div class="hero" id="hero"><div class="av" id="av"></div><div class="hname" id="hname"></div><div class="hst">в сети</div></div>
+  <div class="acts">
+    <button class="act" onclick="toast('Звонки скоро появятся')"><i>📞</i>Звонок</button>
+    <button class="act" onclick="toggleSound(this)"><i>🔔</i>Звук</button>
+    <button class="act" onclick="goTab('chat')"><i>🔍</i>Поиск</button>
   </div>
+  <div class="card bal">
+    <div><b id="bStars">0</b><span>⭐ Звёзды</span></div>
+    <div><b id="bTon">0</b><span>TON</span></div>
+    <div><b id="bGram">0</b><span>GRAM</span></div>
+  </div>
+  <div class="sec">Витрина</div>
+  <div class="grid" id="showGrid"></div>
+  <div class="sec" style="text-transform:none;font-weight:500;padding-top:0">Ваш ID: <b id="myId" style="user-select:all"></b></div>
+</div>
 
-  <div class="tabbar">
-    <div class="tab on" onclick="goTab('profile',this)"><div class="tab-ic">👤</div>Профиль</div>
-    <div class="tab" onclick="goTab('shop',this)"><div class="tab-ic">🎁</div>Магазин</div>
-    <div class="tab" onclick="goTab('inv',this)"><div class="tab-ic">📦</div>Инвентарь</div>
-    <div class="tab" onclick="goTab('settings',this)"><div class="tab-ic">⚙️</div>Настройки</div>
+<div id="pg-chat" class="page">
+  <div class="ph">Глобальный чат</div>
+  <div id="msgs"></div>
+  <div class="cin"><input id="cText" placeholder="Сообщение" maxlength="1000" autocomplete="off"><button onclick="sendMsg()">➤</button></div>
+</div>
+
+<div id="pg-inv" class="page">
+  <div class="ph">Подарки</div>
+  <div class="seg" id="invSeg"><div class="on" data-v="mine">Мои</div><div data-v="shop">Магазин</div></div>
+  <div id="vMine"><div class="sec" style="padding-bottom:0">Нажми на подарок: отправить или в витрину</div><div class="grid" id="invGrid"></div></div>
+  <div id="vShop" style="display:none">
+    <div class="sbar"><input type="search" id="shopQ" placeholder="Поиск подарка…" oninput="renderShop()"></div>
+    <div class="chips" id="chips"><div class="chip on" data-t="all">Все</div><div class="chip" data-t="regular">Обычные</div><div class="chip" data-t="market">Маркет</div><div class="chip" data-t="sold">Продан</div></div>
+    <div class="grid" id="shopGrid"></div>
   </div>
 </div>
 
-<div class="ov" id="giftMod" onclick="if(event.target===this)closeM('giftMod')">
-  <div class="mbox">
-    <div class="mem" id="gfEm"></div>
-    <div class="mtitle" id="gfTitle"></div>
-    <div class="msub" id="gfSub"></div>
-    <div id="gfPriceRow"></div>
-    <button class="mbtn" id="gfBuyBtn" onclick="doBuy()"></button>
-    <button class="mbtn grey" onclick="closeM('giftMod')">Отмена</button>
+<div id="pg-settings" class="page">
+  <div class="ph">Настройки</div>
+  <div class="sec">Аккаунт</div>
+  <div class="card">
+    <div class="row" onclick="editField('name')">Имя<s id="sName"></s></div>
+    <div class="row" onclick="editField('bio')">О себе<s id="sBio"></s></div>
+    <div class="row" onclick="toast('ID: '+me.id)">Мой ID<s id="sId"></s></div>
+  </div>
+  <div class="sec">Конфиденциальность</div>
+  <div class="card" id="privCard"></div>
+  <div class="sec">Кастомизация</div>
+  <div class="card">
+    <div class="cust"><p>Цвет ника</p><div class="opts" id="oColor"></div></div>
+    <div class="cust"><p>Рамка аватара</p><div class="opts" id="oFrame"></div></div>
+    <div class="cust"><p>Фон профиля</p><div class="opts" id="oBg"></div></div>
+  </div>
+  <div class="abox" id="adminBox">
+    <h3>Админ-панель</h3>
+    <input class="ai" id="aId" placeholder="ID пользователя">
+    <div class="ar"><input class="ai" id="aAmt" type="number" placeholder="Сумма">
+      <select class="ai" id="aCur" style="width:90px"><option value="stars">⭐</option><option value="ton">TON</option><option value="gram">GRAM</option></select>
+      <button class="ab" style="flex:0 0 80px" onclick="adm('give_stars',{amount:+v('aAmt'),currency:v('aCur')})">Выдать</button></div>
+    <div class="ar"><select class="ai" id="aGift"></select><button class="ab" style="flex:0 0 80px" onclick="adm('give_gift',{gift_id:+v('aGift')})">Подарок</button></div>
+    <div class="ar"><button class="ab r" onclick="adm('freeze',{frozen:1})">Заморозить</button><button class="ab g" onclick="adm('freeze',{frozen:0})">Разморозить</button></div>
+    <hr>
+    <input class="ai" id="agName" placeholder="Название подарка">
+    <div class="ar"><input class="ai" id="agEmoji" placeholder="Символ"><input class="ai" id="agPrice" type="number" placeholder="Цена"></div>
+    <div class="ar"><select class="ai" id="agType"><option value="regular">Обычный</option><option value="market">Маркет</option></select><input class="ai" id="agSupply" type="number" placeholder="Тираж (0 = ∞)"></div>
+    <button class="ab y" style="width:100%" onclick="addGift()">Создать подарок</button>
   </div>
 </div>
 
-<div class="ov" id="sendMod" onclick="if(event.target===this)closeM('sendMod')">
-  <div class="mbox">
-    <div class="mem" id="sdEm"></div>
-    <div class="mtitle">Отправить подарок</div>
-    <div class="msub" id="sdName"></div>
-    <input class="minput" id="sdTarget" placeholder="Введи ID получателя">
-    <button class="mbtn" onclick="doSend()">Отправить 🎁</button>
-    <button class="mbtn grey" onclick="closeM('sendMod')">Отмена</button>
-  </div>
+</div>
+<div class="tabbar">
+  <div class="tab on" data-p="profile"><i>👤</i>Профиль</div>
+  <div class="tab" data-p="chat"><i>💬</i>Чаты</div>
+  <div class="tab" data-p="inv"><i>🎁</i>Инвентарь</div>
+  <div class="tab" data-p="settings"><i>⚙️</i>Настройки</div>
+</div>
 </div>
 
-<div class="ov" id="editNameMod" onclick="if(event.target===this)closeM('editNameMod')">
-  <div class="mbox">
-    <div class="mtitle">Изменить имя</div>
-    <input class="minput" id="newName" placeholder="Новое имя" maxlength="32">
-    <button class="mbtn" onclick="saveName()">Сохранить</button>
-    <button class="mbtn grey" onclick="closeM('editNameMod')">Отмена</button>
-  </div>
-</div>
-
-<div class="ov" id="editBioMod" onclick="if(event.target===this)closeM('editBioMod')">
-  <div class="mbox">
-    <div class="mtitle">О себе</div>
-    <input class="minput" id="newBio" placeholder="Расскажи о себе…" maxlength="128">
-    <button class="mbtn" onclick="saveBio()">Сохранить</button>
-    <button class="mbtn grey" onclick="closeM('editBioMod')">Отмена</button>
-  </div>
-</div>
-
+<div class="ov" id="regMod"><div class="mb"><div class="me">👋</div><div class="mt">Добро пожаловать в Pepegram</div><div class="ms">Как тебя зовут?</div>
+  <input class="mi" id="regName" maxlength="32" placeholder="Имя"><button class="mbtn" onclick="register()">Начать</button></div></div>
+<div class="ov" id="buyMod" onclick="if(event.target===this)cm('buyMod')"><div class="mb"><div class="me" id="bEm"></div><div class="mt" id="bTitle"></div><div class="ms" id="bSub"></div>
+  <button class="mbtn" id="bBtn" onclick="doBuy()"></button><button class="mbtn gr" onclick="cm('buyMod')">Отмена</button></div></div>
+<div class="ov" id="itemMod" onclick="if(event.target===this)cm('itemMod')"><div class="mb"><div class="me" id="iEm"></div><div class="mt" id="iTitle"></div><div class="ms" id="iSub"></div>
+  <input class="mi" id="iTo" placeholder="ID получателя"><button class="mbtn" onclick="doSend()">Отправить</button>
+  <button class="mbtn gr" id="iShow" onclick="toggleShow()"></button><button class="mbtn gr" onclick="cm('itemMod')">Закрыть</button></div></div>
+<div class="ov" id="editMod" onclick="if(event.target===this)cm('editMod')"><div class="mb"><div class="mt" id="eTitle"></div>
+  <input class="mi" id="eVal" maxlength="140"><button class="mbtn" onclick="saveField()">Сохранить</button><button class="mbtn gr" onclick="cm('editMod')">Отмена</button></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
-const API = "https://fame-api-bs11.onrender.com";
-let uid = "123456789";
-let me = null, allGifts = [], shopFilter = 'all';
-let giftsMap = {}, invMap = {}, selectedGift = null, selectedInvId = null;
-
-const S = `<svg class="si" viewBox="0 0 24 24" fill="#f8b400"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 18.77l-6.18 3.23L7 14.14 2 9.27l6.91-1.01z"/></svg>`;
-const fmt = n => n ? parseInt(n).toLocaleString('ru-RU') : '0';
-
-// ПРЯМЫЕ ССЫЛКИ НА 3D-ПОДАРКИ TELEGRAM
-const TG_IMAGES = {
-    "Сердце с бантом": "https://tlgrm.eu/_/stickers/5e1/2b8/5e12b8e1-9a3f-4c81-b2a1-2b1d4e6c7b8e/1.webp",
-    "Мишка с тыквой": "https://tlgrm.eu/_/stickers/7e9/4a2/7e94a2c1-9b3d-4a81-8c2a-5d1e2f3a4b5c/1.webp",
-    "Подарочная коробка": "https://tlgrm.eu/_/stickers/3c4/1d2/3c41d2e3-5a6b-4c7d-8e9f-1a2b3c4d5e6f/1.webp",
-    "Роза": "https://tlgrm.eu/_/stickers/8f7/2a1/8f72a1b3-4c5d-6e7f-8a9b-1c2d3e4f5a6b/1.webp",
-    "Ракета": "https://tlgrm.eu/_/stickers/2a1/3b4/2a13b4c5-6d7e-8f9a-1b2c-3d4e5f6a7b8c/1.webp",
-    "Кубок": "https://tlgrm.eu/_/stickers/9c8/7d6/9c87d6e5-4f3a-2b1c-8d7e-6f5a4b3c2d1e/1.webp",
-    "Кольцо с бриллиантом": "https://tlgrm.eu/_/stickers/1b2/3c4/1b23c4d5-6e7f-8a9b-1c2d-3e4f5a6b7c8d/1.webp",
-    "Бриллиант": "https://tlgrm.eu/_/stickers/4d5/6e7/4d56e7f8-9a1b-2c3d-4e5f-6a7b8c9d1e2f/1.webp",
-    "Пепе": "https://tlgrm.eu/_/stickers/6f7/8a9/6f78a9b1-2c3d-4e5f-6a7b-8c9d1e2f3a4b/1.webp"
-};
-
-function getIcon(name, emoji) {
-    const img = TG_IMAGES[name];
-    if (img) {
-        return `<img src="${img}" style="width:48px;height:48px;object-fit:contain;margin-bottom:7px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><div class="gem" style="display:none;">${emoji}</div>`;
-    }
-    return `<div class="gem">${emoji}</div>`;
+const API=''; /* для APK/другого хоста впиши сюда адрес сервера, напр. 'https://my-server.com' */
+let TOKEN=localStorage.getItem('pg_token'),me=null,gifts=[],inv=[],shopT='all',selGift=null,selItem=null,editKey=null,lastMsg=0,page='profile';
+const $=id=>document.getElementById(id),v=id=>$(id).value.trim();
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>(+n||0).toLocaleString('ru-RU');
+const om=id=>$(id).classList.add('show'),cm=id=>$(id).classList.remove('show');
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2500)}
+async function api(p,m='GET',b){
+  try{const r=await fetch(API+p,{method:m,headers:{'Content-Type':'application/json','Authorization':TOKEN||''},body:b?JSON.stringify(b):undefined});
+    if(r.status===401&&p!=='/api/register'){localStorage.removeItem('pg_token');TOKEN=null;om('regMod')}
+    return await r.json()}catch(e){toast('Нет связи с сервером');return{success:false,error:'нет связи'}}
 }
-
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2600);
+/* ---------- старт ---------- */
+async function register(){
+  const name=v('regName');if(!name)return toast('Введи имя');
+  const d=await api('/api/register','POST',{name});
+  if(d.success){TOKEN=d.token;localStorage.setItem('pg_token',d.token);cm('regMod');init()}else toast(d.error)
 }
-
-function openM(id) { document.getElementById(id).classList.add('show'); }
-function closeM(id) { document.getElementById(id).classList.remove('show'); }
-
-function goTab(id, el) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
-  document.getElementById('pg-' + id).classList.add('show');
-  el.classList.add('on');
-  if (id === 'shop' && allGifts.length === 0) loadShop();
-  if (id === 'inv') loadInv();
-  if (id === 'profile') loadProfileGifts();
+async function init(){
+  if(!TOKEN){om('regMod');return}
+  me=await api('/api/me');if(!me.id)return;
+  gifts=await api('/api/gifts');inv=await api('/api/inventory');
+  renderAll();loadMsgs(true);
 }
-
-async function loadUser() {
-  try {
-    const r = await fetch(API + '/api/user/' + uid);
-    me = await r.json();
-    const initials = (me.name || '?').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-    document.getElementById('pfAv').textContent = initials;
-    document.getElementById('pfName').textContent = me.name;
-    document.getElementById('pfStars').textContent = fmt(me.stars);
-    document.getElementById('shopBal').textContent = '⭐ ' + fmt(me.stars);
-    document.getElementById('setName').textContent = me.name;
-    document.getElementById('setBio').textContent = me.bio || 'Не указано';
-    document.getElementById('myIdDisplay').textContent = uid;
-    if (me.is_admin) document.getElementById('adminBox').style.display = 'block';
-    loadProfileGifts();
-  } catch(e) { toast('⚠️ Нет соединения с сервером'); }
+function renderAll(){renderProfile();renderInv();renderShop();renderSettings()}
+/* ---------- вкладки ---------- */
+document.querySelector('.tabbar').onclick=e=>{const t=e.target.closest('.tab');t&&goTab(t.dataset.p)};
+async function goTab(p){
+  page=p;document.querySelectorAll('.page').forEach(e=>e.classList.toggle('show',e.id==='pg-'+p));
+  document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('on',e.dataset.p===p));
+  if(!me)return;
+  me=await api('/api/me');gifts=await api('/api/gifts');inv=await api('/api/inventory');renderAll();
+  if(p==='chat')loadMsgs(true);
 }
-
-async function loadProfileGifts() {
-  try {
-    const r = await fetch(API + '/api/user/' + uid + '/inventory');
-    const items = await r.json();
-    document.getElementById('pfGiftCount').textContent = items.length;
-    const grid = document.getElementById('pfGrid');
-    if (!items.length) {
-      grid.innerHTML = `<div class="empty"><div class="empty-em">🎁</div><div class="empty-t">Подарков пока нет</div><div class="empty-s">Купи в магазине</div></div>`;
-      return;
-    }
-    items.slice(0, 9).forEach(it => { invMap[it.id] = it; });
-    grid.innerHTML = items.slice(0, 9).map(it => `
-      <div class="gcard" onclick="openSendMod(${it.id})">
-        ${getIcon(it.name, it.emoji)}
-        <div class="gnm">${it.name}</div>
-        <span class="gprc view">📤 Отправить</span>
-      </div>`).join('');
-  } catch(e) {}
+/* ---------- подарки ---------- */
+const gIcon=e=>`<div class="gem">${esc(e)}</div>`;
+const numTxt=it=>'#'+it.number+(it.supply?' из '+it.supply:'');
+function invCard(it){return `<div class="gc" onclick="openItem(${it.id})">${it.showcase?'<span class="star">⭐</span>':''}${gIcon(it.emoji)}<div class="gn">${esc(it.name)}</div><div class="gnum">${numTxt(it)}</div><span class="pr g">Открыть</span></div>`}
+function renderInv(){$('invGrid').innerHTML=inv.length?inv.map(invCard).join(''):'<div class="empty">Подарков пока нет.<br>Загляни в «Магазин»</div>'}
+function renderProfile(){
+  $('hero').className='hero bg-'+me.bg;$('av').className='av fr-'+me.frame;$('av').textContent=me.name.slice(0,2).toUpperCase();
+  $('hname').textContent=me.name;$('hname').style.color=me.name_color;
+  $('bStars').textContent=fmt(me.stars);$('bTon').textContent=fmt(me.ton);$('bGram').textContent=fmt(me.gram);$('myId').textContent=me.id;
+  const s=inv.filter(i=>i.showcase);
+  $('showGrid').innerHTML=s.length?s.map(it=>`<div class="gc">${gIcon(it.emoji)}<div class="gn">${esc(it.name)}</div><div class="gnum">${numTxt(it)}</div></div>`).join(''):'<div class="empty">Витрина пуста.<br>Выбери подарки в «Инвентаре» → «В витрину»</div>';
 }
-
-async function loadShop() {
-  const grid = document.getElementById('shopGrid');
-  grid.innerHTML = '<div class="spin">⭐</div>';
-  try {
-    const r = await fetch(API + '/api/gifts');
-    allGifts = await r.json();
-    allGifts.forEach(g => { giftsMap[g.id] = g; });
-    filterShop();
-  } catch(e) {
-    grid.innerHTML = `<div class="empty"><div class="empty-em">❌</div><div class="empty-t">Ошибка загрузки</div><div class="empty-s">Проверь соединение</div></div>`;
-  }
+$('invSeg').onclick=e=>{const d=e.target.closest('[data-v]');if(!d)return;
+  document.querySelectorAll('#invSeg div').forEach(x=>x.classList.toggle('on',x===d));
+  $('vMine').style.display=d.dataset.v==='mine'?'':'none';$('vShop').style.display=d.dataset.v==='shop'?'':'none'};
+$('chips').onclick=e=>{const c=e.target.closest('.chip');if(!c)return;shopT=c.dataset.t;
+  document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===c));renderShop()};
+function renderShop(){
+  const q=$('shopQ').value.toLowerCase();
+  const f=gifts.filter(g=>(shopT==='all'||g.gift_type===shopT)&&(!q||g.name.toLowerCase().includes(q)));
+  $('shopGrid').innerHTML=f.length?f.map(g=>{
+    const b=g.gift_type!=='regular'?`<div class="rb ${g.gift_type==='market'?'m':'s'}" data-t="${g.gift_type==='market'?'маркет':'продан'}"></div>`:'';
+    const left=g.supply?`<div class="gnum">${g.minted}/${g.supply}</div>`:'<div class="gnum">&nbsp;</div>';
+    const p=g.gift_type==='sold'?'<span class="pr r">Продан</span>':`<span class="pr">${fmt(g.price)} ⭐</span>`;
+    return `<div class="gc" onclick="openBuy(${g.id})">${b}${gIcon(g.emoji)}<div class="gn">${esc(g.name)}</div>${left}${p}</div>`}).join(''):'<div class="empty">Ничего не найдено</div>';
 }
-
-function filterShop() {
-  const q = document.getElementById('shopQ').value.toLowerCase();
-  const f = allGifts.filter(g => {
-    if (shopFilter !== 'all' && g.gift_type !== shopFilter) return false;
-    if (q && !g.name.toLowerCase().includes(q)) return false;
-    return true;
-  });
-  renderShop(f);
+function openBuy(id){
+  selGift=gifts.find(g=>g.id===id);if(!selGift)return;const g=selGift,sold=g.gift_type==='sold';
+  $('bEm').textContent=g.emoji;$('bTitle').textContent=g.name;
+  $('bSub').textContent=sold?'Распродан':(g.gift_type==='market'?'Коллекционный · ':'Обычный · ')+(g.supply?`выпущено ${g.minted} из ${g.supply}`:`следующий номер #${g.minted+1}`);
+  $('bBtn').style.display=sold?'none':'block';$('bBtn').textContent='Купить за '+fmt(g.price)+' ⭐';om('buyMod');
 }
-
-document.getElementById('stabs').addEventListener('click', e => {
-  const tab = e.target.closest('.stab');
-  if (!tab) return;
-  shopFilter = tab.dataset.t;
-  document.querySelectorAll('.stab').forEach(t => t.classList.toggle('on', t === tab));
-  filterShop();
-});
-
-function renderShop(gifts) {
-  const grid = document.getElementById('shopGrid');
-  if (!gifts.length) {
-    grid.innerHTML = `<div class="empty"><div class="empty-em">🔍</div><div class="empty-t">Ничего не найдено</div></div>`;
-    return;
-  }
-  grid.innerHTML = gifts.map(g => {
-    const badge = g.gift_type !== 'regular'
-      ? `<div class="rb ${g.gift_type === 'market' ? 'm' : 's'}" data-t="${g.gift_type === 'market' ? 'маркет' : 'продан'}"></div>` : '';
-    let price;
-    if (g.gift_type === 'sold' && !g.price) price = `<span class="gprc sold-prc">Продан</span>`;
-    else price = `<span class="gprc">${S}${fmt(g.price)}${g.gift_type === 'market' ? '+' : ''}</span>`;
-    return `<div class="gcard" onclick="openGiftMod(${g.id})">${badge}${getIcon(g.name, g.emoji)}<div class="gnm">${g.name}</div>${price}</div>`;
-  }).join('');
+async function doBuy(){
+  cm('buyMod');const d=await api('/api/buy_gift','POST',{gift_id:selGift.id});
+  if(d.success){toast(`Куплено! Номер #${d.number}`);goTab(page)}else toast(d.error);
 }
-
-function openGiftMod(id) {
-  selectedGift = giftsMap[id];
-  if (!selectedGift) return;
-  document.getElementById('gfEm').innerHTML = getIcon(selectedGift.name, selectedGift.emoji);
-  document.getElementById('gfTitle').textContent = selectedGift.name;
-  const isSold = selectedGift.gift_type === 'sold';
-  const isMarket = selectedGift.gift_type === 'market';
-  document.getElementById('gfSub').textContent = isSold ? 'Этот подарок больше не доступен для покупки' : isMarket ? '✦ Коллекционный подарок' : 'Обычный подарок';
-  const prRow = document.getElementById('gfPriceRow');
-  prRow.innerHTML = isSold ? '' : `<div style="text-align:center;font-size:24px;font-weight:800;color:#a07800;margin:10px 0">${S} ${fmt(selectedGift.price)}${isMarket ? '+' : ''}</div>`;
-  const btn = document.getElementById('gfBuyBtn');
-  btn.style.display = isSold ? 'none' : 'block';
-  btn.textContent = `Купить за ${fmt(selectedGift.price)} ⭐`;
-  openM('giftMod');
+function openItem(id){
+  selItem=inv.find(i=>i.id===id);if(!selItem)return;
+  $('iEm').textContent=selItem.emoji;$('iTitle').textContent=selItem.name;$('iSub').textContent=numTxt(selItem);
+  $('iTo').value='';$('iShow').textContent=selItem.showcase?'Убрать из витрины':'В витрину';om('itemMod');
 }
-
-async function doBuy() {
-  if (!selectedGift) return;
-  closeM('giftMod');
-  try {
-    const r = await fetch(API + '/api/buy_gift', {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({user_id: uid, gift_id: selectedGift.id})
-    });
-    const d = await r.json();
-    if (d.success) {
-      me.stars = d.new_balance;
-      document.getElementById('pfStars').textContent = fmt(me.stars);
-      document.getElementById('shopBal').textContent = '⭐ ' + fmt(me.stars);
-      toast('🎉 ' + d.gift_name + ' куплен!');
-    } else { toast('❌ ' + d.error); }
-  } catch(e) { toast('❌ Ошибка сервера'); }
+async function doSend(){
+  const to=v('iTo');if(!to)return toast('Введи ID получателя');
+  const d=await api('/api/send_gift','POST',{to_user:to,inventory_id:selItem.id});
+  cm('itemMod');toast(d.success?'Отправлено!':d.error);if(d.success)goTab(page);
 }
-
-async function loadInv() {
-  const grid = document.getElementById('invGrid');
-  grid.innerHTML = '<div class="spin">⭐</div>';
-  try {
-    const r = await fetch(API + '/api/user/' + uid + '/inventory');
-    const items = await r.json();
-    if (!items.length) {
-      grid.innerHTML = `<div class="empty"><div class="empty-em">📭</div><div class="empty-t">Инвентарь пуст</div><div class="empty-s">Купи подарки в магазине</div></div>`;
-      return;
-    }
-    items.forEach(it => { invMap[it.id] = it; });
-    grid.innerHTML = items.map(it => `
-      <div class="gcard" onclick="openSendMod(${it.id})">
-        ${getIcon(it.name, it.emoji)}
-        <div class="gnm">${it.name}</div>
-        <span class="gprc view">📤 Отправить</span>
-      </div>`).join('');
-  } catch(e) { grid.innerHTML = '<div class="empty"><div class="empty-em">⚠️</div><div class="empty-t">Ошибка загрузки</div></div>'; }
+async function toggleShow(){
+  const d=await api('/api/showcase','POST',{inventory_id:selItem.id,on:!selItem.showcase});
+  cm('itemMod');toast(d.success?'Витрина обновлена':d.error);if(d.success)goTab(page);
 }
-
-function openSendMod(id) {
-  selectedInvId = id;
-  const item = invMap[id];
-  if (!item) return;
-  document.getElementById('sdEm').innerHTML = getIcon(item.name, item.emoji);
-  document.getElementById('sdName').textContent = item.name;
-  document.getElementById('sdTarget').value = '';
-  openM('sendMod');
+/* ---------- чат ---------- */
+async function loadMsgs(full){
+  if(full){lastMsg=0;$('msgs').innerHTML=''}
+  const list=await api('/api/messages?after='+lastMsg);if(!Array.isArray(list)||!list.length)return;
+  const box=$('msgs'),stick=full||box.scrollHeight-box.scrollTop-box.clientHeight<80;
+  list.forEach(m=>{lastMsg=Math.max(lastMsg,m.id);const mine=m.uid===me.id,d=document.createElement('div');
+    d.className='m'+(mine?' me':'');
+    d.innerHTML=(mine?'':`<b style="color:${/^#[0-9a-f]{3,8}$/i.test(m.name_color)?m.name_color:'#2ca5e0'}">${esc(m.name)}</b>`)+esc(m.text)+`<small>${esc((m.ts||'').slice(11,16))}</small>`;
+    box.appendChild(d)});
+  if(stick)box.scrollTop=box.scrollHeight;
 }
-
-async function doSend() {
-  const toUser = document.getElementById('sdTarget').value.trim();
-  if (!toUser) { toast('Введи ID получателя'); return; }
-  closeM('sendMod');
-  try {
-    const r = await fetch(API + '/api/send_gift', {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({from_user: uid, to_user: toUser, inventory_id: selectedInvId})
-    });
-    const d = await r.json();
-    if (d.success) {
-      toast('🎁 Отправлено ' + d.to_name + '!');
-      loadInv(); loadProfileGifts();
-    } else { toast('❌ ' + d.error); }
-  } catch(e) { toast('❌ Ошибка сервера'); }
+async function sendMsg(){
+  const t=v('cText');if(!t)return;$('cText').value='';
+  const d=await api('/api/messages','POST',{text:t});if(!d.success)toast(d.error);loadMsgs(false);
 }
-
-function openEditName() {
-  document.getElementById('newName').value = me?.name || '';
-  openM('editNameMod');
+$('cText').onkeydown=e=>{if(e.key==='Enter')sendMsg()};
+setInterval(()=>{if(page==='chat'&&me)loadMsgs(false)},3000);
+/* ---------- настройки ---------- */
+const COLORS=['#1c2733','#2ca5e0','#e17076','#7bc862','#faa774','#a695e7','#6ec9cb','#e5ca77'];
+const FRAMES=[['none','Без рамки'],['gold','Золото'],['blue','Синяя'],['rainbow','Радуга']];
+const BGS=[['blue','Синий'],['purple','Фиолет'],['sunset','Закат'],['green','Зелёный']];
+const PRIV=[['hideOnline','Скрывать статус «в сети»'],['hideShow','Скрывать витрину'],['noSound','Тихие уведомления']];
+function renderSettings(){
+  $('sName').textContent=me.name;$('sBio').textContent=me.bio||'Не указано';$('sId').textContent=me.id;
+  $('oColor').innerHTML=COLORS.map(c=>`<div class="sw ${me.name_color===c?'on':''}" style="background:${c}" onclick="setCust('name_color','${c}')"></div>`).join('');
+  $('oFrame').innerHTML=FRAMES.map(([k,n])=>`<div class="ob ${me.frame===k?'on':''}" onclick="setCust('frame','${k}')">${n}</div>`).join('');
+  $('oBg').innerHTML=BGS.map(([k,n])=>`<div class="ob ${me.bg===k?'on':''}" onclick="setCust('bg','${k}')">${n}</div>`).join('');
+  $('privCard').innerHTML=PRIV.map(([k,n])=>`<div class="row">${n}<input type="checkbox" class="tg" ${localStorage.getItem('pg_'+k)?'checked':''} onchange="this.checked?localStorage.setItem('pg_${k}',1):localStorage.removeItem('pg_${k}')"></div>`).join('');
+  $('adminBox').style.display=me.is_admin?'block':'none';
+  $('aGift').innerHTML=gifts.map(g=>`<option value="${g.id}">${esc(g.emoji)} ${esc(g.name)}</option>`).join('');
 }
-async function saveName() {
-  const name = document.getElementById('newName').value.trim();
-  if (!name) { toast('Введи имя'); return; }
-  closeM('editNameMod');
-  await fetch(API + '/api/user/' + uid, {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name})});
-  me.name = name;
-  ['pfName','setName'].forEach(id => document.getElementById(id).textContent = name);
-  document.getElementById('pfAv').textContent = name.slice(0,2).toUpperCase();
-  toast('✅ Имя изменено');
+async function setCust(k,val){const d=await api('/api/me','PUT',{[k]:val});if(d.success){me[k]=val;renderProfile();renderSettings()}}
+function editField(k){editKey=k;$('eTitle').textContent=k==='name'?'Изменить имя':'О себе';$('eVal').value=me[k]||'';om('editMod')}
+async function saveField(){
+  const val=v('eVal');if(editKey==='name'&&!val)return;
+  const d=await api('/api/me','PUT',{[editKey]:val});cm('editMod');if(d.success){me[editKey]=val;renderProfile();renderSettings();toast('Сохранено')}
 }
-function openEditBio() {
-  document.getElementById('newBio').value = me?.bio || '';
-  openM('editBioMod');
+let soundOn=true;function toggleSound(b){soundOn=!soundOn;b.querySelector('i').textContent=soundOn?'🔔':'🔕';toast(soundOn?'Звук включён':'Звук выключен')}
+/* ---------- админка ---------- */
+async function adm(act,extra){
+  const target=v('aId');if(!target&&act!=='add_gift')return toast('Введи ID пользователя');
+  const d=await api('/api/admin/'+act,'POST',{target_id:target,...extra});
+  toast(d.success?'Готово':d.error);if(d.success&&target===me.id)goTab(page);
 }
-async function saveBio() {
-  const bio = document.getElementById('newBio').value.trim();
-  closeM('editBioMod');
-  await fetch(API + '/api/user/' + uid, {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({bio})});
-  me.bio = bio;
-  document.getElementById('setBio').textContent = bio || 'Не указано';
-  toast('✅ Описание обновлено');
+async function addGift(){
+  const d=await api('/api/admin/add_gift','POST',{name:v('agName'),emoji:v('agEmoji'),price:+v('agPrice')||100,gift_type:v('agType'),supply:+v('agSupply')||0});
+  toast(d.success?'Подарок создан':d.error);if(d.success){gifts=await api('/api/gifts');renderShop();renderSettings()}
 }
-
-async function giveStars() {
-  const target = document.getElementById('aId').value.trim();
-  const amount = parseInt(document.getElementById('aAmt').value);
-  if (!target || !amount) { toast('Заполни поля'); return; }
-  const r = await fetch(API + '/api/admin/give_stars', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_id:uid,target_id:target,amount})});
-  const d = await r.json();
-  toast(d.success ? '✅ ' + fmt(amount) + ' звёзд выдано' : '❌ ' + d.error);
-}
-async function freezeUser(state) {
-  const target = document.getElementById('aId').value.trim();
-  if (!target) { toast('Введи ID'); return; }
-  const r = await fetch(API + '/api/admin/freeze', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_id:uid,target_id:target,frozen:state})});
-  const d = await r.json();
-  toast(d.success ? (state ? '🔒 Заморожен' : '🔓 Разморожен') : '❌ ' + d.error);
-}
-async function addGift() {
-  const name = document.getElementById('agName').value.trim();
-  const emoji = document.getElementById('agEmoji').value.trim();
-  const price = parseInt(document.getElementById('agPrice').value) || 100;
-  const gift_type = document.getElementById('agType').value;
-  if (!name || !emoji) { toast('Заполни название и эмодзи'); return; }
-  const r = await fetch(API + '/api/admin/add_gift', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_id:uid,name,emoji,price,gift_type})});
-  const d = await r.json();
-  if (d.success) { toast('✅ ' + emoji + ' ' + name + ' добавлен!'); allGifts = []; loadShop(); }
-  else toast('❌ ' + d.error);
-}
-
-loadUser();
-loadShop();
+init();
 </script>
 </body>
 </html>
