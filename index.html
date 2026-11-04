@@ -19,35 +19,32 @@
 html,body{height:100%;overflow:hidden}
 body{font-family:Inter,-apple-system,sans-serif;background:var(--bg);color:var(--text)}
 
-/* APP */
 .app{height:100dvh;display:flex;flex-direction:column;max-width:480px;margin:0 auto}
 .pages{flex:1;overflow:hidden;position:relative}
 .page{position:absolute;inset:0;overflow-y:auto;display:none;padding-bottom:70px;-webkit-overflow-scrolling:touch}
 .page.show{display:block}
 
-/* TAB BAR */
 .tabbar{height:58px;background:var(--card);border-top:1px solid var(--border);display:flex;align-items:center;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0px)}
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:7px 0;color:var(--sub);font-size:10px;font-weight:600;-webkit-tap-highlight-color:transparent;transition:color .15s;user-select:none}
 .tab.on{color:var(--blue)}
 .tab-ic{font-size:22px}
 
-/* HEADERS */
 .ph{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:1px solid var(--border);padding:13px 16px;display:flex;align-items:center;justify-content:space-between}
 .ph-title{font-size:17px;font-weight:700;letter-spacing:-.3px}
 .ph-bal{font-size:14px;font-weight:700;color:var(--gold)}
 
-/* PROFILE */
 .pf-hero{background:linear-gradient(150deg,#2ca5e0,#0a60c4);padding:36px 20px 24px;text-align:center;color:#fff}
-.pf-av{width:84px;height:84px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 12px;border:3px solid rgba(255,255,255,.35);font-weight:800;font-size:30px;letter-spacing:-.5px}
+.pf-av{width:84px;height:84px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 12px;border:3px solid rgba(255,255,255,.35);font-weight:800;letter-spacing:-.5px}
 .pf-name{font-size:21px;font-weight:800;letter-spacing:-.4px}
 .pf-status{font-size:12px;opacity:.75;margin-top:4px}
+
 .bal-row{display:flex;gap:10px;padding:12px 14px 2px}
 .bal-card{flex:1;background:var(--card);border-radius:var(--r);padding:13px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06)}
 .bal-num{font-size:19px;font-weight:800;color:var(--blue)}
 .bal-lbl{font-size:11px;color:var(--sub);margin-top:3px;font-weight:500}
+
 .sec-title{padding:16px 16px 10px;font-size:12px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.6px}
 
-/* GIFT GRID */
 .ggrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 12px 12px}
 .gcard{background:var(--card);border-radius:var(--r);padding:13px 7px 10px;text-align:center;position:relative;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.05);transition:transform .15s;-webkit-tap-highlight-color:transparent}
 .gcard:active{transform:scale(.95)}
@@ -58,13 +55,11 @@ body{font-family:Inter,-apple-system,sans-serif;background:var(--bg);color:var(-
 .gprc.view{background:rgba(76,175,80,.12);color:var(--green);font-size:10px}
 .gprc.sold-prc{background:rgba(255,67,58,.1);color:var(--red);font-size:10px}
 
-/* RIBBON */
 .rb{position:absolute;top:0;right:0;width:52px;height:52px;overflow:hidden;border-radius:0 var(--r) 0 0;pointer-events:none}
 .rb::after{content:attr(data-t);position:absolute;top:10px;right:-16px;transform:rotate(45deg);font-size:7px;font-weight:800;color:#fff;letter-spacing:.4px;text-transform:uppercase;padding:3px 18px;width:72px;text-align:center}
 .rb.m::after{background:var(--green)}
 .rb.s::after{background:var(--red)}
 
-/* SHOP HEADER */
 .shop-hd{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:1px solid var(--border)}
 .sbar{display:flex;align-items:center;gap:8px;margin:10px 12px;background:var(--bg);border-radius:12px;padding:9px 12px}
 .sbar input{flex:1;border:none;background:none;outline:none;font:inherit;font-size:15px;color:var(--text)}
@@ -73,7 +68,6 @@ body{font-family:Inter,-apple-system,sans-serif;background:var(--bg);color:var(-
 .stab{flex:1;text-align:center;padding:9px 0;font-size:12.5px;font-weight:500;color:var(--sub);cursor:pointer;border-bottom:2.5px solid transparent;transition:.15s;user-select:none}
 .stab.on{color:var(--blue);border-bottom-color:var(--blue)}
 
-/* MODALS */
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .2s}
 .ov.show{opacity:1;pointer-events:all}
 .mbox{width:100%;max-width:480px;margin:0 auto;background:var(--card);border-radius:24px 24px 0 0;padding:24px 20px calc(28px + env(safe-area-inset-bottom,0px));transform:translateY(100%);transition:transform .22s cubic-bezier(.4,0,.2,1)}
@@ -88,7 +82,6 @@ body{font-family:Inter,-apple-system,sans-serif;background:var(--bg);color:var(-
 .minput{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font:inherit;font-size:15px;background:var(--bg);color:var(--text);outline:none;margin-top:8px}
 .minput:focus{border-color:var(--blue)}
 
-/* SETTINGS */
 .sset{margin:14px 14px 0}
 .sset h3{font-size:12px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
 .srow{background:var(--card);border-radius:14px;overflow:hidden;margin-bottom:12px}
@@ -98,7 +91,6 @@ body{font-family:Inter,-apple-system,sans-serif;background:var(--bg);color:var(-
 .sitem-t{font-size:15px;font-weight:500}
 .sitem-s{font-size:12px;color:var(--sub)}
 
-/* ADMIN */
 .abox{background:#1a2535;border-radius:16px;padding:16px;margin:14px}
 .abox h3{color:#ffc53d;font-size:15px;font-weight:700;margin-bottom:14px}
 .ainput{width:100%;padding:10px 12px;border-radius:10px;border:none;background:#243348;color:#e8edf2;font:inherit;font-size:14px;margin-bottom:8px;outline:none}
@@ -113,11 +105,9 @@ body{font-family:Inter,-apple-system,sans-serif;background:var(--bg);color:var(-
 .admin-sep{border-top:1px solid rgba(255,255,255,.08);margin:12px 0;padding-top:12px}
 .admin-sep-title{color:#9ab;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
 
-/* TOAST */
-.toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%) translateY(0);background:rgba(10,20,30,.88);backdrop-filter:blur(8px);color:#fff;padding:10px 20px;border-radius:20px;font-size:13.5px;font-weight:500;z-index:999;opacity:0;transition:opacity .2s;white-space:nowrap;pointer-events:none}
+.toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%);background:rgba(10,20,30,.88);backdrop-filter:blur(8px);color:#fff;padding:10px 20px;border-radius:20px;font-size:13.5px;font-weight:500;z-index:999;opacity:0;transition:opacity .2s;white-space:nowrap;pointer-events:none}
 .toast.show{opacity:1}
 
-/* EMPTY / SPINNER */
 .empty{padding:52px 20px;text-align:center;color:var(--sub);grid-column:1/-1}
 .empty-em{font-size:52px;margin-bottom:12px}
 .empty-t{font-size:15px;font-weight:600;color:var(--text);margin-bottom:5px}
@@ -125,7 +115,6 @@ body{font-family:Inter,-apple-system,sans-serif;background:var(--bg);color:var(-
 .spin{text-align:center;padding:40px;grid-column:1/-1;font-size:28px;animation:sp 1s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 
-/* STAR SVG inline */
 .si{width:12px;height:12px;vertical-align:-1px}
 </style>
 </head>
@@ -133,7 +122,6 @@ body{font-family:Inter,-apple-system,sans-serif;background:var(--bg);color:var(-
 <div class="app">
   <div class="pages">
 
-    <!-- ── ПРОФИЛЬ ── -->
     <div id="pg-profile" class="page show">
       <div class="pf-hero">
         <div class="pf-av" id="pfAv">?</div>
@@ -148,7 +136,6 @@ body{font-family:Inter,-apple-system,sans-serif;background:var(--bg);color:var(-
       <div class="ggrid" id="pfGrid"></div>
     </div>
 
-    <!-- ── МАГАЗИН ── -->
     <div id="pg-shop" class="page">
       <div class="shop-hd">
         <div class="ph"><div class="ph-title">Купить подарок</div><div class="ph-bal" id="shopBal">⭐ 0</div></div>
@@ -166,13 +153,11 @@ body{font-family:Inter,-apple-system,sans-serif;background:var(--bg);color:var(-
       <div class="ggrid" id="shopGrid" style="margin-top:12px"></div>
     </div>
 
-    <!-- ── ИНВЕНТАРЬ ── -->
     <div id="pg-inv" class="page">
       <div class="ph"><div class="ph-title">Инвентарь</div></div>
       <div class="ggrid" id="invGrid" style="margin-top:12px"></div>
     </div>
 
-    <!-- ── НАСТРОЙКИ ── -->
     <div id="pg-settings" class="page">
       <div class="ph"><div class="ph-title">Настройки</div></div>
       <div class="sset">
@@ -225,7 +210,6 @@ body{font-family:Inter,-apple-system,sans-serif;background:var(--bg);color:var(-
 
   </div>
 
-  <!-- TAB BAR -->
   <div class="tabbar">
     <div class="tab on" onclick="goTab('profile',this)"><div class="tab-ic">👤</div>Профиль</div>
     <div class="tab" onclick="goTab('shop',this)"><div class="tab-ic">🎁</div>Магазин</div>
@@ -234,7 +218,6 @@ body{font-family:Inter,-apple-system,sans-serif;background:var(--bg);color:var(-
   </div>
 </div>
 
-<!-- ── MODALS ── -->
 <div class="ov" id="giftMod" onclick="if(event.target===this)closeM('giftMod')">
   <div class="mbox">
     <div class="mem" id="gfEm"></div>
@@ -279,14 +262,33 @@ body{font-family:Inter,-apple-system,sans-serif;background:var(--bg);color:var(-
 
 <script>
 const API = "https://fame-api-bs11.onrender.com";
-// ⚠️ Замени uid на реальный ID пользователя из Telegram WebApp:
-// const uid = window.Telegram?.WebApp?.initDataUnsafe?.user?.id?.toString() || "123456789";
 let uid = "123456789";
 let me = null, allGifts = [], shopFilter = 'all';
 let giftsMap = {}, invMap = {}, selectedGift = null, selectedInvId = null;
 
 const S = `<svg class="si" viewBox="0 0 24 24" fill="#f8b400"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 18.77l-6.18 3.23L7 14.14 2 9.27l6.91-1.01z"/></svg>`;
 const fmt = n => n ? parseInt(n).toLocaleString('ru-RU') : '0';
+
+// ПРЯМЫЕ ССЫЛКИ НА 3D-ПОДАРКИ TELEGRAM
+const TG_IMAGES = {
+    "Сердце с бантом": "https://tlgrm.eu/_/stickers/5e1/2b8/5e12b8e1-9a3f-4c81-b2a1-2b1d4e6c7b8e/1.webp",
+    "Мишка с тыквой": "https://tlgrm.eu/_/stickers/7e9/4a2/7e94a2c1-9b3d-4a81-8c2a-5d1e2f3a4b5c/1.webp",
+    "Подарочная коробка": "https://tlgrm.eu/_/stickers/3c4/1d2/3c41d2e3-5a6b-4c7d-8e9f-1a2b3c4d5e6f/1.webp",
+    "Роза": "https://tlgrm.eu/_/stickers/8f7/2a1/8f72a1b3-4c5d-6e7f-8a9b-1c2d3e4f5a6b/1.webp",
+    "Ракета": "https://tlgrm.eu/_/stickers/2a1/3b4/2a13b4c5-6d7e-8f9a-1b2c-3d4e5f6a7b8c/1.webp",
+    "Кубок": "https://tlgrm.eu/_/stickers/9c8/7d6/9c87d6e5-4f3a-2b1c-8d7e-6f5a4b3c2d1e/1.webp",
+    "Кольцо с бриллиантом": "https://tlgrm.eu/_/stickers/1b2/3c4/1b23c4d5-6e7f-8a9b-1c2d-3e4f5a6b7c8d/1.webp",
+    "Бриллиант": "https://tlgrm.eu/_/stickers/4d5/6e7/4d56e7f8-9a1b-2c3d-4e5f-6a7b8c9d1e2f/1.webp",
+    "Пепе": "https://tlgrm.eu/_/stickers/6f7/8a9/6f78a9b1-2c3d-4e5f-6a7b-8c9d1e2f3a4b/1.webp"
+};
+
+function getIcon(name, emoji) {
+    const img = TG_IMAGES[name];
+    if (img) {
+        return `<img src="${img}" style="width:48px;height:48px;object-fit:contain;margin-bottom:7px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><div class="gem" style="display:none;">${emoji}</div>`;
+    }
+    return `<div class="gem">${emoji}</div>`;
+}
 
 function toast(msg) {
   const t = document.getElementById('toast');
@@ -307,7 +309,6 @@ function goTab(id, el) {
   if (id === 'profile') loadProfileGifts();
 }
 
-// ── USER ──────────────────────────────
 async function loadUser() {
   try {
     const r = await fetch(API + '/api/user/' + uid);
@@ -325,7 +326,6 @@ async function loadUser() {
   } catch(e) { toast('⚠️ Нет соединения с сервером'); }
 }
 
-// ── PROFILE GIFTS ─────────────────────
 async function loadProfileGifts() {
   try {
     const r = await fetch(API + '/api/user/' + uid + '/inventory');
@@ -339,14 +339,13 @@ async function loadProfileGifts() {
     items.slice(0, 9).forEach(it => { invMap[it.id] = it; });
     grid.innerHTML = items.slice(0, 9).map(it => `
       <div class="gcard" onclick="openSendMod(${it.id})">
-        <div class="gem">${it.emoji}</div>
+        ${getIcon(it.name, it.emoji)}
         <div class="gnm">${it.name}</div>
         <span class="gprc view">📤 Отправить</span>
       </div>`).join('');
   } catch(e) {}
 }
 
-// ── SHOP ──────────────────────────────
 async function loadShop() {
   const grid = document.getElementById('shopGrid');
   grid.innerHTML = '<div class="spin">⭐</div>';
@@ -390,15 +389,14 @@ function renderShop(gifts) {
     let price;
     if (g.gift_type === 'sold' && !g.price) price = `<span class="gprc sold-prc">Продан</span>`;
     else price = `<span class="gprc">${S}${fmt(g.price)}${g.gift_type === 'market' ? '+' : ''}</span>`;
-    return `<div class="gcard" onclick="openGiftMod(${g.id})">${badge}<div class="gem">${g.emoji}</div><div class="gnm">${g.name}</div>${price}</div>`;
+    return `<div class="gcard" onclick="openGiftMod(${g.id})">${badge}${getIcon(g.name, g.emoji)}<div class="gnm">${g.name}</div>${price}</div>`;
   }).join('');
 }
 
-// ── GIFT MODAL ────────────────────────
 function openGiftMod(id) {
   selectedGift = giftsMap[id];
   if (!selectedGift) return;
-  document.getElementById('gfEm').textContent = selectedGift.emoji;
+  document.getElementById('gfEm').innerHTML = getIcon(selectedGift.name, selectedGift.emoji);
   document.getElementById('gfTitle').textContent = selectedGift.name;
   const isSold = selectedGift.gift_type === 'sold';
   const isMarket = selectedGift.gift_type === 'market';
@@ -429,7 +427,6 @@ async function doBuy() {
   } catch(e) { toast('❌ Ошибка сервера'); }
 }
 
-// ── INVENTORY ─────────────────────────
 async function loadInv() {
   const grid = document.getElementById('invGrid');
   grid.innerHTML = '<div class="spin">⭐</div>';
@@ -443,19 +440,18 @@ async function loadInv() {
     items.forEach(it => { invMap[it.id] = it; });
     grid.innerHTML = items.map(it => `
       <div class="gcard" onclick="openSendMod(${it.id})">
-        <div class="gem">${it.emoji}</div>
+        ${getIcon(it.name, it.emoji)}
         <div class="gnm">${it.name}</div>
         <span class="gprc view">📤 Отправить</span>
       </div>`).join('');
   } catch(e) { grid.innerHTML = '<div class="empty"><div class="empty-em">⚠️</div><div class="empty-t">Ошибка загрузки</div></div>'; }
 }
 
-// ── SEND MODAL ────────────────────────
 function openSendMod(id) {
   selectedInvId = id;
   const item = invMap[id];
   if (!item) return;
-  document.getElementById('sdEm').textContent = item.emoji;
+  document.getElementById('sdEm').innerHTML = getIcon(item.name, item.emoji);
   document.getElementById('sdName').textContent = item.name;
   document.getElementById('sdTarget').value = '';
   openM('sendMod');
@@ -478,7 +474,6 @@ async function doSend() {
   } catch(e) { toast('❌ Ошибка сервера'); }
 }
 
-// ── EDIT PROFILE ──────────────────────
 function openEditName() {
   document.getElementById('newName').value = me?.name || '';
   openM('editNameMod');
@@ -506,7 +501,6 @@ async function saveBio() {
   toast('✅ Описание обновлено');
 }
 
-// ── ADMIN ─────────────────────────────
 async function giveStars() {
   const target = document.getElementById('aId').value.trim();
   const amount = parseInt(document.getElementById('aAmt').value);
@@ -534,7 +528,6 @@ async function addGift() {
   else toast('❌ ' + d.error);
 }
 
-// ── INIT ──────────────────────────────
 loadUser();
 loadShop();
 </script>
