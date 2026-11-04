@@ -1,210 +1,542 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pepegram</title>
-    <style>
-        :root {
-            --bg: #f0f4f8; --card: #ffffff; --text: #1e293b; --muted: #64748b; 
-            --accent: #0a84ff; --gold: #ffc53d; --green: #34c759; --red: #ff453a;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        
-        #appScreen { position: relative; height: 100%; display: flex; flex-direction: column; }
-        .content { flex: 1; overflow-y: auto; padding-bottom: 80px; }
-        
-        /* НИЖНЕЕ МЕНЮ */
-        .tab-bar { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: var(--card); display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 900; }
-        .tab-item { display: flex; flex-direction: column; align-items: center; color: var(--muted); font-size: 12px; font-weight: 600; cursor: pointer; }
-        .tab-item.active { color: var(--accent); }
-        .tab-icon { font-size: 24px; margin-bottom: 4px; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Pepegram</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f2f5;--card:#fff;--text:#1c2733;--sub:#7a8c9a;
+  --blue:#2ca5e0;--green:#4caf50;--red:#ff453a;--gold:#f8b400;
+  --border:rgba(0,0,0,.08);--r:16px;
+  color-scheme:light dark;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media(prefers-color-scheme:dark){:root{--bg:#17212b;--card:#232e3c;--text:#e8edf2;--sub:#8a9bab;--border:rgba(255,255,255,.07)}}
+html,body{height:100%;overflow:hidden}
+body{font-family:Inter,-apple-system,sans-serif;background:var(--bg);color:var(--text)}
 
-        .page { display: none; padding: 20px; }
-        .page.active { display: block; }
-        .page-header { font-size: 24px; font-weight: 800; margin-bottom: 20px; }
-        
-        /* ПРОФИЛЬ */
-        .profile-header { background: linear-gradient(to bottom, #8fa8b8, var(--bg)); padding: 40px 20px 20px; display: flex; flex-direction: column; align-items: center; border-radius: 0 0 24px 24px; margin: -20px -20px 15px -20px; }
-        .avatar { width: 100px; height: 100px; border-radius: 50%; background: #ccc; margin-bottom: 15px; }
-        .profile-name { font-size: 24px; font-weight: 800; }
-        .balance-card { margin: 15px; padding: 20px; border-radius: 20px; background: linear-gradient(135deg, #0a84ff, #0066cc); color: white; display: flex; justify-content: space-between; align-items: center; }
-        .balance-card h2 { font-size: 26px; display: flex; align-items: center; gap: 10px; }
+/* APP */
+.app{height:100dvh;display:flex;flex-direction:column;max-width:480px;margin:0 auto}
+.pages{flex:1;overflow:hidden;position:relative}
+.page{position:absolute;inset:0;overflow-y:auto;display:none;padding-bottom:70px;-webkit-overflow-scrolling:touch}
+.page.show{display:block}
 
-        /* МАГАЗИН */
-        .shop-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-        .shop-card { background: var(--card); border-radius: 16px; padding: 15px 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; }
-        .shop-emoji { font-size: 32px; margin-bottom: 8px; }
-        .shop-price { background: rgba(255,197,61,0.2); color: #d19b00; padding: 4px 10px; border-radius: 10px; font-size: 13px; font-weight: bold; display: inline-block; }
+/* TAB BAR */
+.tabbar{height:58px;background:var(--card);border-top:1px solid var(--border);display:flex;align-items:center;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0px)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:7px 0;color:var(--sub);font-size:10px;font-weight:600;-webkit-tap-highlight-color:transparent;transition:color .15s;user-select:none}
+.tab.on{color:var(--blue)}
+.tab-ic{font-size:22px}
 
-        /* АДМИНКА */
-        .admin-panel { background: #1e293b; color: white; padding: 20px; border-radius: 20px; margin-top: 20px; }
-        .admin-input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: none; }
-        .admin-btn { width: 100%; padding: 12px; border-radius: 10px; border: none; background: var(--red); color: white; font-weight: bold; cursor: pointer; }
-    </style>
+/* HEADERS */
+.ph{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:1px solid var(--border);padding:13px 16px;display:flex;align-items:center;justify-content:space-between}
+.ph-title{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.ph-bal{font-size:14px;font-weight:700;color:var(--gold)}
+
+/* PROFILE */
+.pf-hero{background:linear-gradient(150deg,#2ca5e0,#0a60c4);padding:36px 20px 24px;text-align:center;color:#fff}
+.pf-av{width:84px;height:84px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 12px;border:3px solid rgba(255,255,255,.35);font-weight:800;font-size:30px;letter-spacing:-.5px}
+.pf-name{font-size:21px;font-weight:800;letter-spacing:-.4px}
+.pf-status{font-size:12px;opacity:.75;margin-top:4px}
+.bal-row{display:flex;gap:10px;padding:12px 14px 2px}
+.bal-card{flex:1;background:var(--card);border-radius:var(--r);padding:13px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.bal-num{font-size:19px;font-weight:800;color:var(--blue)}
+.bal-lbl{font-size:11px;color:var(--sub);margin-top:3px;font-weight:500}
+.sec-title{padding:16px 16px 10px;font-size:12px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.6px}
+
+/* GIFT GRID */
+.ggrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 12px 12px}
+.gcard{background:var(--card);border-radius:var(--r);padding:13px 7px 10px;text-align:center;position:relative;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.05);transition:transform .15s;-webkit-tap-highlight-color:transparent}
+.gcard:active{transform:scale(.95)}
+.gem{font-size:40px;line-height:1;margin-bottom:7px;display:block;filter:drop-shadow(0 2px 4px rgba(0,0,0,.12))}
+.gnm{font-size:10px;font-weight:500;color:var(--sub);min-height:24px;line-height:1.3;margin-bottom:6px;display:flex;align-items:center;justify-content:center;text-align:center}
+.gprc{display:inline-flex;align-items:center;gap:3px;background:rgba(248,180,0,.12);border-radius:20px;padding:3px 8px;font-size:11px;font-weight:700;color:#a07800}
+@media(prefers-color-scheme:dark){.gprc{background:rgba(248,180,0,.2);color:#ffd740}}
+.gprc.view{background:rgba(76,175,80,.12);color:var(--green);font-size:10px}
+.gprc.sold-prc{background:rgba(255,67,58,.1);color:var(--red);font-size:10px}
+
+/* RIBBON */
+.rb{position:absolute;top:0;right:0;width:52px;height:52px;overflow:hidden;border-radius:0 var(--r) 0 0;pointer-events:none}
+.rb::after{content:attr(data-t);position:absolute;top:10px;right:-16px;transform:rotate(45deg);font-size:7px;font-weight:800;color:#fff;letter-spacing:.4px;text-transform:uppercase;padding:3px 18px;width:72px;text-align:center}
+.rb.m::after{background:var(--green)}
+.rb.s::after{background:var(--red)}
+
+/* SHOP HEADER */
+.shop-hd{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:1px solid var(--border)}
+.sbar{display:flex;align-items:center;gap:8px;margin:10px 12px;background:var(--bg);border-radius:12px;padding:9px 12px}
+.sbar input{flex:1;border:none;background:none;outline:none;font:inherit;font-size:15px;color:var(--text)}
+.sbar input::placeholder{color:var(--sub)}
+.stabs{display:flex;padding:0 12px}
+.stab{flex:1;text-align:center;padding:9px 0;font-size:12.5px;font-weight:500;color:var(--sub);cursor:pointer;border-bottom:2.5px solid transparent;transition:.15s;user-select:none}
+.stab.on{color:var(--blue);border-bottom-color:var(--blue)}
+
+/* MODALS */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .2s}
+.ov.show{opacity:1;pointer-events:all}
+.mbox{width:100%;max-width:480px;margin:0 auto;background:var(--card);border-radius:24px 24px 0 0;padding:24px 20px calc(28px + env(safe-area-inset-bottom,0px));transform:translateY(100%);transition:transform .22s cubic-bezier(.4,0,.2,1)}
+.ov.show .mbox{transform:translateY(0)}
+.mem{font-size:72px;text-align:center;margin-bottom:14px;line-height:1}
+.mtitle{font-size:20px;font-weight:800;text-align:center;margin-bottom:4px}
+.msub{font-size:14px;color:var(--sub);text-align:center;margin-bottom:16px}
+.mbtn{width:100%;padding:14px;border-radius:14px;border:none;background:var(--blue);color:#fff;font:inherit;font-size:15px;font-weight:700;cursor:pointer;margin-top:10px;-webkit-tap-highlight-color:transparent}
+.mbtn:active{opacity:.85}
+.mbtn.red{background:var(--red)}
+.mbtn.grey{background:var(--border);color:var(--sub)}
+.minput{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font:inherit;font-size:15px;background:var(--bg);color:var(--text);outline:none;margin-top:8px}
+.minput:focus{border-color:var(--blue)}
+
+/* SETTINGS */
+.sset{margin:14px 14px 0}
+.sset h3{font-size:12px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.srow{background:var(--card);border-radius:14px;overflow:hidden;margin-bottom:12px}
+.sitem{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer}
+.sitem:last-child{border-bottom:none}
+.sitem-l{display:flex;flex-direction:column;gap:2px}
+.sitem-t{font-size:15px;font-weight:500}
+.sitem-s{font-size:12px;color:var(--sub)}
+
+/* ADMIN */
+.abox{background:#1a2535;border-radius:16px;padding:16px;margin:14px}
+.abox h3{color:#ffc53d;font-size:15px;font-weight:700;margin-bottom:14px}
+.ainput{width:100%;padding:10px 12px;border-radius:10px;border:none;background:#243348;color:#e8edf2;font:inherit;font-size:14px;margin-bottom:8px;outline:none}
+.ainput:focus{background:#2d3f52}
+.abtn{width:100%;padding:11px;border-radius:10px;border:none;font:inherit;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:6px}
+.abtn.b{background:var(--blue);color:#fff}
+.abtn.r{background:var(--red);color:#fff}
+.abtn.g{background:var(--green);color:#fff}
+.abtn.y{background:#f8b400;color:#000}
+.arow{display:flex;gap:8px;margin-bottom:6px}
+.arow .abtn{margin-bottom:0}
+.admin-sep{border-top:1px solid rgba(255,255,255,.08);margin:12px 0;padding-top:12px}
+.admin-sep-title{color:#9ab;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+
+/* TOAST */
+.toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%) translateY(0);background:rgba(10,20,30,.88);backdrop-filter:blur(8px);color:#fff;padding:10px 20px;border-radius:20px;font-size:13.5px;font-weight:500;z-index:999;opacity:0;transition:opacity .2s;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1}
+
+/* EMPTY / SPINNER */
+.empty{padding:52px 20px;text-align:center;color:var(--sub);grid-column:1/-1}
+.empty-em{font-size:52px;margin-bottom:12px}
+.empty-t{font-size:15px;font-weight:600;color:var(--text);margin-bottom:5px}
+.empty-s{font-size:12px}
+.spin{text-align:center;padding:40px;grid-column:1/-1;font-size:28px;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* STAR SVG inline */
+.si{width:12px;height:12px;vertical-align:-1px}
+</style>
 </head>
 <body>
+<div class="app">
+  <div class="pages">
 
-<div id="appScreen">
-    <div class="content">
-        
-        <!-- 1. ПРОФИЛЬ -->
-        <div id="page-profile" class="page active" style="padding: 0;">
-            <div class="profile-header">
-                <div class="avatar"></div>
-                <div class="profile-name" id="userName">Загрузка...</div>
-                <div style="font-size: 14px; color: var(--muted); margin-top: 5px;">в сети</div>
-            </div>
-            
-            <div class="balance-card">
-                <div>
-                    <h2><span id="userStars">0</span> ⭐</h2>
-                    <p style="font-size: 14px; opacity: 0.8; margin-top: 5px;">Звезды</p>
-                </div>
-                <div style="font-size: 30px;">⭐</div>
-            </div>
-        </div>
-
-        <!-- 2. МАГАЗИН -->
-        <div id="page-shop" class="page">
-            <div class="page-header">Магазин</div>
-            <div class="shop-grid" id="shopGrid">
-                <!-- Сюда JS подтянет подарки -->
-            </div>
-        </div>
-
-        <!-- 3. НАСТРОЙКИ -->
-        <div id="page-settings" class="page">
-            <div class="page-header">Настройки</div>
-            
-            <div class="admin-panel" id="adminPanel" style="display: none;">
-                <h3 style="margin-bottom: 15px; color: #ffc53d;">Админ-панель</h3>
-                <input type="text" id="adminTarget" class="admin-input" placeholder="ID юзера">
-                <input type="number" id="adminAmount" class="admin-input" placeholder="Сколько звезд выдать">
-                <button class="admin-btn" onclick="giveStars()">Выдать звезды</button>
-            </div>
-        </div>
+    <!-- ── ПРОФИЛЬ ── -->
+    <div id="pg-profile" class="page show">
+      <div class="pf-hero">
+        <div class="pf-av" id="pfAv">?</div>
+        <div class="pf-name" id="pfName">Загрузка…</div>
+        <div class="pf-status">🟢 в сети</div>
+      </div>
+      <div class="bal-row">
+        <div class="bal-card"><div class="bal-num" id="pfStars">0</div><div class="bal-lbl">⭐ Звёзды</div></div>
+        <div class="bal-card"><div class="bal-num" id="pfGiftCount">0</div><div class="bal-lbl">🎁 Подарков</div></div>
+      </div>
+      <div class="sec-title">Мои подарки</div>
+      <div class="ggrid" id="pfGrid"></div>
     </div>
 
-    <div class="tab-bar">
-        <div class="tab-item active" onclick="switchTab('profile', this)"><div class="tab-icon">👤</div>Профиль</div>
-        <div class="tab-item" onclick="switchTab('shop', this)"><div class="tab-icon">🎁</div>Магазин</div>
-        <div class="tab-item" onclick="switchTab('settings', this)"><div class="tab-icon">⚙️</div>Настройки</div>
+    <!-- ── МАГАЗИН ── -->
+    <div id="pg-shop" class="page">
+      <div class="shop-hd">
+        <div class="ph"><div class="ph-title">Купить подарок</div><div class="ph-bal" id="shopBal">⭐ 0</div></div>
+        <div class="sbar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--sub);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="search" placeholder="Поиск подарка…" id="shopQ" oninput="filterShop()">
+        </div>
+        <div class="stabs" id="stabs">
+          <div class="stab on" data-t="all">Все</div>
+          <div class="stab" data-t="regular">Обычные</div>
+          <div class="stab" data-t="market">Маркет</div>
+          <div class="stab" data-t="sold">Продан</div>
+        </div>
+      </div>
+      <div class="ggrid" id="shopGrid" style="margin-top:12px"></div>
     </div>
+
+    <!-- ── ИНВЕНТАРЬ ── -->
+    <div id="pg-inv" class="page">
+      <div class="ph"><div class="ph-title">Инвентарь</div></div>
+      <div class="ggrid" id="invGrid" style="margin-top:12px"></div>
+    </div>
+
+    <!-- ── НАСТРОЙКИ ── -->
+    <div id="pg-settings" class="page">
+      <div class="ph"><div class="ph-title">Настройки</div></div>
+      <div class="sset">
+        <h3>Аккаунт</h3>
+        <div class="srow">
+          <div class="sitem" onclick="openEditName()">
+            <div class="sitem-l"><span class="sitem-t">Имя</span><span class="sitem-s" id="setName">—</span></div>
+            <span style="color:var(--sub);font-size:18px">›</span>
+          </div>
+          <div class="sitem" onclick="openEditBio()">
+            <div class="sitem-l"><span class="sitem-t">О себе</span><span class="sitem-s" id="setBio">—</span></div>
+            <span style="color:var(--sub);font-size:18px">›</span>
+          </div>
+        </div>
+        <h3>Мой ID</h3>
+        <div class="srow">
+          <div class="sitem" onclick="toast('ID скопирован 📋');navigator.clipboard&&navigator.clipboard.writeText(uid)">
+            <div class="sitem-l"><span class="sitem-t" id="myIdDisplay">—</span><span class="sitem-s">Нажми для копирования</span></div>
+            <span style="color:var(--sub);font-size:18px">›</span>
+          </div>
+        </div>
+      </div>
+      <div class="abox" id="adminBox" style="display:none">
+        <h3>⚡ Админ-панель</h3>
+        <input class="ainput" id="aId" placeholder="ID пользователя">
+        <div class="arow">
+          <input class="ainput" id="aAmt" type="number" placeholder="Звёзд" style="margin-bottom:0">
+          <button class="abtn b" style="flex:0 0 auto;padding:10px 14px;border-radius:10px;margin-bottom:0" onclick="giveStars()">Выдать ⭐</button>
+        </div>
+        <div class="arow" style="margin-top:8px">
+          <button class="abtn r" onclick="freezeUser(1)">🔒 Заморозить</button>
+          <button class="abtn g" onclick="freezeUser(0)">🔓 Разморозить</button>
+        </div>
+        <div class="admin-sep">
+          <div class="admin-sep-title">Добавить подарок</div>
+          <input class="ainput" id="agName" placeholder="Название">
+          <div class="arow">
+            <input class="ainput" id="agEmoji" placeholder="Эмодзи" style="margin-bottom:0;flex:0 0 80px">
+            <input class="ainput" id="agPrice" type="number" placeholder="Цена" style="margin-bottom:0">
+          </div>
+          <select class="ainput" id="agType" style="margin-top:8px;margin-bottom:0">
+            <option value="regular">Обычный</option>
+            <option value="market">Маркет (коллекционный)</option>
+            <option value="sold">Продан</option>
+          </select>
+          <button class="abtn y" style="margin-top:10px" onclick="addGift()">Добавить подарок</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TAB BAR -->
+  <div class="tabbar">
+    <div class="tab on" onclick="goTab('profile',this)"><div class="tab-ic">👤</div>Профиль</div>
+    <div class="tab" onclick="goTab('shop',this)"><div class="tab-ic">🎁</div>Магазин</div>
+    <div class="tab" onclick="goTab('inv',this)"><div class="tab-ic">📦</div>Инвентарь</div>
+    <div class="tab" onclick="goTab('settings',this)"><div class="tab-ic">⚙️</div>Настройки</div>
+  </div>
 </div>
 
+<!-- ── MODALS ── -->
+<div class="ov" id="giftMod" onclick="if(event.target===this)closeM('giftMod')">
+  <div class="mbox">
+    <div class="mem" id="gfEm"></div>
+    <div class="mtitle" id="gfTitle"></div>
+    <div class="msub" id="gfSub"></div>
+    <div id="gfPriceRow"></div>
+    <button class="mbtn" id="gfBuyBtn" onclick="doBuy()"></button>
+    <button class="mbtn grey" onclick="closeM('giftMod')">Отмена</button>
+  </div>
+</div>
+
+<div class="ov" id="sendMod" onclick="if(event.target===this)closeM('sendMod')">
+  <div class="mbox">
+    <div class="mem" id="sdEm"></div>
+    <div class="mtitle">Отправить подарок</div>
+    <div class="msub" id="sdName"></div>
+    <input class="minput" id="sdTarget" placeholder="Введи ID получателя">
+    <button class="mbtn" onclick="doSend()">Отправить 🎁</button>
+    <button class="mbtn grey" onclick="closeM('sendMod')">Отмена</button>
+  </div>
+</div>
+
+<div class="ov" id="editNameMod" onclick="if(event.target===this)closeM('editNameMod')">
+  <div class="mbox">
+    <div class="mtitle">Изменить имя</div>
+    <input class="minput" id="newName" placeholder="Новое имя" maxlength="32">
+    <button class="mbtn" onclick="saveName()">Сохранить</button>
+    <button class="mbtn grey" onclick="closeM('editNameMod')">Отмена</button>
+  </div>
+</div>
+
+<div class="ov" id="editBioMod" onclick="if(event.target===this)closeM('editBioMod')">
+  <div class="mbox">
+    <div class="mtitle">О себе</div>
+    <input class="minput" id="newBio" placeholder="Расскажи о себе…" maxlength="128">
+    <button class="mbtn" onclick="saveBio()">Сохранить</button>
+    <button class="mbtn grey" onclick="closeM('editBioMod')">Отмена</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
-    // ВАЖНО: ЗАМЕНИ ЭТУ ССЫЛКУ НА СВОЙ РЕАЛЬНЫЙ URL С RENDER!
-    const API_URL = "https://fame-api-bs11.onrender.com"; 
-    
-    let currentUserId = "123456789"; // Тестовый ID
+const API = "https://fame-api-bs11.onrender.com";
+// ⚠️ Замени uid на реальный ID пользователя из Telegram WebApp:
+// const uid = window.Telegram?.WebApp?.initDataUnsafe?.user?.id?.toString() || "123456789";
+let uid = "123456789";
+let me = null, allGifts = [], shopFilter = 'all';
+let giftsMap = {}, invMap = {}, selectedGift = null, selectedInvId = null;
 
-    // 1. ЗАГРУЗКА ПРОФИЛЯ
-    async function loadUser() {
-        try {
-            const res = await fetch(API_URL + '/api/user/' + currentUserId);
-            if (!res.ok) throw new Error('Сервер не отвечает');
-            
-            const user = await res.json();
-            document.getElementById('userName').innerText = user.name;
-            document.getElementById('userStars').innerText = user.stars;
+const S = `<svg class="si" viewBox="0 0 24 24" fill="#f8b400"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 18.77l-6.18 3.23L7 14.14 2 9.27l6.91-1.01z"/></svg>`;
+const fmt = n => n ? parseInt(n).toLocaleString('ru-RU') : '0';
 
-            if (user.is_admin === 1) {
-                document.getElementById('adminPanel').style.display = 'block';
-            }
-        } catch (e) {
-            document.getElementById('userName').innerText = "Ошибка сети";
-            console.error("Ошибка профиля:", e);
-        }
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function openM(id) { document.getElementById(id).classList.add('show'); }
+function closeM(id) { document.getElementById(id).classList.remove('show'); }
+
+function goTab(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.getElementById('pg-' + id).classList.add('show');
+  el.classList.add('on');
+  if (id === 'shop' && allGifts.length === 0) loadShop();
+  if (id === 'inv') loadInv();
+  if (id === 'profile') loadProfileGifts();
+}
+
+// ── USER ──────────────────────────────
+async function loadUser() {
+  try {
+    const r = await fetch(API + '/api/user/' + uid);
+    me = await r.json();
+    const initials = (me.name || '?').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('pfAv').textContent = initials;
+    document.getElementById('pfName').textContent = me.name;
+    document.getElementById('pfStars').textContent = fmt(me.stars);
+    document.getElementById('shopBal').textContent = '⭐ ' + fmt(me.stars);
+    document.getElementById('setName').textContent = me.name;
+    document.getElementById('setBio').textContent = me.bio || 'Не указано';
+    document.getElementById('myIdDisplay').textContent = uid;
+    if (me.is_admin) document.getElementById('adminBox').style.display = 'block';
+    loadProfileGifts();
+  } catch(e) { toast('⚠️ Нет соединения с сервером'); }
+}
+
+// ── PROFILE GIFTS ─────────────────────
+async function loadProfileGifts() {
+  try {
+    const r = await fetch(API + '/api/user/' + uid + '/inventory');
+    const items = await r.json();
+    document.getElementById('pfGiftCount').textContent = items.length;
+    const grid = document.getElementById('pfGrid');
+    if (!items.length) {
+      grid.innerHTML = `<div class="empty"><div class="empty-em">🎁</div><div class="empty-t">Подарков пока нет</div><div class="empty-s">Купи в магазине</div></div>`;
+      return;
     }
+    items.slice(0, 9).forEach(it => { invMap[it.id] = it; });
+    grid.innerHTML = items.slice(0, 9).map(it => `
+      <div class="gcard" onclick="openSendMod(${it.id})">
+        <div class="gem">${it.emoji}</div>
+        <div class="gnm">${it.name}</div>
+        <span class="gprc view">📤 Отправить</span>
+      </div>`).join('');
+  } catch(e) {}
+}
 
-    // 2. ЗАГРУЗКА МАГАЗИНА
-    async function loadShop() {
-        const grid = document.getElementById('shopGrid');
-        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 20px;">Загрузка...</div>';
-        
-        try {
-            const res = await fetch(API_URL + '/api/gifts');
-            if (!res.ok) throw new Error('Сервер не отвечает');
-            
-            const gifts = await res.json();
-            grid.innerHTML = '';
+// ── SHOP ──────────────────────────────
+async function loadShop() {
+  const grid = document.getElementById('shopGrid');
+  grid.innerHTML = '<div class="spin">⭐</div>';
+  try {
+    const r = await fetch(API + '/api/gifts');
+    allGifts = await r.json();
+    allGifts.forEach(g => { giftsMap[g.id] = g; });
+    filterShop();
+  } catch(e) {
+    grid.innerHTML = `<div class="empty"><div class="empty-em">❌</div><div class="empty-t">Ошибка загрузки</div><div class="empty-s">Проверь соединение</div></div>`;
+  }
+}
 
-            gifts.forEach(gift => {
-                const card = document.createElement('div');
-                card.className = 'shop-card';
-                card.innerHTML = `
-                    <div class="shop-emoji">${gift.emoji}</div>
-                    <div style="font-size: 14px; font-weight: 600;">${gift.name}</div>
-                    <div class="shop-price">${gift.price} ⭐</div>
-                `;
-                card.onclick = () => buyGift(gift.id, gift.price);
-                grid.appendChild(card);
-            });
-        } catch (e) {
-            grid.innerHTML = `
-                <div style="grid-column: 1/-1; text-align: center; padding: 30px; background: var(--card); border-radius: 16px;">
-                    <div style="font-size: 40px; margin-bottom: 10px;">💤</div>
-                    <div style="font-weight: bold; margin-bottom: 5px;">Сервер просыпается</div>
-                    <div style="color: var(--muted); font-size: 14px;">Подождите 30 секунд и обновите страницу</div>
-                </div>
-            `;
-            console.error("Ошибка магазина:", e);
-        }
+function filterShop() {
+  const q = document.getElementById('shopQ').value.toLowerCase();
+  const f = allGifts.filter(g => {
+    if (shopFilter !== 'all' && g.gift_type !== shopFilter) return false;
+    if (q && !g.name.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  renderShop(f);
+}
+
+document.getElementById('stabs').addEventListener('click', e => {
+  const tab = e.target.closest('.stab');
+  if (!tab) return;
+  shopFilter = tab.dataset.t;
+  document.querySelectorAll('.stab').forEach(t => t.classList.toggle('on', t === tab));
+  filterShop();
+});
+
+function renderShop(gifts) {
+  const grid = document.getElementById('shopGrid');
+  if (!gifts.length) {
+    grid.innerHTML = `<div class="empty"><div class="empty-em">🔍</div><div class="empty-t">Ничего не найдено</div></div>`;
+    return;
+  }
+  grid.innerHTML = gifts.map(g => {
+    const badge = g.gift_type !== 'regular'
+      ? `<div class="rb ${g.gift_type === 'market' ? 'm' : 's'}" data-t="${g.gift_type === 'market' ? 'маркет' : 'продан'}"></div>` : '';
+    let price;
+    if (g.gift_type === 'sold' && !g.price) price = `<span class="gprc sold-prc">Продан</span>`;
+    else price = `<span class="gprc">${S}${fmt(g.price)}${g.gift_type === 'market' ? '+' : ''}</span>`;
+    return `<div class="gcard" onclick="openGiftMod(${g.id})">${badge}<div class="gem">${g.emoji}</div><div class="gnm">${g.name}</div>${price}</div>`;
+  }).join('');
+}
+
+// ── GIFT MODAL ────────────────────────
+function openGiftMod(id) {
+  selectedGift = giftsMap[id];
+  if (!selectedGift) return;
+  document.getElementById('gfEm').textContent = selectedGift.emoji;
+  document.getElementById('gfTitle').textContent = selectedGift.name;
+  const isSold = selectedGift.gift_type === 'sold';
+  const isMarket = selectedGift.gift_type === 'market';
+  document.getElementById('gfSub').textContent = isSold ? 'Этот подарок больше не доступен для покупки' : isMarket ? '✦ Коллекционный подарок' : 'Обычный подарок';
+  const prRow = document.getElementById('gfPriceRow');
+  prRow.innerHTML = isSold ? '' : `<div style="text-align:center;font-size:24px;font-weight:800;color:#a07800;margin:10px 0">${S} ${fmt(selectedGift.price)}${isMarket ? '+' : ''}</div>`;
+  const btn = document.getElementById('gfBuyBtn');
+  btn.style.display = isSold ? 'none' : 'block';
+  btn.textContent = `Купить за ${fmt(selectedGift.price)} ⭐`;
+  openM('giftMod');
+}
+
+async function doBuy() {
+  if (!selectedGift) return;
+  closeM('giftMod');
+  try {
+    const r = await fetch(API + '/api/buy_gift', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({user_id: uid, gift_id: selectedGift.id})
+    });
+    const d = await r.json();
+    if (d.success) {
+      me.stars = d.new_balance;
+      document.getElementById('pfStars').textContent = fmt(me.stars);
+      document.getElementById('shopBal').textContent = '⭐ ' + fmt(me.stars);
+      toast('🎉 ' + d.gift_name + ' куплен!');
+    } else { toast('❌ ' + d.error); }
+  } catch(e) { toast('❌ Ошибка сервера'); }
+}
+
+// ── INVENTORY ─────────────────────────
+async function loadInv() {
+  const grid = document.getElementById('invGrid');
+  grid.innerHTML = '<div class="spin">⭐</div>';
+  try {
+    const r = await fetch(API + '/api/user/' + uid + '/inventory');
+    const items = await r.json();
+    if (!items.length) {
+      grid.innerHTML = `<div class="empty"><div class="empty-em">📭</div><div class="empty-t">Инвентарь пуст</div><div class="empty-s">Купи подарки в магазине</div></div>`;
+      return;
     }
+    items.forEach(it => { invMap[it.id] = it; });
+    grid.innerHTML = items.map(it => `
+      <div class="gcard" onclick="openSendMod(${it.id})">
+        <div class="gem">${it.emoji}</div>
+        <div class="gnm">${it.name}</div>
+        <span class="gprc view">📤 Отправить</span>
+      </div>`).join('');
+  } catch(e) { grid.innerHTML = '<div class="empty"><div class="empty-em">⚠️</div><div class="empty-t">Ошибка загрузки</div></div>'; }
+}
 
-    // 3. ПОКУПКА
-    async function buyGift(giftId, price) {
-        if (!confirm("Купить этот подарок?")) return;
-        try {
-            const res = await fetch(API_URL + '/api/buy_gift', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ user_id: currentUserId, gift_id: giftId })
-            });
-            const data = await res.json();
-            
-            if (data.success) {
-                alert("Подарок куплен!");
-                document.getElementById('userStars').innerText = data.new_balance;
-            } else {
-                alert(data.error);
-            }
-        } catch (e) {
-            alert("Сервер не отвечает");
-        }
-    }
+// ── SEND MODAL ────────────────────────
+function openSendMod(id) {
+  selectedInvId = id;
+  const item = invMap[id];
+  if (!item) return;
+  document.getElementById('sdEm').textContent = item.emoji;
+  document.getElementById('sdName').textContent = item.name;
+  document.getElementById('sdTarget').value = '';
+  openM('sendMod');
+}
 
-    // 4. АДМИНКА
-    async function giveStars() {
-        const target = document.getElementById('adminTarget').value;
-        const amount = document.getElementById('adminAmount').value;
-        if (!target || !amount) return alert("Заполни поля");
-        
-        try {
-            const res = await fetch(API_URL + '/api/admin/give_stars', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ admin_id: currentUserId, target_id: target, amount: parseInt(amount) })
-            });
-            const data = await res.json();
-            if (data.success) alert("Звезды выданы!");
-            else alert("Ошибка: " + data.error);
-        } catch (e) {
-            alert("Ошибка сервера");
-        }
-    }
+async function doSend() {
+  const toUser = document.getElementById('sdTarget').value.trim();
+  if (!toUser) { toast('Введи ID получателя'); return; }
+  closeM('sendMod');
+  try {
+    const r = await fetch(API + '/api/send_gift', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({from_user: uid, to_user: toUser, inventory_id: selectedInvId})
+    });
+    const d = await r.json();
+    if (d.success) {
+      toast('🎁 Отправлено ' + d.to_name + '!');
+      loadInv(); loadProfileGifts();
+    } else { toast('❌ ' + d.error); }
+  } catch(e) { toast('❌ Ошибка сервера'); }
+}
 
-    // ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
-    function switchTab(tabId, element) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-        document.getElementById('page-' + tabId).classList.add('active');
-        element.classList.add('active');
-    }
+// ── EDIT PROFILE ──────────────────────
+function openEditName() {
+  document.getElementById('newName').value = me?.name || '';
+  openM('editNameMod');
+}
+async function saveName() {
+  const name = document.getElementById('newName').value.trim();
+  if (!name) { toast('Введи имя'); return; }
+  closeM('editNameMod');
+  await fetch(API + '/api/user/' + uid, {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name})});
+  me.name = name;
+  ['pfName','setName'].forEach(id => document.getElementById(id).textContent = name);
+  document.getElementById('pfAv').textContent = name.slice(0,2).toUpperCase();
+  toast('✅ Имя изменено');
+}
+function openEditBio() {
+  document.getElementById('newBio').value = me?.bio || '';
+  openM('editBioMod');
+}
+async function saveBio() {
+  const bio = document.getElementById('newBio').value.trim();
+  closeM('editBioMod');
+  await fetch(API + '/api/user/' + uid, {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({bio})});
+  me.bio = bio;
+  document.getElementById('setBio').textContent = bio || 'Не указано';
+  toast('✅ Описание обновлено');
+}
 
-    // ЗАПУСК ПРИ ОТКРЫТИИ
-    loadUser();
-    loadShop();
+// ── ADMIN ─────────────────────────────
+async function giveStars() {
+  const target = document.getElementById('aId').value.trim();
+  const amount = parseInt(document.getElementById('aAmt').value);
+  if (!target || !amount) { toast('Заполни поля'); return; }
+  const r = await fetch(API + '/api/admin/give_stars', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_id:uid,target_id:target,amount})});
+  const d = await r.json();
+  toast(d.success ? '✅ ' + fmt(amount) + ' звёзд выдано' : '❌ ' + d.error);
+}
+async function freezeUser(state) {
+  const target = document.getElementById('aId').value.trim();
+  if (!target) { toast('Введи ID'); return; }
+  const r = await fetch(API + '/api/admin/freeze', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_id:uid,target_id:target,frozen:state})});
+  const d = await r.json();
+  toast(d.success ? (state ? '🔒 Заморожен' : '🔓 Разморожен') : '❌ ' + d.error);
+}
+async function addGift() {
+  const name = document.getElementById('agName').value.trim();
+  const emoji = document.getElementById('agEmoji').value.trim();
+  const price = parseInt(document.getElementById('agPrice').value) || 100;
+  const gift_type = document.getElementById('agType').value;
+  if (!name || !emoji) { toast('Заполни название и эмодзи'); return; }
+  const r = await fetch(API + '/api/admin/add_gift', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_id:uid,name,emoji,price,gift_type})});
+  const d = await r.json();
+  if (d.success) { toast('✅ ' + emoji + ' ' + name + ' добавлен!'); allGifts = []; loadShop(); }
+  else toast('❌ ' + d.error);
+}
+
+// ── INIT ──────────────────────────────
+loadUser();
+loadShop();
 </script>
 </body>
 </html>
