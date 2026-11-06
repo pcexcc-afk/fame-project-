@@ -3,326 +3,121 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Orbitagram</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>Древние слова Ульяновска</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-    :root {
-        --bg: #f0f4f8; --card: #ffffff; --text: #1e293b; --sub: #64748b;
-        --blue: #2ca5e0; --green: #34c759; --red: #ff453a; --gold: #ffc53d;
-        --shadow: 0 4px 15px rgba(0,0,0,0.05);
-    }
+    :root { --bg: #f0f4f8; --card: #ffffff; --text: #1e293b; --sub: #64748b; --blue: #0a84ff; }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+    body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center; }
     
-    /* Анимация звезд */
-    #starsCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+    /* Контейнер для страниц */
+    .slider-container { position: relative; width: 100%; max-width: 480px; height: 100vh; overflow: hidden; background: var(--card); box-shadow: 0 0 20px rgba(0,0,0,0.1); }
     
-    .app { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; width: 100%; background: var(--bg); }
-    .content { flex: 1; overflow-y: auto; padding-bottom: 75px; }
-    .page { display: none; animation: fadeIn 0.2s; }
-    .page.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* Экран входа */
-    #loginScreen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; padding: 20px; }
-    .input-box { width: 100%; max-width: 300px; padding: 15px; border-radius: 12px; border: 1px solid #cbd5e1; margin-bottom: 10px; font-size: 16px; outline: none; background: var(--card); }
-    .btn { width: 100%; max-width: 300px; padding: 15px; border-radius: 12px; background: var(--blue); color: white; border: none; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-    .btn:active { transform: scale(0.98); }
-    .btn-grey { background: var(--sub); }
-
-    /* Шапка профиля */
-    .profile-header { background: linear-gradient(150deg, #2ca5e0, #0a60c4); padding: 40px 20px 30px; text-align: center; color: white; border-radius: 0 0 24px 24px; position: relative; }
-    .avatar { width: 90px; height: 90px; border-radius: 50%; background: rgba(255,255,255,0.2); margin: 0 auto 15px; display: flex; justify-content: center; align-items: center; font-size: 36px; font-weight: 800; border: 3px solid rgba(255,255,255,0.4); }
-    .name { font-size: 22px; font-weight: 800; }
+    /* Сами страницы */
+    .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 30px; display: flex; flex-direction: column; align-items: center; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: var(--bg); }
     
-    /* Баланс */
-    .balance-row { display: flex; gap: 10px; padding: 15px; margin-top: -20px; }
-    .balance-card { flex: 1; background: var(--card); padding: 15px; border-radius: 16px; text-align: center; box-shadow: var(--shadow); }
-    .balance-card b { font-size: 20px; color: var(--blue); display: block; }
-    .balance-card span { font-size: 12px; color: var(--sub); font-weight: 600; }
-
-    /* Сетка подарков */
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
-    .gift-card { background: var(--card); border-radius: 16px; padding: 12px 8px; text-align: center; box-shadow: var(--shadow); cursor: pointer; position: relative; }
-    .gift-emoji { font-size: 40px; margin-bottom: 5px; line-height: 1; }
-    .gift-name { font-size: 11px; font-weight: 600; height: 28px; overflow: hidden; }
-    .gift-price { font-size: 12px; font-weight: 800; color: #a07800; background: rgba(255,197,61,0.2); padding: 3px 8px; border-radius: 10px; display: inline-block; margin-top: 5px; }
+    .slide-1 { transform: translateX(0); }
+    .slide-2 { transform: translateX(100%); }
     
-    /* Ленты */
-    .ribbon { position: absolute; top: 0; right: 0; width: 50px; height: 50px; overflow: hidden; border-radius: 0 16px 0 0; pointer-events: none; }
-    .ribbon::after { content: attr(data-t); position: absolute; top: 8px; right: -18px; transform: rotate(45deg); font-size: 7px; font-weight: 800; color: white; padding: 2px 20px; text-align: center; }
-    .ribbon.market::after { background: var(--green); }
-    .ribbon.sold::after { background: var(--red); }
+    /* Активная страница */
+    .slide.active { transform: translateX(0); }
+    .slide.left { transform: translateX(-100%); }
 
-    /* Фильтры */
-    .tabs { display: flex; padding: 10px 15px 0; gap: 5px; overflow-x: auto; }
-    .tab { padding: 8px 15px; border-radius: 20px; background: var(--card); font-size: 13px; font-weight: 600; color: var(--sub); white-space: nowrap; cursor: pointer; }
-    .tab.active { background: var(--blue); color: white; }
+    /* Контент */
+    .slide h1 { font-size: 28px; font-weight: 800; margin-bottom: 10px; margin-top: 20px; color: var(--text); text-align: center; }
+    .slide .subtitle { font-size: 14px; color: var(--sub); text-align: center; margin-bottom: 20px; }
+    
+    /* Картинки */
+    .img-container { width: 100%; height: 250px; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .img-container img { width: 100%; height: 100%; object-fit: cover; }
+    
+    /* Текст */
+    .text-block { background: var(--card); padding: 20px; border-radius: 20px; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .text-block p { font-size: 15px; line-height: 1.5; color: var(--text); }
+    .text-block b { color: var(--blue); }
 
-    /* Настройки и Админка */
-    .section-title { padding: 15px; font-size: 12px; font-weight: 700; color: var(--sub); text-transform: uppercase; }
-    .menu-item { background: var(--card); padding: 15px; border-bottom: 1px solid #f1f5f9; font-weight: 500; display: flex; justify-content: space-between; cursor: pointer; }
-    .admin-box { background: #1e293b; margin: 15px; padding: 15px; border-radius: 16px; color: white; }
-    .admin-input { width: 100%; padding: 10px; border-radius: 8px; border: none; margin-bottom: 10px; background: #334155; color: white; font-size: 14px; }
-    .admin-btn { width: 100%; padding: 12px; border-radius: 8px; border: none; background: var(--red); color: white; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
-
-    /* Нижнее меню */
-    .tabbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 65px; background: var(--card); display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 10; max-width: 480px; left: 50%; transform: translateX(-50%); }
-    .nav-item { font-size: 11px; font-weight: 600; color: var(--sub); cursor: pointer; text-align: center; }
-    .nav-item.active { color: var(--blue); }
-    .nav-icon { font-size: 22px; display: block; margin-bottom: 2px; }
-
-    /* Модалки */
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; justify-content: center; align-items: flex-end; }
-    .modal.show { display: flex; }
-    .modal-content { background: var(--card); width: 100%; max-width: 480px; padding: 25px 20px; border-radius: 24px 24px 0 0; text-align: center; }
+    /* Кнопки-стрелки */
+    .nav-arrows { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: space-between; padding: 0 30px; }
+    .arrow-btn { width: 60px; height: 60px; border-radius: 50%; background: var(--blue); color: white; border: none; font-size: 24px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 10px 20px rgba(10,132,255,0.3); transition: 0.2s; }
+    .arrow-btn:active { transform: scale(0.9); }
+    .arrow-btn.right { margin-left: auto; }
+    .arrow-btn.hidden { display: none; }
 </style>
 </head>
 <body>
-<canvas id="starsCanvas"></canvas>
 
-<div class="app">
-    <!-- ЭКРАН ВХОДА -->
-    <div id="loginScreen">
-        <h2 style="margin-bottom: 20px;">Orbitagram</h2>
-        <input type="text" id="phoneInput" class="input-box" placeholder="+79991234567">
-        <button class="btn" onclick="requestCode()">Получить код в боте</button>
-        <div id="codeDiv" style="display: none; width: 100%; max-width: 300px; margin-top: 15px;">
-            <input type="text" id="codeInput" class="input-box" placeholder="Введите код">
-            <button class="btn" style="background: var(--green);" onclick="verifyCode()">Войти</button>
+<div class="slider-container">
+    
+    <!-- СТРАНИЦА 1: УРЕМА -->
+    <div class="slide slide-1 active" id="page1">
+        <h1>Урема</h1>
+        <div class="subtitle">Древнее слово</div>
+        
+        <!-- Фото Ульяновска (река Волга) -->
+        <div class="img-container">
+            <!-- Вставь свою ссылку на фото реки или леса -->
+            <img src="https://images.unsplash.com/photo-1543832923-44667a44c804?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Река Волга">
+        </div>
+
+        <div class="text-block">
+            <p><b>Значение:</b> Густой лиственный лес или кустарник в пойме реки, который затапливается во время половодья.</p>
+            <br>
+            <p><b>Где находится в Ульяновске:</b> Поймы рек Волги и Свияги. Ты можешь увидеть настоящую урему, прогуливаясь вдоль берегов реки в парках или за городом.</p>
         </div>
     </div>
 
-    <!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
-    <div id="mainApp" style="display: none; height: 100%; flex-direction: column;">
-        <div class="content">
-            
-            <!-- СТРАНИЦА ПРОФИЛЬ -->
-            <div id="page-profile" class="page active" style="padding: 0;">
-                <div class="profile-header">
-                    <div class="avatar" id="userAvatar">?</div>
-                    <div class="name" id="userName">Загрузка...</div>
-                    <div id="userId" style="font-size: 13px; opacity: 0.8; margin-top: 5px;"></div>
-                </div>
-                <div class="balance-row">
-                    <div class="balance-card"><b id="userStars">0</b><span>Звезды</span></div>
-                    <div class="balance-card"><b id="userTon">0</b><span>TON</span></div>
-                </div>
-                <div class="section-title">Витрина подарков</div>
-                <div class="grid" id="profileGrid">
-                    <div style="grid-column: 1/-1; text-align: center; color: var(--sub); padding: 20px;">Подарков пока нет</div>
-                </div>
-            </div>
-
-            <!-- СТРАНИЦА МАГАЗИН -->
-            <div id="page-shop" class="page">
-                <h2 style="padding: 20px 15px 0;">Магазин</h2>
-                <div class="tabs">
-                    <div class="tab active" onclick="filterShop('all', this)">Все</div>
-                    <div class="tab" onclick="filterShop('regular', this)">Обычные</div>
-                    <div class="tab" onclick="filterShop('market', this)">Market</div>
-                    <div class="tab" onclick="filterShop('sold', this)">Продан</div>
-                </div>
-                <div class="grid" id="shopGrid"></div>
-            </div>
-
-            <!-- СТРАНИЦА ИНВЕНТАРЬ -->
-            <div id="page-inventory" class="page">
-                <h2 style="padding: 20px 15px 0;">Инвентарь</h2>
-                <div class="grid" id="invGrid">
-                    <div style="grid-column: 1/-1; text-align: center; color: var(--sub); padding: 20px;">Пусто</div>
-                </div>
-            </div>
-
-            <!-- СТРАНИЦА НАСТРОЙКИ -->
-            <div id="page-settings" class="page">
-                <h2 style="padding: 20px 15px 0;">Настройки</h2>
-                <div class="section-title">Аккаунт</div>
-                <div class="menu-item">Мой ID: <span id="setId"></span></div>
-                <div class="menu-item" onclick="logout()" style="color: var(--red);">Выйти</div>
-
-                <!-- АДМИНКА (появится только если ты админ) -->
-                <div id="adminPanel" style="display: none;">
-                    <div class="section-title" style="color: var(--red);">Админ-панель</div>
-                    <div class="admin-box">
-                        <h4 style="margin-bottom: 10px;">Выдать ресурсы</h4>
-                        <input type="text" id="adminTarget" class="admin-input" placeholder="ID получателя">
-                        <input type="number" id="adminAmount" class="admin-input" placeholder="Сумма">
-                        <button class="admin-btn" onclick="giveStars()">Выдать Звезды</button>
-                        <button class="admin-btn" style="background: var(--blue);" onclick="freezeUser()">Заморозить / Разморозить</button>
-                    </div>
-                </div>
-            </div>
+    <!-- СТРАНИЦА 2: ОСКОРИ -->
+    <div class="slide slide-2" id="page2">
+        <h1>Оскори</h1>
+        <div class="subtitle">Древнее слово</div>
+        
+        <!-- Фото Ульяновска (тополь/дерево) -->
+        <div class="img-container">
+            <!-- Вставь свою ссылку на фото дерева или парка -->
+            <img src="https://images.unsplash.com/photo-1596727147705-61a532a659bd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Тополь">
         </div>
 
-        <!-- НИЖНЕЕ МЕНЮ -->
-        <div class="tabbar">
-            <div class="nav-item active" onclick="switchTab('profile', this)"><span class="nav-icon">👤</span>Профиль</div>
-            <div class="nav-item" onclick="switchTab('shop', this)"><span class="nav-icon">🎁</span>Магазин</div>
-            <div class="nav-item" onclick="switchTab('inventory', this)"><span class="nav-icon">📦</span>Инвентарь</div>
-            <div class="nav-item" onclick="switchTab('settings', this)"><span class="nav-icon">⚙️</span>Настройки</div>
+        <div class="text-block">
+            <p><b>Значение:</b> В древности так называли черный тополь (осокорь), а также большой топор.</p>
+            <br>
+            <p><b>Где находится в Ульяновске:</b> Старые тополя (осокори) можно встретить в городских парках (например, в Винновской роще) и на берегах Свияги.</p>
         </div>
     </div>
+
+    <!-- Кнопки навигации -->
+    <div class="nav-arrows">
+        <button class="arrow-btn left hidden" id="btnLeft" onclick="prevSlide()">←</button>
+        <button class="arrow-btn right" id="btnRight" onclick="nextSlide()">→</button>
+    </div>
+
 </div>
 
 <script>
-    const API = "https://fame-api-bs11.onrender.com"; // Твой сервер
-    let currentUser = null;
-    let allGifts = [];
+    let currentSlide = 1;
 
-    // Анимация звезд
-    const canvas = document.getElementById('starsCanvas');
-    const ctx = canvas.getContext('2d');
-    let stars = [];
-    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    window.addEventListener('resize', resize); resize();
-    for(let i=0; i<60; i++) stars.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2+1, sp: Math.random()*0.5+0.2});
-    function draw() {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle = 'rgba(44, 165, 224, 0.4)'; // Голубоватые звезды
-        stars.forEach(st => { 
-            ctx.beginPath(); ctx.arc(st.x, st.y, st.s, 0, Math.PI*2); ctx.fill(); 
-            st.y += st.sp; 
-            if(st.y > canvas.height) { st.y = 0; st.x = Math.random()*canvas.width; }
-        });
-        requestAnimationFrame(draw);
-    }
-    draw();
-
-    // --- ЛОГИКА ВХОДА ---
-    function requestCode() {
-        if(!document.getElementById('phoneInput').value) return alert("Введите номер!");
-        document.getElementById('codeDiv').style.display = 'block';
-        alert("Проверьте Telegram-бота! Он прислал код.");
-    }
-
-    async function verifyCode() {
-        const phone = document.getElementById('phoneInput').value;
-        const code = document.getElementById('codeInput').value;
-        try {
-            const res = await fetch(API + '/api/auth/verify', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({phone, code})
-            });
-            const data = await res.json();
-            if (data.success) {
-                currentUser = data.user;
-                localStorage.setItem('orbit_user', JSON.stringify(currentUser));
-                initApp();
-            } else alert(data.error);
-        } catch(e) { alert("Ошибка сети (сервер спит?)"); }
-    }
-
-    // --- ИНИЦИАЛИЗАЦИЯ ---
-    function initApp() {
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'flex';
-        
-        document.getElementById('userName').innerText = currentUser.name;
-        document.getElementById('userAvatar').innerText = currentUser.name[0].toUpperCase();
-        document.getElementById('userId').innerText = "ID: " + currentUser.id;
-        document.getElementById('setId').innerText = currentUser.id;
-        
-        updateBalances();
-        
-        if (currentUser.is_admin === 1) {
-            document.getElementById('adminPanel').style.display = 'block';
-        }
-        loadShop();
-    }
-
-    function updateBalances() {
-        document.getElementById('userStars').innerText = currentUser.stars;
-        document.getElementById('userTon').innerText = currentUser.ton || 0;
-    }
-
-    // --- МАГАЗИН ---
-    async function loadShop() {
-        try {
-            const res = await fetch(API + '/api/gifts');
-            allGifts = await res.json();
-            renderShop('all');
-        } catch(e) { console.log(e); }
-    }
-
-    function filterShop(type, el) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        if(el) el.classList.add('active');
-        renderShop(type);
-    }
-
-    function renderShop(type) {
-        const grid = document.getElementById('shopGrid');
-        const filtered = allGifts.filter(g => type === 'all' || g.gift_type === type);
-        
-        grid.innerHTML = filtered.map(g => {
-            let ribbon = '';
-            if(g.gift_type === 'market') ribbon = `<div class="ribbon market" data-t="Market"></div>`;
-            if(g.gift_type === 'sold') ribbon = `<div class="ribbon sold" data-t="Sold"></div>`;
+    function nextSlide() {
+        if (currentSlide === 1) {
+            document.getElementById('page1').classList.remove('active');
+            document.getElementById('page1').classList.add('left');
+            document.getElementById('page2').classList.add('active');
             
-            return `
-            <div class="gift-card" onclick="buyGift(${g.id})">
-                ${ribbon}
-                <div class="gift-emoji">${g.emoji}</div>
-                <div class="gift-name">${g.name}</div>
-                <div class="gift-price">${g.price} ⭐</div>
-            </div>`;
-        }).join('');
+            document.getElementById('btnLeft').classList.remove('hidden');
+            document.getElementById('btnRight').classList.add('hidden');
+            currentSlide = 2;
+        }
     }
 
-    async function buyGift(id) {
-        if(!confirm("Купить этот подарок?")) return;
-        try {
-            const res = await fetch(API + '/api/buy_gift', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({user_id: currentUser.id, gift_id: id})
-            });
-            const data = await res.json();
-            if(data.success) {
-                alert("Успешно куплено!");
-                currentUser.stars = data.new_balance;
-                updateBalances();
-            } else alert(data.error);
-        } catch(e) { alert("Ошибка сервера"); }
+    function prevSlide() {
+        if (currentSlide === 2) {
+            document.getElementById('page2').classList.remove('active');
+            document.getElementById('page1').classList.remove('left');
+            document.getElementById('page1').classList.add('active');
+            
+            document.getElementById('btnRight').classList.remove('hidden');
+            document.getElementById('btnLeft').classList.add('hidden');
+            currentSlide = 1;
+        }
     }
-
-    // --- НАВИГАЦИЯ ---
-    function switchTab(tabId, el) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById('page-' + tabId).classList.add('active');
-        el.classList.add('active');
-    }
-
-    // --- АДМИНКА ---
-    async function giveStars() {
-        const target = document.getElementById('adminTarget').value;
-        const amount = document.getElementById('adminAmount').value;
-        if(!target || !amount) return alert("Заполните поля");
-        
-        try {
-            const res = await fetch(API + '/api/admin/give', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({admin_id: currentUser.id, target_id: target, amount: parseInt(amount)})
-            });
-            const data = await res.json();
-            if(data.success) alert("Выдано!");
-            else alert(data.error);
-        } catch(e) { alert("Ошибка"); }
-    }
-
-    function logout() {
-        localStorage.removeItem('orbit_user');
-        location.reload();
-    }
-
-    // Проверка при загрузке страницы
-    const savedUser = localStorage.getItem('orbit_user');
-    if(savedUser) {
-        currentUser = JSON.parse(savedUser);
-        initApp();
-    }
-
 </script>
 </body>
 </html>
