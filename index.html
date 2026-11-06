@@ -2,276 +2,147 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Orbitagram</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AxonAI - Генератор Картинок</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-    :root { --bg: #f0f4f8; --card: #ffffff; --text: #1e293b; --sub: #64748b; --blue: #0a84ff; --gold: #ffc53d; --green: #34c759; --red: #ff453a; }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    :root { --bg: #0a0a0a; --text: #ffffff; --accent: #0a84ff; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
     body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
     
-    /* Вход */
-    #loginScreen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; padding: 20px; }
-    .input { width: 100%; max-width: 300px; padding: 15px; border-radius: 12px; border: 1px solid #cbd5e1; margin-bottom: 10px; font-size: 16px; outline: none; }
-    .btn { width: 100%; max-width: 300px; padding: 15px; border-radius: 12px; background: var(--blue); color: white; border: none; font-size: 16px; font-weight: 600; cursor: pointer; }
-    .btn-green { background: var(--green); }
-    #testCode { text-align: center; color: var(--blue); font-weight: 800; margin-top: 10px; font-size: 18px; }
+    /* Фон (Звездопад) */
+    #starsCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+    /* Основной контейнер */
+    .app { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; max-width: 600px; margin: 0 auto; width: 100%; padding: 20px; }
     
-    /* Основное */
-    #mainApp { display: none; flex-direction: column; height: 100%; max-width: 480px; margin: 0 auto; width: 100%; background: var(--bg); }
-    .content { flex: 1; overflow-y: auto; padding-bottom: 70px; }
-    
-    /* Профиль */
-    .header { background: linear-gradient(150deg, #2ca5e0, #0a60c4); padding: 40px 20px 30px; text-align: center; color: white; border-radius: 0 0 24px 24px; }
-    .avatar { width: 90px; height: 90px; border-radius: 50%; background: rgba(255,255,255,0.2); margin: 0 auto 15px; display: flex; justify-content: center; align-items: center; font-size: 36px; font-weight: 800; border: 3px solid rgba(255,255,255,0.4); }
-    .name { font-size: 22px; font-weight: 800; }
-    .bal-row { display: flex; gap: 10px; padding: 15px; margin-top: -20px; }
-    .bal-card { flex: 1; background: var(--card); padding: 15px; border-radius: 16px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-    .bal-card b { font-size: 20px; color: var(--blue); display: block; }
-    
-    /* Магазин */
-    .tabs { display: flex; gap: 5px; padding: 15px; overflow-x: auto; }
-    .tab { padding: 8px 15px; border-radius: 20px; background: var(--card); font-size: 13px; font-weight: 600; color: var(--sub); cursor: pointer; }
-    .tab.active { background: var(--blue); color: white; }
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
-    .gift-card { background: var(--card); border-radius: 16px; padding: 15px 10px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); cursor: pointer; }
-    .gift-emoji { font-size: 40px; margin-bottom: 5px; }
-    .gift-name { font-size: 12px; font-weight: 600; height: 28px; overflow: hidden; }
-    .gift-price { font-size: 12px; font-weight: 800; color: #a07800; background: rgba(255,197,61,0.2); padding: 3px 8px; border-radius: 10px; display: inline-block; margin-top: 5px; }
-    
-    /* Меню */
-    .tabbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: var(--card); display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); max-width: 480px; left: 50%; transform: translateX(-50%); }
-    .nav-item { font-size: 11px; font-weight: 600; color: var(--sub); cursor: pointer; text-align: center; }
-    .nav-item.active { color: var(--blue); }
-    .nav-icon { font-size: 20px; display: block; }
-    
-    /* Админка */
-    .admin-box { background: #1e293b; margin: 15px; padding: 15px; border-radius: 16px; color: white; }
-    .admin-input { width: 100%; padding: 10px; border-radius: 8px; border: none; margin-bottom: 10px; background: #334155; color: white; }
+    .header { text-align: center; margin-bottom: 20px; margin-top: 20px; }
+    .header h1 { font-size: 32px; font-weight: 800; background: linear-gradient(90deg, #0a84ff, #bf5af2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .header p { color: #888; font-size: 14px; margin-top: 5px; }
+
+    /* Окно результата */
+    .result-box { flex: 1; background: rgba(255,255,255,0.05); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: center; align-items: center; overflow: hidden; margin-bottom: 20px; position: relative; }
+    .result-box img { width: 100%; height: 100%; object-fit: contain; display: none; }
+    .placeholder { color: #555; font-size: 16px; text-align: center; padding: 20px; }
+    .loader { display: none; font-size: 40px; animation: spin 1s linear infinite; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    /* Ввод и кнопка */
+    .input-area { display: flex; gap: 10px; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); }
+    .input-area input { flex: 1; background: none; border: none; color: white; font-size: 16px; outline: none; padding: 10px; }
+    .input-area button { background: var(--accent); color: white; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .input-area button:active { transform: scale(0.95); }
+    .input-area button:disabled { background: #555; cursor: not-allowed; }
 </style>
 </head>
 <body>
 
-<!-- ВХОД -->
-<div id="loginScreen">
-    <h2 style="margin-bottom: 20px;">Orbitagram</h2>
-    <div id="phoneStep">
-        <input type="text" id="phoneInput" class="input" placeholder="+79991234567">
-        <button class="btn" onclick="getCode()">Получить код</button>
-    </div>
-    <div id="codeStep" style="display: none; width: 100%; max-width: 300px; margin-top: 10px;">
-        <input type="text" id="codeInput" class="input" placeholder="Введите код">
-        <button class="btn btn-green" onclick="login()">Войти</button>
-        <div id="testCode"></div>
-    </div>
-</div>
+<canvas id="starsCanvas"></canvas>
 
-<!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
-<div id="mainApp">
-    <div class="content">
-        <!-- ПРОФИЛЬ -->
-        <div id="page-profile" class="page active">
-            <div class="header">
-                <div class="avatar" id="userAv">?</div>
-                <div class="name" id="userName">Загрузка...</div>
-                <div id="userId" style="font-size: 13px; opacity: 0.8; margin-top: 5px;"></div>
-            </div>
-            <div class="bal-row">
-                <div class="bal-card"><b id="userStars">0</b>Звезды</div>
-                <div class="bal-card"><b id="userTon">0</b>TON</div>
-            </div>
-            <h3 style="padding: 0 15px;">Мои подарки</h3>
-            <div class="grid" id="invGrid"></div>
-        </div>
-
-        <!-- МАГАЗИН -->
-        <div id="page-shop" class="page" style="display: none;">
-            <h2 style="padding: 20px 15px 0;">Магазин</h2>
-            <div class="tabs">
-                <div class="tab active" onclick="filterShop('all', this)">Все</div>
-                <div class="tab" onclick="filterShop('regular', this)">Обычные</div>
-                <div class="tab" onclick="filterShop('market', this)">Market</div>
-            </div>
-            <div class="grid" id="shopGrid"></div>
-        </div>
-
-        <!-- НАСТРОЙКИ -->
-        <div id="page-settings" class="page" style="display: none;">
-            <h2 style="padding: 20px 15px;">Настройки</h2>
-            <div id="adminPanel" style="display: none;">
-                <div class="admin-box">
-                    <h4 style="margin-bottom: 10px;">Админ-панель</h4>
-                    <input type="text" id="adminTarget" class="admin-input" placeholder="ID получателя">
-                    <input type="number" id="adminAmount" class="admin-input" placeholder="Сумма">
-                    <button class="btn" style="max-width: 100%; background: var(--red);" onclick="giveStars()">Выдать звезды</button>
-                </div>
-            </div>
-            <button class="btn" style="max-width: 300px; margin: 20px auto; display: block; background: var(--red);" onclick="logout()">Выйти</button>
-        </div>
+<div class="app">
+    <div class="header">
+        <h1>AxonAI</h1>
+        <p>Генератор картинок</p>
     </div>
 
-    <!-- НАВИГАЦИЯ -->
-    <div class="tabbar">
-        <div class="nav-item active" onclick="switchTab('profile', this)"><span class="nav-icon">👤</span>Профиль</div>
-        <div class="nav-item" onclick="switchTab('shop', this)"><span class="nav-icon">🎁</span>Магазин</div>
-        <div class="nav-item" onclick="switchTab('settings', this)"><span class="nav-icon">⚙️</span>Настройки</div>
+    <div class="result-box" id="resultBox">
+        <div class="placeholder" id="placeholder">Здесь появится твоя картинка...</div>
+        <div class="loader" id="loader">⏳</div>
+        <img id="resultImg" src="" alt="Результат">
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="promptInput" placeholder="Нарисуй кота в космосе..." onkeypress="if(event.key==='Enter') generateImage()">
+        <button id="genBtn" onclick="generateImage()">Создать</button>
     </div>
 </div>
 
 <script>
-    const API = "https://fame-api-bs11.onrender.com"; 
-    let currentUser = null;
-    let allGifts = [];
-    let currentPhone = "";
+    // --- ФОН (ЗВЕЗДОПАД) ---
+    const canvas = document.getElementById('starsCanvas');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
 
-    // --- ВХОД ---
-    async function getCode() {
-        const phone = document.getElementById('phoneInput').value;
-        if(!phone) return alert("Введите номер!");
-        currentPhone = phone;
-        try {
-            const res = await fetch(API + '/api/auth/request_code', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({phone})
-            });
-            const data = await res.json();
-            if(data.success) {
-                document.getElementById('phoneStep').style.display = 'none';
-                document.getElementById('codeStep').style.display = 'block';
-                document.getElementById('testCode').innerText = "Ваш код: " + data.test_code;
-            }
-        } catch(e) { alert("Сервер спит, подождите 30 сек."); }
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize); resize();
+
+    for(let i=0; i<100; i++) {
+        stars.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: Math.random() * 2 + 1, speed: Math.random() * 2 + 1 });
     }
 
-    async function login() {
-        const code = document.getElementById('codeInput').value;
-        try {
-            const res = await fetch(API + '/api/auth/verify', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({phone: currentPhone, code})
-            });
-            const data = await res.json();
-            if(data.success) {
-                currentUser = data.user;
-                localStorage.setItem('orbit_user', JSON.stringify(currentUser)); // СОХРАНЯЕМ ВХОД
-                initApp();
-            } else alert(data.error);
-        } catch(e) { alert("Ошибка сети"); }
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'white';
+        stars.forEach(s => {
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+            ctx.fill();
+            s.y += s.speed;
+            if (s.y > canvas.height) { s.y = 0; s.x = Math.random() * canvas.width; }
+        });
+        requestAnimationFrame(draw);
     }
+    draw();
 
-    function logout() {
-        localStorage.removeItem('orbit_user'); // УДАЛЯЕМ ВХОД
-        location.reload();
-    }
+    // --- ГЕНЕРАЦИЯ КАРТИНКИ (POLLINATIONS) ---
+    let isGenerating = false;
 
-    // --- ИНИЦИАЛИЗАЦИЯ ---
-    function initApp() {
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'flex';
+    async function generateImage() {
+        if (isGenerating) return;
         
-        document.getElementById('userName').innerText = currentUser.name;
-        document.getElementById('userAv').innerText = currentUser.name[0].toUpperCase();
-        document.getElementById('userId').innerText = "ID: " + currentUser.id;
-        document.getElementById('userStars').innerText = currentUser.stars;
-        document.getElementById('userTon').innerText = currentUser.ton || 0;
-        
-        if(currentUser.is_admin === 1) {
-            document.getElementById('adminPanel').style.display = 'block';
+        const prompt = document.getElementById('promptInput').value.trim();
+        if (!prompt) return alert('Напиши, что нарисовать!');
+
+        const resultImg = document.getElementById('resultImg');
+        const placeholder = document.getElementById('placeholder');
+        const loader = document.getElementById('loader');
+        const btn = document.getElementById('genBtn');
+
+        // Включаем загрузку
+        isGenerating = true;
+        btn.disabled = true;
+        btn.innerText = 'Рисую...';
+        resultImg.style.display = 'none';
+        placeholder.style.display = 'none';
+        loader.style.display = 'block';
+
+        try {
+            // Кодируем запрос для URL
+            const encodedPrompt = encodeURIComponent(prompt);
+            
+            // Ссылка на Pollinations (без ключей)
+            const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${Date.now()}`;
+
+            // Создаем новый объект Image для загрузки
+            const img = new Image();
+            img.src = imageUrl;
+
+            img.onload = () => {
+                resultImg.src = imageUrl;
+                resultImg.style.display = 'block';
+                loader.style.display = 'none';
+                isGenerating = false;
+                btn.disabled = false;
+                btn.innerText = 'Создать';
+            };
+
+            img.onerror = () => {
+                alert("Ошибка генерации. Подожди 15 секунд и попробуй снова.");
+                loader.style.display = 'none';
+                placeholder.style.display = 'block';
+                isGenerating = false;
+                btn.disabled = false;
+                btn.innerText = 'Создать';
+            };
+
+        } catch (e) {
+            alert("Ошибка сети.");
+            loader.style.display = 'none';
+            placeholder.style.display = 'block';
+            isGenerating = false;
+            btn.disabled = false;
+            btn.innerText = 'Создать';
         }
-        
-        loadShop();
-        loadInventory();
-    }
-
-    // --- МАГАЗИН ---
-    async function loadShop() {
-        try {
-            const res = await fetch(API + '/api/gifts');
-            allGifts = await res.json();
-            renderShop('all');
-        } catch(e) { console.log(e); }
-    }
-
-    function filterShop(type, el) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        el.classList.add('active');
-        renderShop(type);
-    }
-
-    function renderShop(type) {
-        const grid = document.getElementById('shopGrid');
-        const filtered = allGifts.filter(g => type === 'all' || g.gift_type === type);
-        grid.innerHTML = filtered.map(g => `
-            <div class="gift-card" onclick="buyGift(${g.id})">
-                <div class="gift-emoji">${g.emoji}</div>
-                <div class="gift-name">${g.name}</div>
-                <div class="gift-price">${g.price} ⭐</div>
-            </div>
-        `).join('');
-    }
-
-    async function buyGift(id) {
-        if(!confirm("Купить?")) return;
-        try {
-            const res = await fetch(API + '/api/buy_gift', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({user_id: currentUser.id, gift_id: id})
-            });
-            const data = await res.json();
-            if(data.success) {
-                alert("Куплено!");
-                currentUser.stars = data.new_balance;
-                document.getElementById('userStars').innerText = currentUser.stars;
-                localStorage.setItem('orbit_user', JSON.stringify(currentUser)); // Обновляем баланс в памяти
-                loadInventory();
-            } else alert(data.error);
-        } catch(e) { alert("Ошибка"); }
-    }
-
-    // --- ИНВЕНТАРЬ ---
-    async function loadInventory() {
-        try {
-            const res = await fetch(API + '/api/inventory/' + currentUser.id);
-            const items = await res.json();
-            const grid = document.getElementById('invGrid');
-            grid.innerHTML = items.map(i => `
-                <div class="gift-card">
-                    <div class="gift-emoji">${i.emoji}</div>
-                    <div class="gift-name">${i.name}</div>
-                </div>
-            `).join('');
-        } catch(e) { console.log(e); }
-    }
-
-    // --- НАВИГАЦИЯ ---
-    function switchTab(tabId, el) {
-        document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-        document.getElementById('page-' + tabId).style.display = 'block';
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        el.classList.add('active');
-    }
-
-    // --- АДМИНКА ---
-    async function giveStars() {
-        const target = document.getElementById('adminTarget').value;
-        const amount = document.getElementById('adminAmount').value;
-        if(!target || !amount) return;
-        try {
-            const res = await fetch(API + '/api/admin/give', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({admin_id: currentUser.id, target_id: target, amount: parseInt(amount)})
-            });
-            const data = await res.json();
-            if(data.success) alert("Выдано!");
-            else alert(data.error);
-        } catch(e) { alert("Ошибка"); }
-    }
-
-    // --- ПРОВЕРКА ПРИ ЗАГРУЗКЕ (АВТОВХОД) ---
-    const savedUser = localStorage.getItem('orbit_user');
-    if (savedUser) {
-        currentUser = JSON.parse(savedUser);
-        initApp(); // Если ты уже входил, сайт сразу откроет профиль
     }
 </script>
 </body>
