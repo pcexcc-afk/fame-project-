@@ -26,10 +26,9 @@
     
     button { width: 100%; padding: 15px; border-radius: 12px; border: none; background: var(--accent); color: white; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; }
     button:active { transform: scale(0.98); }
-    button:disabled { background: #555; cursor: not-allowed; }
+    .btn-grey { background: #475569; font-size: 14px; padding: 10px; margin-top: -5px;}
     
     .error { color: var(--danger); font-size: 13px; text-align: center; }
-    .success { color: #34c759; font-size: 13px; text-align: center; }
 </style>
 </head>
 <body>
@@ -41,8 +40,9 @@
         <!-- ШАГ 1: Ввод номера -->
         <div id="step-phone" class="step active">
             <h2>Вход</h2>
-            <p>Введите ваш номер или ID</p>
+            <p>Введите номер или сгенерируйте</p>
             <input type="text" id="phoneInput" placeholder="+7 999 123-45-67">
+            <button class="btn-grey" onclick="generateNumber()">🎲 Сгенерировать номер</button>
             <button onclick="requestCode()">Получить код</button>
             <div id="error-phone" class="error"></div>
         </div>
@@ -90,6 +90,23 @@
     function showStep(stepId) {
         document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
         document.getElementById('step-' + stepId).classList.add('active');
+    }
+
+    // --- ГЕНЕРАТОР НОМЕРОВ ---
+    function generateNumber() {
+        const countries = ['RU', 'UA', 'BY'];
+        const country = countries[Math.floor(Math.random() * countries.length)];
+        let number = "";
+
+        if (country === 'RU') {
+            number = `+7 9${Math.floor(Math.random()*90+10)} ${Math.floor(Math.random()*900+100)}-${Math.floor(Math.random()*90+10)}-${Math.floor(Math.random()*90+10)}`;
+        } else if (country === 'UA') {
+            number = `+380 ${Math.floor(Math.random()*90+10)} ${Math.floor(Math.random()*900+100)}-${Math.floor(Math.random()*90+10)}-${Math.floor(Math.random()*90+10)}`;
+        } else {
+            number = `+375 ${Math.floor(Math.random()*90+10)} ${Math.floor(Math.random()*900+100)}-${Math.floor(Math.random()*90+10)}-${Math.floor(Math.random()*90+10)}`;
+        }
+
+        document.getElementById('phoneInput').value = number;
     }
 
     async function requestCode() {
