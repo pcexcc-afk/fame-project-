@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Урема в Ульяновске</title>
+    <title>Урема и Осокорь в Ульяновске</title>
     
     <!-- Подключение карт -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -99,6 +99,7 @@
             color: #718096;
             margin-top: 10px;
             font-style: italic;
+            text-align: center;
         }
 
         @media (max-width: 768px) {
@@ -110,14 +111,14 @@
 
     <div class="container">
         <header>
-            <h1>Урема: Пойменный лес и кустарник</h1>
-            <p>Историческая справка и интерактивная карта Ульяновска</p>
+            <h1>Урема: Пойменный лес Ульяновска</h1>
+            <p>Нажмите на маркеры на карте, чтобы узнать о древних словах</p>
         </header>
 
         <div class="content-grid">
             <!-- Блок с объяснением -->
             <div class="info-block">
-                <h2>Что означает слово?</h2>
+                <h2>Что означает слово «Урема»?</h2>
                 <p><strong>Урема</strong> (или урёма) — старинное слово тюркского происхождения, означающее <strong>«поречье»</strong>. Так наши предки называли густые, часто труднопроходимые заросли деревьев и кустарников, растущие в низменных долинах рек.</p>
                 
                 <p>Главная особенность уремы — она <strong>затапливается</strong> во время весеннего половодья. В старину здесь ловили рыбу, собирали ягоды, заготавливали лозу для плетения и прятались от врагов.</p>
@@ -132,10 +133,9 @@
             <div class="photo-block">
                 <div class="placeholder-icon">🌳</div>
                 <h2>Как выглядит урема?</h2>
-                <p><em>Здесь вы можете вставить реальное фото.</em></p>
-                <p>Представьте густой, влажный лес в пойме реки:</p>
+                <p><em>Представьте густой, влажный лес в пойме реки:</em></p>
                 <ul>
-                    <li><strong>Деревья:</strong> Ива, ольха, осокорь, вяз.</li>
+                    <li><strong>Деревья:</strong> Ива, ольха, <strong>осокорь</strong>, вяз.</li>
                     <li><strong>Кустарники:</strong> Тальник (ивняк), черёмуха, калина.</li>
                     <li><strong>Травы:</strong> Высокие осоки, камыш.</li>
                 </ul>
@@ -147,38 +147,61 @@
                 <h2>Где искать урему в Ульяновске?</h2>
                 <p>На современных картах вы не найдете подписи «Урема», так как это природный ландшафт. Наиболее вероятное место исторических пойменных лесов — это <strong>пойма реки Свияги</strong> и низменные берега Волги.</p>
                 <div id="map"></div>
-                <div class="map-note">* Красная метка указывает на пойму реки Свияги — исторический ареал пойменных лесов.</div>
+                <div class="map-note">📍 Нажмите на красный круг — узнаете про Урему. 👆 Нажмите на синюю стрелку — узнаете про древнее слово «Осокорь».</div>
             </div>
         </div>
     </div>
 
     <script>
-        // Координаты поймы Свияги в Ульяновске (район к северо-западу от центра)
+        // --- НАСТРОЙКИ КАРТЫ ---
+        // Координаты поймы Свияги в Ульяновске
         const lat = 54.3285; 
         const lon = 48.3640;
 
         // Инициализация карты
         var map = L.map('map').setView([lat, lon], 12);
 
-        // Добавляем слой карты
+        // Добавляем слой карты (OpenStreetMap)
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '© OpenStreetMap'
         }).addTo(map);
 
-        // Создаем красную метку
-        var marker = L.marker([lat, lon]).addTo(map);
-
-        // Добавляем всплывающее окно
-        marker.bindPopup('<b>Пойма реки Свияги</b><br>Историческая зона пойменных лесов (урема) в Ульяновске.').openPopup();
-        
-        // Рисуем круг вокруг метки, чтобы показать примерную зону
-        L.circle([lat, lon], {
+        // --- МЕТКА 1: УРЕМА (Красный круг) ---
+        var markerUrema = L.circleMarker([lat, lon], {
+            radius: 15,
             color: 'red',
             fillColor: '#f03',
-            fillOpacity: 0.1,
-            radius: 1500 // Радиус 1.5 км
+            fillOpacity: 0.4,
+            weight: 2
         }).addTo(map);
+
+        markerUrema.bindPopup('<b>Урема</b><br>Древнее слово, означающее «поречье». Пойменный лес, который затапливается при половодье.').openPopup();
+
+        // --- МЕТКА 2: ОСОКОРЬ (Синяя стрелка) ---
+        // Ставим стрелку чуть в стороне от круга
+        const latOsokor = lat + 0.012; 
+        const lonOsokor = lon + 0.015;
+
+        // Создаем иконку со стрелкой (DivIcon)
+        var arrowIcon = L.divIcon({
+            className: 'custom-arrow',
+            html: '<div style="font-size: 30px; color: #2b6cb0; cursor: pointer; text-shadow: 1px 1px 2px white;">⬆️</div>',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+
+        var markerOsokor = L.marker([latOsokor, lonOsokor], {icon: arrowIcon}).addTo(map);
+
+        // Текст про Осокорь при нажатии
+        markerOsokor.bindPopup(`
+            <div style="font-family: Arial, sans-serif; font-size: 14px; max-width: 250px;">
+                <b style="color: #2b6cb0; font-size: 16px;">Осокорь</b><br><br>
+                <b>Древнее слово</b>, которым в старину называли <b>чёрный тополь</b> (Populus nigra). <br><br>
+                Это могучее дерево с широкой кроной и темной корой часто росло именно в пойменных лесах (уремах) вдоль рек. На Руси из его мягкой древесины делали лодки-долблёнки, а из коры получали краску.
+            </div>
+        `);
+
     </script>
 </body>
 </html>
