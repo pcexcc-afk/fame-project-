@@ -10,37 +10,28 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center; }
     
-    /* Контейнер для страниц */
     .slider-container { position: relative; width: 100%; max-width: 480px; height: 100vh; overflow: hidden; background: var(--card); box-shadow: 0 0 20px rgba(0,0,0,0.1); }
     
-    /* Сами страницы */
-    .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 30px; display: flex; flex-direction: column; align-items: center; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: var(--bg); }
+    .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 25px; display: flex; flex-direction: column; align-items: center; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: var(--bg); overflow-y: auto; }
     
     .slide-1 { transform: translateX(0); }
     .slide-2 { transform: translateX(100%); }
-    
-    /* Активная страница */
     .slide.active { transform: translateX(0); }
     .slide.left { transform: translateX(-100%); }
 
-    /* Контент */
-    .slide h1 { font-size: 28px; font-weight: 800; margin-bottom: 10px; margin-top: 20px; color: var(--text); text-align: center; }
-    .slide .subtitle { font-size: 14px; color: var(--sub); text-align: center; margin-bottom: 20px; }
+    .slide h1 { font-size: 28px; font-weight: 800; margin-bottom: 5px; margin-top: 10px; color: var(--text); text-align: center; }
+    .slide .subtitle { font-size: 13px; color: var(--sub); text-align: center; margin-bottom: 15px; }
     
-    /* Картинки */
-    .img-container { width: 100%; height: 250px; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .img-container { width: 100%; height: 220px; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.1); margin-bottom: 15px; flex-shrink: 0; background: #ddd; }
     .img-container img { width: 100%; height: 100%; object-fit: cover; }
     
-    /* Текст */
-    .text-block { background: var(--card); padding: 20px; border-radius: 20px; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-    .text-block p { font-size: 15px; line-height: 1.5; color: var(--text); }
+    .text-block { background: var(--card); padding: 18px; border-radius: 20px; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 80px; }
+    .text-block p { font-size: 14px; line-height: 1.5; color: var(--text); margin-bottom: 8px; }
     .text-block b { color: var(--blue); }
 
-    /* Кнопки-стрелки */
-    .nav-arrows { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: space-between; padding: 0 30px; }
-    .arrow-btn { width: 60px; height: 60px; border-radius: 50%; background: var(--blue); color: white; border: none; font-size: 24px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 10px 20px rgba(10,132,255,0.3); transition: 0.2s; }
+    .nav-arrows { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 25px; z-index: 10; }
+    .arrow-btn { width: 56px; height: 56px; border-radius: 50%; background: var(--blue); color: white; border: none; font-size: 24px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 8px 20px rgba(10,132,255,0.4); transition: 0.2s; }
     .arrow-btn:active { transform: scale(0.9); }
-    .arrow-btn.right { margin-left: auto; }
     .arrow-btn.hidden { display: none; }
 </style>
 </head>
@@ -53,16 +44,14 @@
         <h1>Урема</h1>
         <div class="subtitle">Древнее слово</div>
         
-        <!-- Фото Ульяновска (река Волга) -->
+        <!-- Фото поймы реки (подходит под описание Уремы) -->
         <div class="img-container">
-            <!-- Вставь свою ссылку на фото реки или леса -->
-            <img src="https://images.unsplash.com/photo-1543832923-44667a44c804?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Река Волга">
+            <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Река в лесу">
         </div>
 
         <div class="text-block">
             <p><b>Значение:</b> Густой лиственный лес или кустарник в пойме реки, который затапливается во время половодья.</p>
-            <br>
-            <p><b>Где находится в Ульяновске:</b> Поймы рек Волги и Свияги. Ты можешь увидеть настоящую урему, прогуливаясь вдоль берегов реки в парках или за городом.</p>
+            <p><b>Где находится в Ульяновске:</b> Поймы рек Волги и Свияги. Настоящую урему можно увидеть, прогуливаясь вдоль берегов реки в парках или за городом.</p>
         </div>
     </div>
 
@@ -71,20 +60,17 @@
         <h1>Оскори</h1>
         <div class="subtitle">Древнее слово</div>
         
-        <!-- Фото Ульяновска (тополь/дерево) -->
+        <!-- Фото могучего дерева (тополь/осокорь) -->
         <div class="img-container">
-            <!-- Вставь свою ссылку на фото дерева или парка -->
-            <img src="https://images.unsplash.com/photo-1596727147705-61a532a659bd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Тополь">
+            <img src="https://images.unsplash.com/photo-1596727147705-61a532a659bd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Большое дерево">
         </div>
 
         <div class="text-block">
             <p><b>Значение:</b> В древности так называли черный тополь (осокорь), а также большой топор.</p>
-            <br>
-            <p><b>Где находится в Ульяновске:</b> Старые тополя (осокори) можно встретить в городских парках (например, в Винновской роще) и на берегах Свияги.</p>
+            <p><b>Где находится в Ульяновске:</b> Старые тополя (осокори) можно встретить в городских парках (например, в Винновской роще) и на берегах Свияги. В Новоульяновске есть настоящие «древесные небоскрёбы» — осокори высотой с 10-этажный дом [citation:1].</p>
         </div>
     </div>
 
-    <!-- Кнопки навигации -->
     <div class="nav-arrows">
         <button class="arrow-btn left hidden" id="btnLeft" onclick="prevSlide()">←</button>
         <button class="arrow-btn right" id="btnRight" onclick="nextSlide()">→</button>
