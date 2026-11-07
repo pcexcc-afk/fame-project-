@@ -1,259 +1,456 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="dark">
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#05060f">
 <title>AxonAI — открытый искусственный интеллект</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
 <style>
-:root, [data-theme="dark"] {
-  --bg:#070b14; --bg2:#0d1424; --card:#111a30; --text:#e6ecff; --muted:#8b98b8;
-  --accent:#6d8bff; --accent2:#9b6dff; --border:#1e2a4a; --bubble-u:#1c2a52; --bubble-a:#141d36;
+:root{
+  --bg:#05060f; --panel:#0b0e1e; --panel2:#101430; --line:#1d2450;
+  --txt:#dfe4ff; --dim:#7a84b8; --acc:#6d5cff; --acc2:#00e5ff; --danger:#ff4d6d; --ok:#2dffa8;
 }
-[data-theme="light"] {
-  --bg:#f4f7ff; --bg2:#ffffff; --card:#ffffff; --text:#17203a; --muted:#5a6a90;
-  --accent:#3b5bdb; --accent2:#7048e8; --border:#dbe3f5; --bubble-u:#dbe4ff; --bubble-a:#ffffff;
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden}
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+.app{position:relative;z-index:1;display:flex;height:100vh}
+/* ---------- боковая панель ---------- */
+aside{width:290px;background:rgba(9,11,26,.92);border-right:1px solid var(--line);display:flex;flex-direction:column;backdrop-filter:blur(8px);transition:transform .3s}
+.brand{display:flex;align-items:center;gap:10px;padding:16px;border-bottom:1px solid var(--line)}
+.brand svg{width:34px;height:34px}
+.brand b{font-size:18px;background:linear-gradient(90deg,var(--acc2),var(--acc));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px}
+.btn{background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:9px 10px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:7px;transition:.2s}
+.btn:hover{border-color:var(--acc);box-shadow:0 0 12px rgba(109,92,255,.35)}
+.btn svg{width:16px;height:16px;flex:none}
+.btn.primary{background:linear-gradient(135deg,var(--acc),#4836d8);border:none;font-weight:600;justify-content:center}
+.btn.danger:hover{border-color:var(--danger);color:var(--danger)}
+.search{padding:0 12px 10px}
+.search input{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--txt);font-size:13px;outline:none}
+.search input:focus{border-color:var(--acc)}
+.chats{flex:1;overflow-y:auto;padding:4px 12px 12px}
+.chat-item{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;cursor:pointer;margin-bottom:4px;border:1px solid transparent;font-size:14px}
+.chat-item:hover{background:var(--panel2)}
+.chat-item.active{background:var(--panel2);border-color:var(--acc)}
+.chat-item .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chat-item .ic{opacity:0;cursor:pointer}
+.chat-item:hover .ic{opacity:.7}
+.chat-item .ic:hover{opacity:1}
+.empty{color:var(--dim);text-align:center;padding:20px;font-size:13px}
+/* ---------- основная зона ---------- */
+main{flex:1;display:flex;flex-direction:column;min-width:0}
+header{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);background:rgba(9,11,26,.85)}
+select,.toggle{background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:9px;padding:7px 10px;font-size:13px;outline:none;cursor:pointer}
+.toggle.on{border-color:var(--acc2);color:var(--acc2)}
+.spacer{flex:1}
+#status{font-size:12px;color:var(--dim)}
+#status b{color:var(--ok)}
+.msgs{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:14px}
+.msg{max-width:min(820px,92%);padding:12px 16px;border-radius:16px;line-height:1.55;font-size:15px;white-space:pre-wrap;word-break:break-word;animation:pop .25s}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1}}
+.msg.user{align-self:flex-end;background:linear-gradient(135deg,#2a2470,#3b2f9e);border-bottom-right-radius:4px}
+.msg.ai{align-self:flex-start;background:var(--panel2);border:1px solid var(--line);border-bottom-left-radius:4px}
+.msg img.gen{max-width:100%;border-radius:12px;display:block;margin-top:8px}
+.mbar{display:flex;gap:8px;margin-top:8px}
+.mbar .btn{padding:4px 9px;font-size:12px}
+.src a{color:var(--acc2);font-size:13px}
+pre{position:relative;background:#070a18;border:1px solid var(--line);border-radius:12px;padding:14px;overflow-x:auto;margin:10px 0}
+code{font-family:Consolas,monospace;font-size:13.5px;color:#a8ffdc}
+.copy{position:absolute;top:8px;right:8px;font-size:12px;padding:4px 10px}
+.welcome{align-self:center;text-align:center;color:var(--dim);margin:auto;max-width:520px}
+.welcome h1{font-size:34px;margin-bottom:10px;background:linear-gradient(90deg,var(--acc2),var(--acc),#ff6ec7);-webkit-background-clip:text;background-clip:text;color:transparent}
+/* ---------- ввод ---------- */
+.inputbar{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--line);background:rgba(9,11,26,.9)}
+#inp{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:13px 16px;color:var(--txt);font-size:15px;resize:none;outline:none;max-height:140px;font-family:inherit}
+#inp:focus{border-color:var(--acc)}
+.icobtn{width:46px;height:46px;border-radius:14px;background:var(--panel2);border:1px solid var(--line);cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;transition:.2s}
+.icobtn:hover{border-color:var(--acc)}
+.icobtn.rec{border-color:var(--danger);box-shadow:0 0 14px var(--danger)}
+.icobtn svg{width:20px;height:20px}
+#send{background:linear-gradient(135deg,var(--acc),#4836d8);border:none}
+.typing span{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--acc2);margin:0 2px;animation:tp 1s infinite}
+.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}
+@keyframes tp{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+/* ---------- модалки / пранки ---------- */
+.modal{position:fixed;inset:0;background:rgba(3,4,12,.85);display:flex;align-items:center;justify-content:center;z-index:50;backdrop-filter:blur(4px)}
+.modal .box{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;width:min(480px,92vw);max-height:86vh;overflow-y:auto}
+.modal h3{margin-bottom:14px;font-size:18px}
+.modal input,.modal textarea{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--txt);margin-bottom:10px;outline:none;font-family:inherit}
+.modal .row{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
+.prank-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.prank-grid .btn{justify-content:flex-start}
+#prankLayer{position:fixed;inset:0;z-index:100;display:none}
+/* BSOD */
+#prankLayer.bsod{background:#0078d7;color:#fff;font-family:'Segoe UI',monospace;padding:8vh 10vw;font-size:clamp(15px,2.4vw,22px);line-height:1.9}
+/* сканер хакера */
+#prankLayer.hacker{background:#000;color:#0f0;font-family:monospace;padding:24px;font-size:14px;overflow:hidden}
+/* локер */
+#prankLayer.locker{background:#0a0a12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#ff4757;font-family:monospace;text-align:center}
+#prankLayer.locker img{width:min(320px,70vw);border-radius:14px;border:2px solid #ff4757;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{box-shadow:0 0 40px #ff4757}}
+#prankLayer.locker input{width:200px;text-align:center;font-size:22px;letter-spacing:8px;background:#000;border:1px solid #ff4757;color:#0f0;padding:8px;border-radius:8px;outline:none;font-family:monospace}
+/* бегающая кнопка */
+#prankLayer.runner{background:#05060f;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+#runBtn{position:absolute;padding:18px 34px;font-size:18px;background:linear-gradient(135deg,var(--acc),var(--acc2));border:none;border-radius:14px;color:#fff;cursor:pointer;font-weight:700}
+/* таймер удаления */
+#prankLayer.timer{background:radial-gradient(circle,#1a0000,#000);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;color:#ff6b6b;font-family:monospace}
+#timerBig{font-size:clamp(60px,15vw,140px);text-shadow:0 0 30px #ff0000}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--acc);padding:10px 18px;border-radius:12px;z-index:200;font-size:14px;animation:pop .25s}
+#burger{display:none}
+@media(max-width:760px){
+  aside{position:fixed;z-index:40;height:100%;transform:translateX(-100%)}
+  aside.open{transform:translateX(0)}
+  #burger{display:flex}
 }
-* { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',system-ui,sans-serif; }
-body { background:var(--bg); color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
-#stars { position:fixed; inset:0; z-index:0; pointer-events:none; }
-header { position:relative; z-index:2; display:flex; align-items:center; justify-content:space-between;
-  padding:14px 20px; background:color-mix(in srgb, var(--bg) 80%, transparent); backdrop-filter:blur(8px);
-  border-bottom:1px solid var(--border); }
-.logo { font-size:20px; font-weight:800; background:linear-gradient(90deg,var(--accent),var(--accent2));
-  -webkit-background-clip:text; background-clip:text; color:transparent; }
-#themeBtn { width:40px; height:40px; border-radius:50%; border:1px solid var(--border); background:var(--card);
-  color:var(--text); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:.3s; }
-#themeBtn:hover { transform:rotate(30deg) scale(1.1); border-color:var(--accent); }
-main { position:relative; z-index:1; flex:1; padding:16px; padding-bottom:90px; max-width:820px; width:100%; margin:0 auto; }
-.tab { display:none; height:calc(100vh - 180px); flex-direction:column; }
-.tab.active { display:flex; }
-#chatBox { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:12px; }
-.msg { max-width:85%; padding:12px 16px; border-radius:18px; line-height:1.55; white-space:pre-wrap; word-break:break-word; }
-.msg.user { align-self:flex-end; background:var(--bubble-u); border-bottom-right-radius:4px; }
-.msg.ai { align-self:flex-start; background:var(--bubble-a); border:1px solid var(--border); border-bottom-left-radius:4px; }
-.msg code { display:block; background:#0a0f1e; color:#9fe8a0; padding:12px; border-radius:10px; margin:8px 0;
-  overflow-x:auto; font-family:Consolas,monospace; font-size:13px; }
-.msg p code { display:inline; padding:2px 6px; margin:0; }
-.msg pre code { margin:0; }
-.typing { align-self:flex-start; color:var(--muted); font-style:italic; padding:6px 12px; }
-#inputBar { display:flex; gap:8px; padding:10px 0; }
-#msgInput { flex:1; padding:14px 18px; border-radius:26px; border:1px solid var(--border);
-  background:var(--card); color:var(--text); font-size:15px; outline:none; }
-#msgInput:focus { border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
-.iconbtn { width:50px; height:50px; border-radius:50%; border:1px solid var(--border); background:var(--card);
-  color:var(--text); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:.2s; flex-shrink:0; }
-.iconbtn:hover { border-color:var(--accent); transform:scale(1.08); }
-#sendBtn { background:linear-gradient(135deg,var(--accent),var(--accent2)); border:none; color:#fff; }
-#sendBtn:hover { filter:brightness(1.15); }
-#micBtn.rec { background:#e03131; color:#fff; border:none; animation:pulse 1s infinite; }
-@keyframes pulse { 50% { box-shadow:0 0 0 10px rgba(224,49,49,.25); } }
-.card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:18px; }
-#imgRow { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin-top:14px; overflow-y:auto; flex:1; }
-#imgRow img { width:100%; border-radius:12px; border:1px solid var(--border); }
-#imgRow .ph { aspect-ratio:1; border-radius:12px; background:linear-gradient(110deg,var(--card) 30%,var(--bg2) 50%,var(--card) 70%);
-  background-size:200% 100%; animation:shimmer 1.4s infinite; }
-@keyframes shimmer { to { background-position:-200% 0; } }
-nav { position:fixed; bottom:0; left:0; right:0; z-index:5; display:flex; justify-content:center; gap:8px;
-  padding:10px; background:color-mix(in srgb, var(--bg) 85%, transparent); backdrop-filter:blur(10px);
-  border-top:1px solid var(--border); }
-nav button { display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 22px; border:none;
-  background:transparent; color:var(--muted); cursor:pointer; border-radius:14px; font-size:12px; transition:.25s; }
-nav button.active { color:var(--accent); background:color-mix(in srgb, var(--accent) 12%, transparent); }
-nav button:hover { color:var(--text); }
-.setting-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 0; border-bottom:1px solid var(--border); }
-input[type=text] { padding:10px 14px; border-radius:10px; border:1px solid var(--border); background:var(--bg2);
-  color:var(--text); width:100%; outline:none; }
-.small { color:var(--muted); font-size:13px; margin-top:6px; }
-h2 { margin-bottom:12px; }
 </style>
 </head>
 <body>
 <canvas id="stars"></canvas>
-
-<header>
-  <div class="logo">◈ AxonAI</div>
-  <button id="themeBtn" title="Сменить тему">
-    <svg id="iconMoon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-    <svg id="iconSun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-  </button>
-</header>
+<div class="app">
+<aside id="side">
+  <div class="brand">
+    <svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="20" stroke="url(#g1)" stroke-width="2.5"/><path d="M14 28c4-10 16-10 20 0" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round"/><circle cx="24" cy="17" r="3" fill="#6d5cff"/><defs><linearGradient id="g1" x1="0" y1="0" x2="48" y2="48"><stop stop-color="#6d5cff"/><stop offset="1" stop-color="#00e5ff"/></linearGradient></defs></svg>
+    <b>AxonAI</b>
+  </div>
+  <div class="tools">
+    <button class="btn primary" onclick="newChat()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Новый чат</button>
+    <button class="btn" onclick="openPranks()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/></svg>Пранки</button>
+    <button class="btn" onclick="genImageUI()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Картинка</button>
+    <button class="btn" onclick="document.getElementById('fileInp').click()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Анализ фото</button>
+  </div>
+  <div class="search"><input id="chatSearch" placeholder="Поиск по чатам…" oninput="renderChats()"></div>
+  <div class="chats" id="chatList"></div>
+</aside>
 
 <main>
-  <!-- ЧАТ -->
-  <section id="tab-chat" class="tab active">
-    <div id="chatBox"></div>
-    <div id="inputBar">
-      <button class="iconbtn" id="micBtn" title="Голосовой ввод">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 19v3"/></svg>
-      </button>
-      <input id="msgInput" placeholder="Спроси AxonAI о чём угодно..." autocomplete="off">
-      <button class="iconbtn" id="sendBtn" title="Отправить">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-      </button>
-    </div>
-  </section>
+  <header>
+    <button class="icobtn" id="burger" onclick="document.getElementById('side').classList.toggle('open')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <select id="selModel" title="Модель">
+      <option value="axon-1">Axon 1.0</option>
+      <option value="axon-2" selected>Axon 2.0</option>
+      <option value="axon-3">Axon 3.0 Pro</option>
+    </select>
+    <select id="selLevel" title="Уровень креатива">
+      <option value="low">Низкий</option>
+      <option value="mid" selected>Средний</option>
+      <option value="high">Высокий</option>
+    </select>
+    <select id="selMode" title="Режим общения">
+      <option value="normal" selected>Обычный</option>
+      <option value="strict">Строгий</option>
+      <option value="hacker">Хакер</option>
+    </select>
+    <button class="toggle" id="planBtn" onclick="togglePlan()">Тариф: Обычный</button>
+    <button class="toggle" id="dsBtn" onclick="toggleDS()">Deep Search</button>
+    <div class="spacer"></div>
+    <div id="status">движок: <b>…</b></div>
+  </header>
 
-  <!-- КАРТИНКИ -->
-  <section id="tab-img" class="tab">
-    <div class="card">
-      <h2>Генерация картинок</h2>
-      <div style="display:flex;gap:8px">
-        <input type="text" id="imgPrompt" placeholder="Опиши картинку: «космический кот в неоновом городе»">
-        <button class="iconbtn" id="genBtn" style="background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
-        </button>
-      </div>
-    </div>
-    <div id="imgRow"></div>
-  </section>
+  <div class="msgs" id="msgs"></div>
 
-  <!-- НАСТРОЙКИ -->
-  <section id="tab-set" class="tab">
-    <div class="card">
-      <h2>Настройки</h2>
-      <div class="setting-row">
-        <div>Адрес сервера API<div class="small">Оставь пустым, если index.html лежит рядом с app.py</div></div>
-        <input type="text" id="apiUrl" placeholder="https://axonai.onrender.com" style="max-width:260px">
-      </div>
-      <div class="setting-row">
-        <div>Очистить историю чата</div>
-        <button class="iconbtn" id="clearBtn" title="Очистить">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
-        </button>
-      </div>
-      <div class="setting-row" style="border:none">
-        <div>Тема оформления</div>
-        <button class="iconbtn" id="themeBtn2">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-        </button>
-      </div>
-      <p class="small">AxonAI — открытый проект. Без регистрации, без лимитов. Отвечает на русском, пишет код, генерирует изображения.</p>
-    </div>
-  </section>
+  <div class="inputbar">
+    <button class="icobtn" id="micBtn" title="Голосовой ввод" onclick="toggleMic()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 19v3"/></svg></button>
+    <textarea id="inp" rows="1" placeholder="Спроси AxonAI… (Enter — отправить)"></textarea>
+    <button class="icobtn" id="send" title="Отправить" onclick="sendMsg()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></button>
+  </div>
 </main>
+</div>
 
-<nav>
-  <button class="active" data-tab="chat">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-    Чаты</button>
-  <button data-tab="img">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
-    Картинки</button>
-  <button data-tab="set">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    Настройки</button>
-</nav>
+<input type="file" id="fileInp" accept="image/*" hidden onchange="visionFile(this)">
+<div id="prankLayer"></div>
 
 <script>
-// ---------- ЗВЁЗДЫ ----------
+/* ======================= ЗВЕЗДОПАД ======================= */
 const cv = document.getElementById('stars'), cx = cv.getContext('2d');
-let stars = [], meteors = [];
-function resize(){ cv.width = innerWidth; cv.height = innerHeight;
-  stars = Array.from({length:160}, () => ({x:Math.random()*cv.width, y:Math.random()*cv.height, r:Math.random()*1.4+.3, tw:Math.random()*6.28})); }
-addEventListener('resize', resize); resize();
-function spawnMeteor(){ meteors.push({x:Math.random()*cv.width*.8+cv.width*.2, y:-20, vx:-(3+Math.random()*4), vy:3+Math.random()*4, life:1});
-  setTimeout(spawnMeteor, 2000+Math.random()*4000); }
-spawnMeteor();
-function draw(){
-  const dark = document.documentElement.dataset.theme === 'dark';
-  cx.clearRect(0,0,cv.width,cv.height);
-  if (dark) {
-    stars.forEach(s => { s.tw += .05; cx.globalAlpha = .4 + Math.sin(s.tw)*.35;
-      cx.fillStyle = '#fff'; cx.beginPath(); cx.arc(s.x, s.y, s.r, 0, 7); cx.fill(); });
-    cx.globalAlpha = 1;
-    meteors = meteors.filter(m => m.life > 0);
-    meteors.forEach(m => { m.x += m.vx; m.y += m.vy; m.life -= .012;
-      const g = cx.createLinearGradient(m.x, m.y, m.x - m.vx*12, m.y - m.vy*12);
-      g.addColorStop(0, `rgba(180,200,255,${m.life})`); g.addColorStop(1, 'rgba(180,200,255,0)');
-      cx.strokeStyle = g; cx.lineWidth = 2; cx.beginPath();
-      cx.moveTo(m.x, m.y); cx.lineTo(m.x - m.vx*12, m.y - m.vy*12); cx.stroke(); });
-  }
-  requestAnimationFrame(draw);
-}
-draw();
+let stars = [];
+function initStars(){ cv.width = innerWidth; cv.height = innerHeight;
+  stars = Array.from({length:160}, () => ({x:Math.random()*cv.width, y:Math.random()*cv.height,
+    s:Math.random()*1.6+.3, v:Math.random()*.6+.15, tw:Math.random()*Math.PI*2}));}
+initStars(); addEventListener('resize', initStars);
+(function loop(){ cx.clearRect(0,0,cv.width,cv.height);
+  for(const st of stars){ st.y += st.v; st.tw += .05; if(st.y > cv.height){st.y = -4; st.x = Math.random()*cv.width;}
+    cx.globalAlpha = .4 + Math.sin(st.tw)*.35; cx.fillStyle = '#cdd6ff';
+    cx.fillRect(st.x, st.y, st.s, st.s*2.6);}  // удлинённые — эффект падения
+  cx.globalAlpha = 1; requestAnimationFrame(loop);})();
 
-// ---------- ТЕМА ----------
-const htmlEl = document.documentElement;
-function setTheme(t){ htmlEl.dataset.theme = t;
-  document.getElementById('iconMoon').style.display = t === 'dark' ? '' : 'none';
-  document.getElementById('iconSun').style.display = t === 'dark' ? 'none' : '';
-  localStorage.setItem('axon_theme', t); }
-document.getElementById('themeBtn').onclick = () => setTheme(htmlEl.dataset.theme === 'dark' ? 'light' : 'dark');
-document.getElementById('themeBtn2').onclick = document.getElementById('themeBtn').onclick;
-setTheme(localStorage.getItem('axon_theme') || 'dark');
+/* ======================= ХРАНИЛИЩЕ ЧАТОВ ======================= */
+const LS = 'axonai_chats';
+let chats = JSON.parse(localStorage.getItem(LS) || '[]');
+let curId = localStorage.getItem('axonai_cur') || null;
+let plan = localStorage.getItem('axonai_plan') || 'base';
+let deepSearch = false;
+function save(){ localStorage.setItem(LS, JSON.stringify(chats)); localStorage.setItem('axonai_cur', curId||''); }
+function cur(){ return chats.find(c => c.id === curId); }
+function newChat(){ curId = Date.now().toString();
+  chats.unshift({id:curId, name:'Новый чат', msgs:[]}); save(); renderChats(); renderMsgs();
+  document.getElementById('side').classList.remove('open'); }
+function delChat(id, e){ e.stopPropagation();
+  if(!confirm('Удалить этот чат навсегда?')) return;
+  chats = chats.filter(c => c.id !== id);
+  if(curId === id){ curId = chats[0]?.id || null; if(!curId){newChat();return;} }
+  save(); renderChats(); renderMsgs(); }
+function renameChat(id, e){ e.stopPropagation();
+  const c = chats.find(x=>x.id===id); const nm = prompt('Новое имя чата:', c.name);
+  if(nm && nm.trim()){ c.name = nm.trim().slice(0,60); save(); renderChats(); } }
+function pickChat(id){ curId = id; save(); renderChats(); renderMsgs();
+  document.getElementById('side').classList.remove('open'); }
+function renderChats(){
+  const q = document.getElementById('chatSearch').value.trim().toLowerCase();
+  const el = document.getElementById('chatList'); el.innerHTML = '';
+  const list = chats.filter(c => !q || c.name.toLowerCase().includes(q));
+  if(!list.length){ el.innerHTML = '<div class="empty">Чатов не найдено</div>'; return; }
+  for(const c of list){
+    const d = document.createElement('div');
+    d.className = 'chat-item' + (c.id === curId ? ' active' : '');
+    d.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span class="nm"></span>
+      <span class="ic" title="Переименовать" onclick="renameChat('${c.id}',event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg></span>
+      <span class="ic" title="Удалить" onclick="delChat('${c.id}',event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2m1 0v14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V6"/></svg></span>`;
+    d.querySelector('.nm').textContent = c.name;
+    d.onclick = () => pickChat(c.id);
+    el.appendChild(d); } }
 
-// ---------- ВКЛАДКИ ----------
-document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
-  document.querySelectorAll('nav button').forEach(x => x.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-  b.classList.add('active');
-  document.getElementById('tab-' + b.dataset.tab).classList.add('active');
-});
+/* ======================= РЕНДЕР СООБЩЕНИЙ ======================= */
+const msgsEl = document.getElementById('msgs');
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function md(s){ // лёгкий markdown: **жирный**, ```код```
+  let h = esc(s);
+  h = h.replace(/```(\w*)\n?([\s\S]*?)```/g, (m,l,c) =>
+    `<pre><button class="btn copy" onclick="copyCode(this)">Копировать код</button><code>${c.trim()}</code></pre>`);
+  h = h.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+  h = h.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+  return h; }
+function copyCode(btn){
+  const code = btn.parentElement.querySelector('code').innerText;
+  navigator.clipboard.writeText(code).then(()=>{ btn.textContent = 'Скопировано ✓';
+    setTimeout(()=>btn.textContent = 'Копировать код', 1500); }); }
+function addMsg(role, text, extra){
+  const c = cur(); if(!c) return null;
+  const m = {role, text, ts: Date.now(), ...extra}; c.msgs.push(m);
+  if(role === 'user' && (c.name === 'Новый чат')){ c.name = text.slice(0,40); renderChats(); }
+  save(); return m; }
+function renderMsgs(){
+  const c = cur(); msgsEl.innerHTML = '';
+  if(!c || !c.msgs.length){
+    msgsEl.innerHTML = `<div class="welcome"><h1>AxonAI</h1>
+      <p>Открытый искусственный интеллект. Пиши код, переводи на 200+ языков,
+      генерируй картинки, анализируй фото, включай Deep Search или запускай пранки.</p></div>`;
+    return; }
+  for(const m of c.msgs) drawMsg(m); }
+function drawMsg(m){
+  const d = document.createElement('div'); d.className = 'msg ' + m.role;
+  let inner = md(m.text);
+  if(m.img) inner += `<img class="gen" src="${m.img}">`;
+  if(m.src) inner += `<div class="src">` + m.src.map(s =>
+    `<div><a href="${s.url}" target="_blank" rel="noopener">${esc(s.title)}</a><br><span style="color:var(--dim);font-size:12px">${esc(s.snippet||'')}</span></div>`).join('') + `</div>`;
+  if(m.role === 'ai') inner += `<div class="mbar">
+    <button class="btn" onclick="tts(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5zM15.5 8.5a5 5 0 0 1 0 7"/></svg>Озвучить</button></div>`;
+  d.innerHTML = inner; msgsEl.appendChild(d); msgsEl.scrollTop = msgsEl.scrollHeight; return d; }
+function toast(t){ const d = document.createElement('div'); d.className='toast'; d.textContent=t;
+  document.body.appendChild(d); setTimeout(()=>d.remove(), 2200); }
 
-// ---------- API ----------
-const apiUrlInput = document.getElementById('apiUrl');
-apiUrlInput.value = localStorage.getItem('axon_api') || '';
-apiUrlInput.onchange = () => localStorage.setItem('axon_api', apiUrlInput.value.trim());
-const api = () => "https://fame-api-bs11.onrender.com";
+/* ======================= ОТПРАВКА / API ======================= */
+const inp = document.getElementById('inp');
+inp.addEventListener('keydown', e => { if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendMsg(); }});
+inp.addEventListener('input', ()=>{ inp.style.height='auto'; inp.style.height = Math.min(inp.scrollHeight,140)+'px'; });
 
-// ---------- ЧАТ ----------
-const chatBox = document.getElementById('chatBox');
-const input = document.getElementById('msgInput');
-function md(t){ // мини-разметка: **жирный**, `код`, ```блок```
-  let s = t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  s = s.replace(/```([\s\S]*?)```/g, (_,c) => '<code>'+c.trim()+'</code>');
-  s = s.replace(/`([^`\n]+)`/g, '<code>$1</code>');
-  s = s.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
-  return s.replace(/\n/g,'<br>'); }
-function addMsg(text, who){ const d = document.createElement('div');
-  d.className = 'msg ' + who; d.innerHTML = md(text);
-  chatBox.appendChild(d); chatBox.scrollTop = chatBox.scrollHeight; return d; }
-addMsg('Привет! Я AxonAI — открытый ИИ без регистрации. Могу написать код, объяснить любую тему или сгенерировать картинку. Чем помочь?', 'ai');
+async function sendMsg(){
+  const text = inp.value.trim(); if(!text) return;
+  inp.value = ''; inp.style.height = 'auto';
+  if(!cur()) newChat();
+  addMsg('user', text); drawMsg(cur().msgs.at(-1));
+  await respond(text); }
 
-async function send(){
-  const text = input.value.trim(); if (!text) return;
-  input.value = ''; addMsg(text, 'user');
-  const t = document.createElement('div'); t.className = 'typing'; t.textContent = 'AxonAI думает...';
-  chatBox.appendChild(t); chatBox.scrollTop = chatBox.scrollHeight;
-  try {
-    const r = await fetch(api() + '/api/chat', { method:'POST',
-      headers:{'Content-Type':'application/json'}, body: JSON.stringify({message: text}) });
-    const j = await r.json();
-    t.remove(); addMsg(j.reply || 'Ошибка: пустой ответ сервера.', 'ai');
-  } catch(e) { t.remove(); addMsg('Не удалось связаться с сервером. Проверь адрес API в Настройках (сейчас: ' + api() + ').', 'ai'); }
-}
-document.getElementById('sendBtn').onclick = send;
-input.onkeydown = e => { if (e.key === 'Enter') send(); };
+async function respond(text){
+  const t = document.createElement('div'); t.className = 'msg ai typing';
+  t.innerHTML = '<span></span> <span></span> <span></span>'; msgsEl.appendChild(t);
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+  let src = null;
+  if(deepSearch && !/^(пранк|матрица|bsod|локер)/i.test(text)){
+    try{ const r = await fetch('/api/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({q:text})});
+      src = (await r.json()).results; }catch(e){} }
+  let reply = '', prank = null;
+  try{
+    const r = await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ messages: cur().msgs.filter(m=>m.role==='user'||m.role==='ai').map(m=>({role:m.role, content:m.text})).slice(-20),
+        model: selModel.value, level: selLevel.value, mode: selMode.value, plan })});
+    const j = await r.json(); reply = j.reply; prank = j.prank;
+  }catch(e){ reply = 'Ошибка связи с сервером. Проверь интернет и перезагрузи страницу.'; }
+  t.remove();
+  addMsg('ai', reply, {src: src || undefined}); renderMsgs();
+  if(prank) setTimeout(()=>runPrank(prank), 700); }
 
-document.getElementById('clearBtn').onclick = async () => {
-  try { await fetch(api() + '/api/clear', {method:'POST'}); chatBox.innerHTML = '';
-    addMsg('История очищена. Начнём с чистого листа!', 'ai'); } catch(e) {} };
+/* ======================= ТАРИФ / DEEP SEARCH ======================= */
+function togglePlan(){ plan = plan === 'base' ? 'promax' : 'base';
+  localStorage.setItem('axonai_plan', plan);
+  dsBtnOff(planBtn); planBtn.textContent = 'Тариф: ' + (plan==='promax' ? 'Pro Max' : 'Обычный');
+  if(plan==='promax') planBtn.classList.add('on'); }
+function dsBtnOff(b){ b.classList.remove('on'); }
+const dsBtn = document.getElementById('dsBtn'), planBtn = document.getElementById('planBtn');
+if(plan === 'promax'){ planBtn.textContent = 'Тариф: Pro Max'; planBtn.classList.add('on'); }
+function toggleDS(){ deepSearch = !deepSearch; dsBtn.classList.toggle('on', deepSearch);
+  toast(deepSearch ? 'Deep Search включён' : 'Deep Search выключен'); }
 
-// ---------- ГОЛОСОВОЙ ВВОД ----------
-const mic = document.getElementById('micBtn');
+/* ======================= ГОЛОСОВОЙ ВВОД / TTS ======================= */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-if (!SR) mic.style.display = 'none';
-else {
-  const rec = new SR(); rec.lang = 'ru-RU'; rec.interimResults = false;
-  mic.onclick = () => { mic.classList.add('rec'); rec.start(); };
-  rec.onresult = e => { input.value = e.results[0][0].transcript; send(); };
-  rec.onend = () => mic.classList.remove('rec');
-  rec.onerror = () => mic.classList.remove('rec');
+let rec = null;
+function toggleMic(){
+  if(!SR){ toast('Голосовой ввод не поддерживается в этом браузере'); return; }
+  if(rec && rec._on){ rec.stop(); return; }
+  rec = new SR(); rec.lang = 'ru-RU'; rec.interimResults = false; rec._on = true;
+  document.getElementById('micBtn').classList.add('rec');
+  rec.onresult = e => { inp.value += (inp.value ? ' ' : '') + e.results[0][0].transcript; inp.dispatchEvent(new Event('input')); };
+  rec.onend = () => { rec._on = false; document.getElementById('micBtn').classList.remove('rec'); };
+  rec.onerror = rec.onend; rec.start(); toast('Говорите…'); }
+function tts(btn){
+  const text = btn.closest('.msg').innerText.replace('Озвучить','').trim();
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text); u.lang = 'ru-RU'; u.rate = 1;
+  const v = speechSynthesis.getVoices().find(v => v.lang.startsWith('ru')); if(v) u.voice = v;
+  speechSynthesis.speak(u); }
+
+/* ======================= КАРТИНКИ / VISION ======================= */
+function modal(html){ const d = document.createElement('div'); d.className = 'modal';
+  d.innerHTML = `<div class="box">${html}</div>`;
+  d.onclick = e => { if(e.target === d) d.remove(); }; document.body.appendChild(d); return d; }
+function genImageUI(){
+  const m = modal(`<h3>Генерация картинки</h3>
+    <input id="imgPrompt" placeholder="Опиши картинку… (на русском)">
+    <div class="row"><button class="btn" onclick="this.closest('.modal').remove()">Отмена</button>
+    <button class="btn primary" onclick="doGenImage(this)">Сгенерировать</button></div>`);
+  m.querySelector('#imgPrompt').focus(); }
+async function doGenImage(btn){
+  const p = btn.closest('.box').querySelector('#imgPrompt').value.trim(); if(!p) return;
+  btn.disabled = true; btn.textContent = 'Генерирую… (до 60 сек)';
+  try{
+    const r = await fetch('/api/image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:p})});
+    if(!r.ok) throw 0;
+    const blob = await r.blob(); const url = URL.createObjectURL(blob);
+    if(!cur()) newChat();
+    addMsg('user', 'Сгенерируй картинку: ' + p);
+    addMsg('ai', 'Готово! Вот сгенерированная картинка:', {img: url});
+    renderMsgs(); btn.closest('.modal').remove();
+  }catch(e){ btn.disabled = false; btn.textContent = 'Повторить'; toast('Генератор занят — попробуй ещё раз'); } }
+function visionFile(inpF){
+  const f = inpF.files[0]; inpF.value = ''; if(!f) return;
+  if(!cur()) newChat();
+  const rd = new FileReader();
+  rd.onload = async () => {
+    const url = rd.result;
+    addMsg('user', '[фото] Анализирую изображение…'); cur().msgs.at(-1).img = url; renderMsgs();
+    const t = document.createElement('div'); t.className = 'msg ai typing';
+    t.innerHTML = '<span></span> <span></span> <span></span>'; msgsEl.appendChild(t);
+    try{
+      const r = await fetch('/api/vision',{method:'POST',headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({image: url.split(',')[1], prompt: 'Опиши, что на изображении'})});
+      const j = await r.json(); t.remove(); addMsg('ai', j.reply); renderMsgs();
+    }catch(e){ t.remove(); addMsg('ai', 'Не удалось проанализировать фото.'); renderMsgs(); } };
+  rd.readAsDataURL(f); }
+
+/* ======================= ПРАНКИ ======================= */
+const PRANKS = [
+ ['matrix','Матрица'], ['bsod','Синий экран (BSOD)'], ['hacker','Симулятор хакера'],
+ ['timer','Таймер удаления'], ['runbutton','Бегающая кнопка'], ['locker','Локер «Вас заметили»']];
+function openPranks(){
+  modal(`<h3>Пранки (безопасные, всё локально)</h3><div class="prank-grid">` +
+    PRANKS.map(p => `<button class="btn" onclick="runPrank('${p[0]}');this.closest('.modal').remove()">${p[1]}</button>`).join('') +
+    `</div><div class="row"><button class="btn" onclick="this.closest('.modal').remove()">Закрыть</button></div>`); }
+const layer = document.getElementById('prankLayer');
+function closePrank(){ layer.style.display = 'none'; layer.className = ''; layer.innerHTML = ''; }
+function show(layerCls, html, keyHandler){
+  layer.className = layerCls; layer.innerHTML = html; layer.style.display = 'block';
+  layer._esc = e => { if(e.key === 'Escape') closePrank(); if(keyHandler) keyHandler(e); };
+  addEventListener('keydown', layer._esc); }
+function runPrank(type){
+  removeEventListener('keydown', layer._esc || (()=>{})); closePrank();
+  if(type === 'matrix'){
+    show('', `<canvas id="pCv" style="width:100%;height:100%;background:#000"></canvas>
+      <button class="btn" style="position:fixed;top:14px;right:14px;z-index:101" onclick="closePrank()">Закрыть [Esc]</button>`);
+    const c = document.getElementById('pCv'), g = c.getContext('2d');
+    c.width = innerWidth; c.height = innerHeight;
+    const cols = Math.floor(c.width/18), drops = Array(cols).fill(1);
+    const chars = 'アカサタナハマヤラワ0123456789AXON';
+    layer._iv = setInterval(() => {
+      if(!document.getElementById('pCv')) return clearInterval(layer._iv);
+      g.fillStyle = 'rgba(0,0,0,.08)'; g.fillRect(0,0,c.width,c.height);
+      g.fillStyle = '#0f0'; g.font = '16px monospace';
+      drops.forEach((y,i) => { g.fillText(chars[Math.random()*chars.length|0], i*18, y*18);
+        drops[i] = y*18 > c.height && Math.random() > .97 ? 0 : y+1; }); }, 50);
+  }
+  if(type === 'bsod'){
+    show('bsod', `<div style="font-size:60px">:(</div>
+      <p>На вашем устройстве возникла проблема, и его необходимо перезагрузить.<br>
+      Мы лишь собираем некоторые данные об ошибке, а затем перезагрузим его для вас.</p>
+      <p id="bsodPct">0% завершено</p>
+      <p style="font-size:14px;opacity:.8">Код ошибки: AXON_PRANK_2026 (это шутка, всё в порядке)<br>Нажми Esc чтобы закрыть</p>`);
+    let p = 0; layer._iv = setInterval(() => { p = Math.min(100, p + Math.random()*9);
+      const el = document.getElementById('bsodPct'); if(!el) return clearInterval(layer._iv);
+      el.textContent = Math.floor(p) + '% завершено'; if(p >= 100) setTimeout(closePrank, 900); }, 300);
+  }
+  if(type === 'hacker'){
+    show('hacker', `<div id="hackLog" style="white-space:pre-wrap"></div>
+      <div style="margin-top:10px;color:#666">Печатай — «взлом» идёт. Esc — выход.</div>`);
+    layer._esc2 = e => { const l = document.getElementById('hackLog');
+      if(l && e.key.length === 1){ l.textContent += e.key;
+        if(Math.random() < .12) l.textContent += '\n> ACCESS GRANTED [OK]\n> root@axon:~# ';
+        l.parentElement.scrollTop = 1e6; } };
+    addEventListener('keydown', layer._esc2);
+    document.getElementById('hackLog').textContent = '> INIT AXON TERMINAL v2.6\n> root@axon:~# ';
+  }
+  if(type === 'timer'){
+    let s = 10;
+    show('timer', `<div id="timerBig">10</div>
+      <div style="font-size:18px">Удаление всех данных…</div>
+      <div class="btn danger" style="border:1px solid #ff6b6b;color:#ff6b6b" onclick="closePrank()">ОСТАНОВИТЬ!</div>
+      <div style="font-size:13px;color:#888">(шутка: ничего не удаляется)</div>`);
+    layer._iv = setInterval(() => { s--;
+      const el = document.getElementById('timerBig'); if(!el) return clearInterval(layer._iv);
+      el.textContent = s; if(s <= 0){ clearInterval(layer._iv);
+        el.textContent = 'ШУТКА!'; el.style.color = '#2dffa8'; } }, 1000);
+  }
+  if(type === 'runbutton'){
+    show('runner', `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px">
+      <div style="font-size:22px">Нажми кнопку, если не боишься</div>
+      <button id="runBtn">НЕ НАЖИМАЙ</button></div>`);
+    const b = document.getElementById('runBtn');
+    const run = () => { b.style.left = Math.random()*(innerWidth-160)+'px';
+      b.style.top = Math.random()*(innerHeight-80)+'px'; };
+    b.onmouseenter = run; b.onclick = () => { closePrank(); toast('Всё равно поймал! Это был пранк.'); };
+    setTimeout(run, 100);
+  }
+  if(type === 'locker'){
+    const code = String(Math.floor(1000 + Math.random()*9000));
+    show('locker', `
+      <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#ff4757" stroke-width="1.5">
+        <circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/><path d="M2 12L22 2M22 12L2 2" stroke="#00e5ff" opacity=".7"/></svg>
+      <h2 style="color:#ff4757;font-size:clamp(24px,6vw,40px)">ВАС ЗАМЕТИЛИ!</h2>
+      <p style="color:#aab">Ваше устройство заблокировано.<br>Введите код разблокировки: <b style="color:#00e5ff">${code}</b></p>
+      <input id="lockInp" maxlength="4" placeholder="0000" autocomplete="off">
+      <div id="lockMsg" style="color:#ff6b6b;min-height:20px"></div>`,
+      e => { if(e.key === 'Enter'){ const v = document.getElementById('lockInp').value;
+        if(v === code){ closePrank(); toast('Разблокировано. Это был пранк!'); }
+        else document.getElementById('lockMsg').textContent = 'Неверный код!'; } });
+    setTimeout(()=>document.getElementById('lockInp')?.focus(), 50);
+  }
 }
 
-// ---------- КАРТИНКИ ----------
-const imgRow = document.getElementById('imgRow');
-document.getElementById('genBtn').onclick = async () => {
-  const p = document.getElementById('imgPrompt').value.trim(); if (!p) return;
-  const ph = document.createElement('div'); ph.className = 'ph'; imgRow.prepend(ph);
-  try {
-    const r = await fetch(api() + '/api/image?prompt=' + encodeURIComponent(p));
-    const j = await r.json();
-    const img = document.createElement('img'); img.src = j.url; img.alt = p;
-    ph.replaceWith(img);
-  } catch(e) { ph.remove(); }
-};
-document.getElementById('imgPrompt').onkeydown = e => { if (e.key === 'Enter') document.getElementById('genBtn').click(); };
+/* ======================= СТАТУС / INIT ======================= */
+fetch('/api/health').then(r=>r.json()).then(j=>{
+  document.getElementById('status').innerHTML = 'движок: <b>' + (j.engine === 'openrouter' ? 'Neural Cloud' : 'Local Core') + '</b>';})
+  .catch(()=>{ document.getElementById('status').innerHTML = 'движок: <b style="color:#ff4d6d">offline</b>'; });
+if(!chats.length) newChat(); else { if(!curId || !cur()) curId = chats[0].id; }
+renderChats(); renderMsgs();
+if('serviceWorker' in navigator){ /* можно добавить sw.js позже */ }
 </script>
 </body>
 </html>
