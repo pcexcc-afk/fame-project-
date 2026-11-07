@@ -194,7 +194,7 @@ document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
 const apiUrlInput = document.getElementById('apiUrl');
 apiUrlInput.value = localStorage.getItem('axon_api') || '';
 apiUrlInput.onchange = () => localStorage.setItem('axon_api', apiUrlInput.value.trim());
-const api = () => (apiUrlInput.value || location.origin).replace(/\/$/, '');
+const api = () => "https://fame-api-bs11.onrender.com";
 
 // ---------- ЧАТ ----------
 const chatBox = document.getElementById('chatBox');
