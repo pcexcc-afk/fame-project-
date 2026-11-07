@@ -83,19 +83,13 @@ code{font-family:Consolas,monospace;font-size:13.5px;color:#a8ffdc}
 .prank-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .prank-grid .btn{justify-content:flex-start}
 #prankLayer{position:fixed;inset:0;z-index:100;display:none}
-/* BSOD */
 #prankLayer.bsod{background:#0078d7;color:#fff;font-family:'Segoe UI',monospace;padding:8vh 10vw;font-size:clamp(15px,2.4vw,22px);line-height:1.9}
-/* сканер хакера */
 #prankLayer.hacker{background:#000;color:#0f0;font-family:monospace;padding:24px;font-size:14px;overflow:hidden}
-/* локер */
 #prankLayer.locker{background:#0a0a12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#ff4757;font-family:monospace;text-align:center}
-#prankLayer.locker img{width:min(320px,70vw);border-radius:14px;border:2px solid #ff4757;animation:pulse 1.2s infinite}
-@keyframes pulse{50%{box-shadow:0 0 40px #ff4757}}
+#prankLayer.locker h2{font-size:clamp(24px,6vw,40px);text-shadow:0 0 20px #ff4757}
 #prankLayer.locker input{width:200px;text-align:center;font-size:22px;letter-spacing:8px;background:#000;border:1px solid #ff4757;color:#0f0;padding:8px;border-radius:8px;outline:none;font-family:monospace}
-/* бегающая кнопка */
 #prankLayer.runner{background:#05060f;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
 #runBtn{position:absolute;padding:18px 34px;font-size:18px;background:linear-gradient(135deg,var(--acc),var(--acc2));border:none;border-radius:14px;color:#fff;cursor:pointer;font-weight:700}
-/* таймер удаления */
 #prankLayer.timer{background:radial-gradient(circle,#1a0000,#000);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;color:#ff6b6b;font-family:monospace}
 #timerBig{font-size:clamp(60px,15vw,140px);text-shadow:0 0 30px #ff0000}
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--acc);padding:10px 18px;border-radius:12px;z-index:200;font-size:14px;animation:pop .25s}
@@ -170,6 +164,8 @@ code{font-family:Consolas,monospace;font-size:13.5px;color:#a8ffdc}
 <div id="prankLayer"></div>
 
 <script>
+const API_URL = "https://bs11.onrender.com"; // Твой сервер
+
 /* ======================= ЗВЕЗДОПАД ======================= */
 const cv = document.getElementById('stars'), cx = cv.getContext('2d');
 let stars = [];
@@ -180,7 +176,7 @@ initStars(); addEventListener('resize', initStars);
 (function loop(){ cx.clearRect(0,0,cv.width,cv.height);
   for(const st of stars){ st.y += st.v; st.tw += .05; if(st.y > cv.height){st.y = -4; st.x = Math.random()*cv.width;}
     cx.globalAlpha = .4 + Math.sin(st.tw)*.35; cx.fillStyle = '#cdd6ff';
-    cx.fillRect(st.x, st.y, st.s, st.s*2.6);}  // удлинённые — эффект падения
+    cx.fillRect(st.x, st.y, st.s, st.s*2.6);}
   cx.globalAlpha = 1; requestAnimationFrame(loop);})();
 
 /* ======================= ХРАНИЛИЩЕ ЧАТОВ ======================= */
@@ -223,7 +219,7 @@ function renderChats(){
 /* ======================= РЕНДЕР СООБЩЕНИЙ ======================= */
 const msgsEl = document.getElementById('msgs');
 function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function md(s){ // лёгкий markdown: **жирный**, ```код```
+function md(s){
   let h = esc(s);
   h = h.replace(/```(\w*)\n?([\s\S]*?)```/g, (m,l,c) =>
     `<pre><button class="btn copy" onclick="copyCode(this)">Копировать код</button><code>${c.trim()}</code></pre>`);
@@ -277,11 +273,11 @@ async function respond(text){
   msgsEl.scrollTop = msgsEl.scrollHeight;
   let src = null;
   if(deepSearch && !/^(пранк|матрица|bsod|локер)/i.test(text)){
-    try{ const r = await fetch('/api/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({q:text})});
+    try{ const r = await fetch(API_URL + '/api/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({q:text})});
       src = (await r.json()).results; }catch(e){} }
   let reply = '', prank = null;
   try{
-    const r = await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+    const r = await fetch(API_URL + '/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ messages: cur().msgs.filter(m=>m.role==='user'||m.role==='ai').map(m=>({role:m.role, content:m.text})).slice(-20),
         model: selModel.value, level: selLevel.value, mode: selMode.value, plan })});
     const j = await r.json(); reply = j.reply; prank = j.prank;
@@ -333,7 +329,7 @@ async function doGenImage(btn){
   const p = btn.closest('.box').querySelector('#imgPrompt').value.trim(); if(!p) return;
   btn.disabled = true; btn.textContent = 'Генерирую… (до 60 сек)';
   try{
-    const r = await fetch('/api/image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:p})});
+    const r = await fetch(API_URL + '/api/image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:p})});
     if(!r.ok) throw 0;
     const blob = await r.blob(); const url = URL.createObjectURL(blob);
     if(!cur()) newChat();
@@ -351,7 +347,7 @@ function visionFile(inpF){
     const t = document.createElement('div'); t.className = 'msg ai typing';
     t.innerHTML = '<span></span> <span></span> <span></span>'; msgsEl.appendChild(t);
     try{
-      const r = await fetch('/api/vision',{method:'POST',headers:{'Content-Type':'application/json'},
+      const r = await fetch(API_URL + '/api/vision',{method:'POST',headers:{'Content-Type':'application/json'},
         body: JSON.stringify({image: url.split(',')[1], prompt: 'Опиши, что на изображении'})});
       const j = await r.json(); t.remove(); addMsg('ai', j.reply); renderMsgs();
     }catch(e){ t.remove(); addMsg('ai', 'Не удалось проанализировать фото.'); renderMsgs(); } };
@@ -362,95 +358,4 @@ const PRANKS = [
  ['matrix','Матрица'], ['bsod','Синий экран (BSOD)'], ['hacker','Симулятор хакера'],
  ['timer','Таймер удаления'], ['runbutton','Бегающая кнопка'], ['locker','Локер «Вас заметили»']];
 function openPranks(){
-  modal(`<h3>Пранки (безопасные, всё локально)</h3><div class="prank-grid">` +
-    PRANKS.map(p => `<button class="btn" onclick="runPrank('${p[0]}');this.closest('.modal').remove()">${p[1]}</button>`).join('') +
-    `</div><div class="row"><button class="btn" onclick="this.closest('.modal').remove()">Закрыть</button></div>`); }
-const layer = document.getElementById('prankLayer');
-function closePrank(){ layer.style.display = 'none'; layer.className = ''; layer.innerHTML = ''; }
-function show(layerCls, html, keyHandler){
-  layer.className = layerCls; layer.innerHTML = html; layer.style.display = 'block';
-  layer._esc = e => { if(e.key === 'Escape') closePrank(); if(keyHandler) keyHandler(e); };
-  addEventListener('keydown', layer._esc); }
-function runPrank(type){
-  removeEventListener('keydown', layer._esc || (()=>{})); closePrank();
-  if(type === 'matrix'){
-    show('', `<canvas id="pCv" style="width:100%;height:100%;background:#000"></canvas>
-      <button class="btn" style="position:fixed;top:14px;right:14px;z-index:101" onclick="closePrank()">Закрыть [Esc]</button>`);
-    const c = document.getElementById('pCv'), g = c.getContext('2d');
-    c.width = innerWidth; c.height = innerHeight;
-    const cols = Math.floor(c.width/18), drops = Array(cols).fill(1);
-    const chars = 'アカサタナハマヤラワ0123456789AXON';
-    layer._iv = setInterval(() => {
-      if(!document.getElementById('pCv')) return clearInterval(layer._iv);
-      g.fillStyle = 'rgba(0,0,0,.08)'; g.fillRect(0,0,c.width,c.height);
-      g.fillStyle = '#0f0'; g.font = '16px monospace';
-      drops.forEach((y,i) => { g.fillText(chars[Math.random()*chars.length|0], i*18, y*18);
-        drops[i] = y*18 > c.height && Math.random() > .97 ? 0 : y+1; }); }, 50);
-  }
-  if(type === 'bsod'){
-    show('bsod', `<div style="font-size:60px">:(</div>
-      <p>На вашем устройстве возникла проблема, и его необходимо перезагрузить.<br>
-      Мы лишь собираем некоторые данные об ошибке, а затем перезагрузим его для вас.</p>
-      <p id="bsodPct">0% завершено</p>
-      <p style="font-size:14px;opacity:.8">Код ошибки: AXON_PRANK_2026 (это шутка, всё в порядке)<br>Нажми Esc чтобы закрыть</p>`);
-    let p = 0; layer._iv = setInterval(() => { p = Math.min(100, p + Math.random()*9);
-      const el = document.getElementById('bsodPct'); if(!el) return clearInterval(layer._iv);
-      el.textContent = Math.floor(p) + '% завершено'; if(p >= 100) setTimeout(closePrank, 900); }, 300);
-  }
-  if(type === 'hacker'){
-    show('hacker', `<div id="hackLog" style="white-space:pre-wrap"></div>
-      <div style="margin-top:10px;color:#666">Печатай — «взлом» идёт. Esc — выход.</div>`);
-    layer._esc2 = e => { const l = document.getElementById('hackLog');
-      if(l && e.key.length === 1){ l.textContent += e.key;
-        if(Math.random() < .12) l.textContent += '\n> ACCESS GRANTED [OK]\n> root@axon:~# ';
-        l.parentElement.scrollTop = 1e6; } };
-    addEventListener('keydown', layer._esc2);
-    document.getElementById('hackLog').textContent = '> INIT AXON TERMINAL v2.6\n> root@axon:~# ';
-  }
-  if(type === 'timer'){
-    let s = 10;
-    show('timer', `<div id="timerBig">10</div>
-      <div style="font-size:18px">Удаление всех данных…</div>
-      <div class="btn danger" style="border:1px solid #ff6b6b;color:#ff6b6b" onclick="closePrank()">ОСТАНОВИТЬ!</div>
-      <div style="font-size:13px;color:#888">(шутка: ничего не удаляется)</div>`);
-    layer._iv = setInterval(() => { s--;
-      const el = document.getElementById('timerBig'); if(!el) return clearInterval(layer._iv);
-      el.textContent = s; if(s <= 0){ clearInterval(layer._iv);
-        el.textContent = 'ШУТКА!'; el.style.color = '#2dffa8'; } }, 1000);
-  }
-  if(type === 'runbutton'){
-    show('runner', `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px">
-      <div style="font-size:22px">Нажми кнопку, если не боишься</div>
-      <button id="runBtn">НЕ НАЖИМАЙ</button></div>`);
-    const b = document.getElementById('runBtn');
-    const run = () => { b.style.left = Math.random()*(innerWidth-160)+'px';
-      b.style.top = Math.random()*(innerHeight-80)+'px'; };
-    b.onmouseenter = run; b.onclick = () => { closePrank(); toast('Всё равно поймал! Это был пранк.'); };
-    setTimeout(run, 100);
-  }
-  if(type === 'locker'){
-    const code = String(Math.floor(1000 + Math.random()*9000));
-    show('locker', `
-      <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#ff4757" stroke-width="1.5">
-        <circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/><path d="M2 12L22 2M22 12L2 2" stroke="#00e5ff" opacity=".7"/></svg>
-      <h2 style="color:#ff4757;font-size:clamp(24px,6vw,40px)">ВАС ЗАМЕТИЛИ!</h2>
-      <p style="color:#aab">Ваше устройство заблокировано.<br>Введите код разблокировки: <b style="color:#00e5ff">${code}</b></p>
-      <input id="lockInp" maxlength="4" placeholder="0000" autocomplete="off">
-      <div id="lockMsg" style="color:#ff6b6b;min-height:20px"></div>`,
-      e => { if(e.key === 'Enter'){ const v = document.getElementById('lockInp').value;
-        if(v === code){ closePrank(); toast('Разблокировано. Это был пранк!'); }
-        else document.getElementById('lockMsg').textContent = 'Неверный код!'; } });
-    setTimeout(()=>document.getElementById('lockInp')?.focus(), 50);
-  }
-}
-
-/* ======================= СТАТУС / INIT ======================= */
-fetch('/api/health').then(r=>r.json()).then(j=>{
-  document.getElementById('status').innerHTML = 'движок: <b>' + (j.engine === 'openrouter' ? 'Neural Cloud' : 'Local Core') + '</b>';})
-  .catch(()=>{ document.getElementById('status').innerHTML = 'движок: <b style="color:#ff4d6d">offline</b>'; });
-if(!chats.length) newChat(); else { if(!curId || !cur()) curId = chats[0].id; }
-renderChats(); renderMsgs();
-if('serviceWorker' in navigator){ /* можно добавить sw.js позже */ }
-</script>
-</body>
-</html>
+  modal(`<h3>Пранки
