@@ -5,817 +5,145 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>AnoxGram</title>
 <style>
-:root{
-  --panel:#1c1c1e; --panel2:#2c2c2e; --bg:#0e0e10; --text:#f2f2f7;
-  --muted:#8e8e93; --accent:#6c5ce7; --accent2:#a29bfe; --gold:#ffd166;
-  --green:#30d158; --red:#ff453a; --radius:18px;
-}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%}
-body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;overflow:hidden}
-::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:#3a3a3c;border-radius:3px}
+:root{--bg:#0e0e10;--panel:#1c1c1e;--panel2:#2c2c2e;--text:#f2f2f7;--muted:#8e8e93;--accent:#6c5ce7;--gold:#ffd166;--green:#30d158;--red:#ff453a}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;overflow:hidden}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
-input,textarea,select{font-family:inherit;background:var(--panel2);border:1px solid #3a3a3c;border-radius:12px;color:var(--text);padding:12px 14px;width:100%;outline:none;font-size:15px;transition:border-color .2s}
-input:focus,textarea:focus{border-color:var(--accent)}
+input{font-family:inherit;background:var(--panel2);border:1px solid #3a3a3c;border-radius:12px;color:var(--text);padding:12px 14px;width:100%;outline:none;font-size:15px}
 .hidden{display:none!important}
-/* ---------- Auth ---------- */
-#auth{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(1200px 600px at 50% -10%,#2a1e5c 0%,var(--bg) 60%);z-index:50;overflow:auto;padding:20px}
-.auth-card{width:100%;max-width:400px;background:rgba(28,28,30,.85);backdrop-filter:blur(20px);border:1px solid #333;border-radius:26px;padding:32px;animation:pop .4s cubic-bezier(.2,.9,.3,1.2)}
-@keyframes pop{from{transform:scale(.92);opacity:0}}
+#auth{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(1200px 600px at 50% -10%,#2a1e5c 0%,var(--bg) 60%);z-index:50;padding:20px}
+.auth-card{width:100%;max-width:400px;background:rgba(28,28,30,.85);border:1px solid #333;border-radius:26px;padding:32px}
 .logo{display:flex;align-items:center;gap:12px;margin-bottom:22px}
-.logo svg{filter:drop-shadow(0 0 14px rgba(108,92,231,.7))}
-.logo h1{font-size:26px;letter-spacing:.5px}
-.logo h1 span{background:linear-gradient(90deg,var(--accent2),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.logo h1{font-size:26px}
+.logo h1 span{color:var(--gold)}
 .tabs{display:flex;background:var(--panel2);border-radius:14px;padding:4px;margin-bottom:20px}
-.tabs button{flex:1;padding:10px;border-radius:11px;color:var(--muted);font-weight:600;transition:.25s}
-.tabs button.on{background:var(--accent);color:#fff;box-shadow:0 4px 16px rgba(108,92,231,.5)}
+.tabs button{flex:1;padding:10px;border-radius:11px;color:var(--muted);font-weight:600}
+.tabs button.on{background:var(--accent);color:#fff}
 .field{margin-bottom:14px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--accent),#8e6cf0);color:#fff;border-radius:14px;padding:13px 20px;font-weight:700;font-size:15px;transition:transform .15s,box-shadow .2s;width:100%}
-.btn:hover{box-shadow:0 6px 24px rgba(108,92,231,.45)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--accent),#8e6cf0);color:#fff;border-radius:14px;padding:13px 20px;font-weight:700;font-size:15px;width:100%}
 .btn:active{transform:scale(.96)}
-.btn.ghost{background:var(--panel2);color:var(--text)}
-.btn.small{width:auto;padding:8px 14px;font-size:13px;border-radius:10px}
-.btn.gold{background:linear-gradient(135deg,#f7b733,#fc4a1a)}
-.btn.green{background:linear-gradient(135deg,#11998e,#38ef7d)}
-.btn.danger{background:linear-gradient(135deg,#eb3349,#f45c43)}
 .err{background:rgba(255,69,58,.12);border:1px solid rgba(255,69,58,.4);color:#ff9b95;border-radius:12px;padding:10px 14px;font-size:14px;margin-bottom:14px}
 .hint{color:var(--muted);font-size:13px;text-align:center;margin-top:14px}
-/* ---------- App layout ---------- */
-#app{display:flex;height:100dvh}
-#side{width:340px;min-width:340px;background:var(--panel);border-right:1px solid #2a2a2c;display:flex;flex-direction:column}
-#main{flex:1;display:flex;flex-direction:column;min-width:0}
-.side-head{padding:16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #2a2a2c}
-.burger{width:38px;height:38px;border-radius:12px;background:var(--panel2);display:flex;align-items:center;justify-content:center;transition:.2s}
-.burger:active{transform:scale(.9)}
-.search{flex:1}
-.nav{display:flex;padding:10px 14px;gap:6px}
-.nav button{flex:1;padding:9px;border-radius:12px;color:var(--muted);font-size:13px;font-weight:600;transition:.25s;display:flex;flex-direction:column;align-items:center;gap:4px}
-.nav button svg{opacity:.8}
-.nav button.on{background:var(--panel2);color:var(--text);box-shadow:inset 0 0 0 1px #3a3a3c}
-.nav button.on svg{opacity:1;filter:drop-shadow(0 0 6px var(--accent2))}
-.list{flex:1;overflow-y:auto;padding:8px}
-.item{display:flex;gap:12px;align-items:center;padding:11px;border-radius:16px;cursor:pointer;transition:background .2s,transform .15s;animation:slidein .3s both}
-.item:hover{background:var(--panel2)} .item:active{transform:scale(.98)}
-@keyframes slidein{from{opacity:0;transform:translateX(-12px)}}
-.avatar{width:48px;height:48px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;position:relative;background:#3a3a3c}
-.avatar.ring{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--gold)}
-.item-body{flex:1;min-width:0}
-.item-title{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.item-sub{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.badge-mini{display:inline-block;font-size:10px;padding:2px 7px;border-radius:8px;background:var(--panel2);color:var(--muted);margin-left:6px;vertical-align:middle}
-.premium-star{vertical-align:-2px}
-.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:14px;text-align:center;padding:30px}
-/* ---------- Chat view ---------- */
-.chat-head{padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #2a2a2c;background:var(--panel)}
-.chat-body{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:10px}
-.msg{max-width:min(70%,560px);background:var(--panel2);border-radius:18px 18px 18px 6px;padding:10px 14px;animation:msgin .25s both}
-@keyframes msgin{from{opacity:0;transform:translateY(8px)}}
-.msg.me{align-self:flex-end;background:linear-gradient(135deg,#5b4bc4,#6c5ce7);border-radius:18px 18px 6px 18px}
-.msg .who{font-size:12px;color:var(--accent2);font-weight:600;margin-bottom:3px}
-.msg .time{font-size:10px;color:rgba(255,255,255,.45);text-align:right;margin-top:4px}
-.chat-input{display:flex;gap:8px;padding:12px;border-top:1px solid #2a2a2c;background:var(--panel)}
-.chat-input .btn{width:48px;height:48px;padding:0;border-radius:14px;flex-shrink:0}
-/* ---------- Profile ---------- */
-.banner{height:180px;border-radius:0 0 26px 26px;position:relative;overflow:hidden}
-.banner .edit{position:absolute;right:14px;bottom:14px}
-.profile-card{margin-top:-46px;padding:0 20px;position:relative;z-index:2}
-.profile-card .avatar{width:92px;height:92px;font-size:34px;border:4px solid var(--bg)}
-.pname{font-size:23px;font-weight:800;margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.pnick{color:var(--muted);font-size:14px}
-.tags{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
-.tag{font-size:12px;padding:4px 11px;border-radius:20px;background:var(--panel2);border:1px solid #3a3a3c}
-.tag.warn{background:rgba(255,159,10,.15);border-color:rgba(255,159,10,.4);color:#ffbd4c}
-.tag.bad{background:rgba(255,69,58,.12);border-color:rgba(255,69,58,.4);color:#ff9b95}
-.tag.good{background:rgba(48,209,88,.12);border-color:rgba(48,209,88,.4);color:#7ee2a0}
-.wallet-row{display:flex;gap:12px;margin:18px 0}
-.wallet-card{flex:1;background:var(--panel2);border-radius:20px;padding:16px;display:flex;align-items:center;gap:12px;transition:transform .15s}
-.wallet-card:active{transform:scale(.97)}
-.wallet-card .amt{font-size:20px;font-weight:800}
-.wallet-card .lbl{font-size:12px;color:var(--muted)}
-.section-title{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:22px 0 10px;font-weight:700}
-.gifts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px}
-.gift{background:var(--panel2);border-radius:18px;padding:14px 10px;text-align:center;position:relative;transition:transform .2s}
-.gift:active{transform:scale(.94)}
-.gift .gname{font-size:12px;margin-top:8px;font-weight:600}
-.gift .grar{font-size:10px;color:var(--muted)}
-.gift.nft{box-shadow:0 0 18px rgba(108,92,231,.45),inset 0 0 12px rgba(162,155,254,.15);border:1px solid rgba(162,155,254,.4)}
-.scene{width:64px;height:64px;margin:0 auto;perspective:400px}
-.cube{width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:spin 6s linear infinite}
-.cube i{position:absolute;inset:0;border-radius:12px;background:var(--gbg,linear-gradient(135deg,#667eea,#764ba2));opacity:.92;border:1px solid rgba(255,255,255,.25)}
-.cube i:nth-child(1){transform:translateZ(32px)}.cube i:nth-child(2){transform:rotateY(180deg) translateZ(32px)}
-.cube i:nth-child(3){transform:rotateY(90deg) translateZ(32px)}.cube i:nth-child(4){transform:rotateY(-90deg) translateZ(32px)}
-.cube i:nth-child(5){transform:rotateX(90deg) translateZ(32px)}.cube i:nth-child(6){transform:rotateX(-90deg) translateZ(32px)}
-@keyframes spin{to{transform:rotateX(360deg) rotateY(360deg)}}
-.sphere i{border-radius:50%}
-.pyramid i{clip-path:polygon(50% 0,100% 100%,0 100%)}
-.heart i{border-radius:50% 50% 0 0;clip-path:path("M32 58 C8 40 4 18 20 10 C28 6 32 14 32 18 C32 14 36 6 44 10 C60 18 56 40 32 58 Z")}
-.star i{clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
-.gem i{clip-path:polygon(50% 0,100% 38%,50% 100%,0 38%)}
-/* ---------- Settings ---------- */
-.set-item{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;cursor:pointer;transition:background .2s}
-.set-item:hover{background:var(--panel2)}
-.set-item .ic{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:var(--panel2);flex-shrink:0}
-.set-item .txt{flex:1;font-size:15px}
-.set-item .val{color:var(--muted);font-size:13px}
-/* ---------- Market / Clans ---------- */
-.market-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
-.card{background:var(--panel);border-radius:20px;padding:16px;border:1px solid #2a2a2c;animation:slidein .3s both}
-.clan-emblem{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px}
-.topbar{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid #2a2a2c;background:var(--panel)}
-.topbar h2{font-size:18px;flex:1}
-/* ---------- Bottom nav (mobile) ---------- */
-#bnav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(28,28,30,.92);backdrop-filter:blur(16px);border-top:1px solid #2a2a2c;padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:40}
-#bnav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);font-size:10px;padding:6px 0;border-radius:12px;transition:.2s}
-#bnav button.on{color:var(--accent2)}
-#bnav button:active{transform:scale(.92)}
-/* ---------- Modal ---------- */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;z-index:60;animation:fade .2s}
-@keyframes fade{from{opacity:0}}
-.modal{background:var(--panel);border-radius:26px 26px 0 0;width:100%;max-width:480px;padding:22px;max-height:85dvh;overflow-y:auto;animation:sheet .3s cubic-bezier(.2,.9,.3,1.1)}
-@keyframes sheet{from{transform:translateY(60px);opacity:0}}
-.modal h3{margin-bottom:16px;font-size:18px}
-@media(min-width:760px){.modal-bg{align-items:center}.modal{border-radius:26px}}
-.grabber{width:40px;height:4px;border-radius:2px;background:#3a3a3c;margin:0 auto 14px}
-@media(max-width:760px){
-  #side{display:none}
-  #main{padding-bottom:76px}
-  #bnav{display:flex}
-  .msg{max-width:85%}
-}
-.toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid #3a3a3c;padding:12px 20px;border-radius:14px;z-index:100;font-size:14px;box-shadow:0 8px 30px rgba(0,0,0,.5);animation:msgin .25s}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-select{appearance:none}
-.fade{animation:fade .25s}
+#app{display:flex;height:100dvh;display:none}
+#app.active{display:flex}
+#main{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;color:var(--muted);gap:14px}
+.logout{position:fixed;bottom:20px;left:20px;right:20px;background:var(--red);color:#fff;padding:14px;border-radius:14px;font-weight:700}
 </style>
 </head>
 <body>
 
-<!-- ================= AUTH ================= -->
 <div id="auth">
   <div class="auth-card">
     <div class="logo">
-      <svg width="46" height="46" viewBox="0 0 46 46"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a29bfe"/><stop offset="1" stop-color="#6c5ce7"/></linearGradient></defs><rect x="4" y="4" width="38" height="38" rx="12" fill="url(#lg)"/><path d="M14 30 L23 13 L32 30" stroke="#fff" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="24" r="2.4" fill="#fff"/></svg>
+      <svg width="40" height="40" viewBox="0 0 46 46"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a29bfe"/><stop offset="1" stop-color="#6c5ce7"/></linearGradient></defs><rect x="4" y="4" width="38" height="38" rx="12" fill="url(#lg)"/><path d="M14 30 L23 13 L32 30" stroke="#fff" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="24" r="2.4" fill="#fff"/></svg>
       <h1>Anox<span>Gram</span></h1>
     </div>
     <div class="tabs">
-      <button id="tabLogin" class="on" onclick="authTab('login')">Вход</button>
-      <button id="tabReg" onclick="authTab('reg')">Регистрация</button>
+      <button id="tabLogin" class="on" onclick="switchTab('login')">Вход</button>
+      <button id="tabReg" onclick="switchTab('reg')">Регистрация</button>
     </div>
     <div id="authErr" class="err hidden"></div>
     <div class="field"><input id="aUser" placeholder="Ник (a-z, 0-9, _)" autocomplete="username"></div>
-    <div class="field hidden" id="fNick"><input id="aNick" placeholder="Отображаемое имя (необязательно)"></div>
+    <div class="field hidden" id="fNick"><input id="aNick" placeholder="Отображаемое имя"></div>
     <div class="field"><input id="aPass" type="password" placeholder="Пароль" autocomplete="current-password"></div>
     <button class="btn" id="authBtn" onclick="doAuth()">Войти</button>
-    <div class="hint">Стартовый бонус: 100 <b style="color:var(--gold)">★</b> и 100 GRAM</div>
+    <div class="hint">Стартовый бонус: 1 000 Звёзд</div>
   </div>
 </div>
 
-<!-- ================= APP ================= -->
-<div id="app" class="hidden">
-  <aside id="side">
-    <div class="side-head">
-      <button class="burger" onclick="openProfile()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a29bfe" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
-      </button>
-      <input class="search" id="searchBox" placeholder="Поиск" oninput="renderList()">
-      <button class="burger" onclick="openSettings()" title="Настройки">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8e8e93" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-2-1.2L14 3h-4l-.5 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 2 1.2L10 21h4l.5-2.6a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2z"/></svg>
-      </button>
-    </div>
-    <div class="nav">
-      <button data-v="chats" class="on" onclick="setView('chats')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/></svg>Чаты</button>
-      <button data-v="market" onclick="setView('market')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16l-1.5 12h-13L4 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>Маркет</button>
-      <button data-v="clans" onclick="setView('clans')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z"/></svg>Кланы</button>
-      <button data-v="gifts" onclick="setView('gifts')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M12 10v10M4 14h16M12 10c-3 0-5-1.5-5-3.5S9 3 12 7c3-4 5-2.5 5-.5S15 10 12 10z"/></svg>Подарки</button>
-    </div>
-    <div class="list" id="sideList"></div>
-  </aside>
-
+<div id="app">
   <main id="main">
-    <div id="view"></div>
+    <div style="font-size:64px">⭐</div>
+    <div>Добро пожаловать, <b id="userName"></b>!</div>
+    <div style="font-size:14px">Сайт и сервер связаны успешно.</div>
+    <button class="logout" onclick="logout()">Выйти</button>
   </main>
-
-  <nav id="bnav">
-    <button data-v="chats" class="on" onclick="setView('chats')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/></svg>Чаты</button>
-    <button data-v="market" onclick="setView('market')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16l-1.5 12h-13L4 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>Маркет</button>
-    <button data-v="clans" onclick="setView('clans')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z"/></svg>Кланы</button>
-    <button onclick="openProfile()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>Профиль</button>
-    <button onclick="openSettings()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Ещё</button>
-  </nav>
 </div>
-
-<div id="modalRoot"></div>
-<div id="toasts"></div>
 
 <script>
-/* ================= CONFIG ================= */
-const API = 'https://fame-api-1.onrender.com'; // Адрес твоего бэкенда на Render
+const API = 'https://fame-api-1.onrender.com';
 let TOKEN = localStorage.getItem('anox_token') || '';
-let ME = null, VIEW = 'chats', CUR = {chat:null}, listCache = {chats:[], public:[], market:[], clans:[], gifts:[]};
+let AUTH_MODE = 'login';
 
-/* ================= API ================= */
-async function api(path, opts={}){
-  const r = await fetch(API + '/api' + path, {
-    method: opts.method || 'GET',
-    headers: {'Content-Type':'application/json', 'X-Token':TOKEN, ...(opts.headers||{})},
-    body: opts.body ? JSON.stringify(opts.body) : undefined
-  });
-  const d = await r.json().catch(()=>({error:'Ошибка сети'}));
-  if(!r.ok) throw new Error(d.error || 'Ошибка');
-  return d;
-}
-const $ = s => document.querySelector(s);
-const esc = s => String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function toast(t){ const el=document.createElement('div'); el.className='toast'; el.textContent=t; $('#toasts').appendChild(el); setTimeout(()=>el.remove(),2600); }
-function money(n){ return n>=1e6 ? (n/1e6).toFixed(1)+'M' : n>=1e3 ? (n/1e3).toFixed(1)+'K' : n; }
-function initials(n){ return (n||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
-function avatarHtml(u, size){
-  const ring = u.is_premium ? ' ring' : '';
-  const glow = u.effect==='glow' ? 'box-shadow:0 0 14px '+u.accent : '';
-  return `<div class="avatar${ring}" style="width:${size||48}px;height:${size||48}px;background:${u.avatar_color||'#3a3a3c'};${glow};font-family:${esc(u.nick_font||'Inter')}">${esc((u.avatar_emoji||'')+initials(u.nickname))}</div>`;
-}
-function premiumSvg(){ return `<svg class="premium-star" width="16" height="16" viewBox="0 0 24 24"><defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe37e"/><stop offset="1" stop-color="#f7b733"/></linearGradient></defs><path d="M12 2l2.6 6.3 6.8.5-5.2 4.4 1.6 6.6L12 16.2 6.2 19.8l1.6-6.6L2.6 8.8l6.8-.5z" fill="url(#pg)"/></svg>`; }
-function labelTags(u){
-  const t=[];
-  for(const l of u.labels||[]){
-    if(l==='Новичок') t.push('<span class="tag good">Новичок</span>');
-    else if(l==='Галочка') t.push('<span class="tag" style="color:#5ac8fa">✔ Verified</span>');
-    else if(l==='Scam') t.push('<span class="tag bad">Scam</span>');
-    else if(l==='Fake') t.push('<span class="tag bad">Fake</span>');
-    else if(l==='Hold') t.push('<span class="tag warn">Hold</span>');
-    else if(l==='Major') t.push('<span class="tag warn">Major</span>');
-    else t.push(`<span class="tag">${esc(l)}</span>`);
-  }
-  for(const b of u.badges||[]) t.push(`<span class="tag" style="border-color:var(--gold);color:var(--gold)">🏅 ${esc(b)}</span>`);
-  return t.join('');
-}
-function giftScene(g, size){
-  const bg = g.bg || 'linear-gradient(135deg,#667eea,#764ba2)';
-  const cls = g.model || 'cube';
-  return `<div class="scene" style="width:${size||64}px;height:${size||64}px"><div class="cube ${cls}" style="--gbg:${esc(bg)}"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>`;
+function switchTab(m){
+  AUTH_MODE = m;
+  document.getElementById('tabLogin').classList.toggle('on', m==='login');
+  document.getElementById('tabReg').classList.toggle('on', m==='reg');
+  document.getElementById('fNick').classList.toggle('hidden', m==='login');
+  document.getElementById('authBtn').textContent = m==='login' ? 'Войти' : 'Создать аккаунт';
+  document.getElementById('authErr').classList.add('hidden');
 }
 
-/* ================= AUTH ================= */
-let AUTH_MODE='login';
-function authTab(m){
-  AUTH_MODE=m;
-  $('#tabLogin').classList.toggle('on', m==='login');
-  $('#tabReg').classList.toggle('on', m==='reg');
-  $('#fNick').classList.toggle('hidden', m==='login');
-  $('#authBtn').textContent = m==='login' ? 'Войти' : 'Создать аккаунт';
-  $('#authErr').classList.add('hidden');
+function showErr(t){
+  const el = document.getElementById('authErr');
+  el.textContent = t;
+  el.classList.remove('hidden');
 }
+
 async function doAuth(){
-  $('#authErr').classList.add('hidden');
-  const body = {username:$('#aUser').value.trim(), password:$('#aPass').value};
-  if(AUTH_MODE==='reg') body.nickname = $('#aNick').value.trim();
-  try{
-    const d = await api(AUTH_MODE==='login' ? '/login' : '/register', {method:'POST', body});
-    TOKEN = d.token; localStorage.setItem('anox_token', TOKEN);
-    await boot();
-  }catch(e){ const el=$('#authErr'); el.textContent=e.message; el.classList.remove('hidden'); }
-}
-async function boot(){
-  try{ ME = (await api('/me')).user; }catch(e){ localStorage.removeItem('anox_token'); return; }
-  $('#auth').classList.add('hidden'); $('#app').classList.remove('hidden');
-  refreshAll(); setView('chats');
-}
-async function logout(){
-  try{ await api('/logout',{method:'POST'}); }catch(e){}
-  localStorage.removeItem('anox_token'); location.reload();
-}
+  document.getElementById('authErr').classList.add('hidden');
+  const user = document.getElementById('aUser').value.trim();
+  const pass = document.getElementById('aPass').value;
+  if(!user || !pass){ showErr('Введите ник и пароль'); return; }
+  
+  const btn = document.getElementById('authBtn');
+  btn.textContent = 'Загрузка...';
+  btn.disabled = true;
 
-/* ================= NAV ================= */
-function setView(v){
-  VIEW=v;
-  document.querySelectorAll('[data-v]').forEach(b=>b.classList.toggle('on', b.dataset.v===v));
-  renderList(); renderView();
-}
-function renderList(){
-  const q = ($('#searchBox').value||'').toLowerCase();
-  const L = $('#sideList'); let html='';
-  const item = (icon,title,sub,onclick,badge)=>`<div class="item" onclick="${onclick}">
-    ${icon}<div class="item-body"><div class="item-title">${title}${badge||''}</div><div class="item-sub">${sub||''}</div></div></div>`;
-  if(VIEW==='chats'){
-    html += `<div style="padding:8px 12px"><button class="btn small ghost" onclick="newChatModal()">+ Новый чат / канал / бот</button></div>`;
-    for(const c of listCache.chats) if((c.title||'').toLowerCase().includes(q))
-      html += item(`<div class="avatar" style="width:48px;height:48px;background:#3a3a3c;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a29bfe" stroke-width="2"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/></svg></div>`,
-        esc(c.title)+(c.boosts?`<span class="badge-mini">🚀${c.boosts}</span>`:''),
-        esc(c.type==='channel'?'Канал':c.type==='bot'?'Бот':'Группа'), `openChat(${c.id})`);
-    if(listCache.chats.length && listCache.public.length) html += `<div class="section-title" style="padding:8px 12px">Публичные каналы</div>`;
-    for(const c of listCache.public) if((c.title||'').toLowerCase().includes(q))
-      html += item(`<div class="avatar" style="width:48px;height:48px;background:#3a3a3c"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8e8e93" stroke-width="2"><path d="M3 11l18-7-7 18-2.5-7.5L3 11z"/></svg></div>`,
-        esc(c.title)+(c.boosts?`<span class="badge-mini">🚀${c.boosts}</span>`:''), esc('Канал · '+c.about), `joinChat(${c.id})`);
+  try {
+    const body = { username: user, password: pass };
+    if(AUTH_MODE === 'reg') body.nickname = document.getElementById('aNick').value.trim() || user;
+    
+    const res = await fetch(API + '/api/' + (AUTH_MODE === 'login' ? 'login' : 'register'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    
+    const data = await res.json();
+    
+    if(!res.ok){
+      showErr(data.error || 'Ошибка сервера');
+      btn.textContent = AUTH_MODE === 'login' ? 'Войти' : 'Создать аккаунт';
+      btn.disabled = false;
+      return;
+    }
+    
+    TOKEN = data.token;
+    localStorage.setItem('anox_token', TOKEN);
+    enterApp(data.user);
+  } catch(e) {
+    showErr('Ошибка сети. Сервер на Render просыпается (подожди 30 сек и попробуй снова)');
+    btn.textContent = AUTH_MODE === 'login' ? 'Войти' : 'Создать аккаунт';
+    btn.disabled = false;
   }
-  else if(VIEW==='market'){
-    for(const m of listCache.market) if((m.name||'').toLowerCase().includes(q))
-      html += item(giftScene(m,44), esc(m.name)+(m.is_nft?'<span class="badge-mini" style="color:var(--accent2)">NFT</span>':''),
-        esc('@'+m.username+' · '+money(m.price)+' ★'), `buyMarket(${m.id})`);
-  }
-  else if(VIEW==='clans'){
-    html += `<div style="padding:8px 12px"><button class="btn small" onclick="newClanModal()">+ Создать клан (50K ★)</button></div>`;
-    for(const c of listCache.clans) if((c.name||'').toLowerCase().includes(q))
-      html += item(`<div class="clan-emblem" style="background:${esc(c.color)};width:48px;height:48px">${esc(c.tag||c.name[0])}</div>`,
-        esc(c.name)+(c.badge?`<span class="badge-mini">${esc(c.badge)}</span>`:''), esc(c.members_count+' участников'), `openClan(${c.id})`);
-  }
-  else if(VIEW==='gifts'){
-    for(const g of listCache.gifts) 
-      html += `<div class="item" onclick="giftMenu(${g.id})">${giftScene(g,44)}
-        <div class="item-body"><div class="item-title">${esc(g.name)}${g.is_nft?'<span class="badge-mini" style="color:var(--accent2)">NFT</span>':''}</div>
-        <div class="item-sub">${esc(g.rarity)} · ур. ${g.upgrade_level}</div></div></div>`;
-  }
-  L.innerHTML = html || `<div class="empty">Пусто</div>`;
-}
-function renderView(){
-  const V=$('#view');
-  if(VIEW==='chats'){
-    if(CUR.chat) return renderChatRoom();
-    V.innerHTML = `<div class="empty"><svg width="90" height="90" viewBox="0 0 46 46"><rect x="4" y="4" width="38" height="38" rx="12" fill="#2c2c2e"/><path d="M14 30 L23 13 L32 30" stroke="#6c5ce7" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><div>Выберите чат слева</div></div>`;
-  } else if(VIEW==='market'){ renderMarket(V); }
-  else if(VIEW==='clans'){ renderClans(V); }
-  else if(VIEW==='gifts'){ renderGiftsPage(V); }
-}
-async function refreshAll(){
-  try{
-    const [ch, mk, cl, gf] = await Promise.all([api('/chats'), api('/market'), api('/clans'), api('/gifts')]);
-    listCache.chats = ch.mine; listCache.public = ch.public;
-    listCache.market = mk.items; listCache.clans = cl.clans; listCache.gifts = gf.gifts;
-    ME = (await api('/me')).user;
-    renderList();
-    if(['market','clans','gifts'].includes(VIEW)) renderView();
-  }catch(e){ toast(e.message); }
 }
 
-/* ================= CHATS ================= */
-async function openChat(id){
-  try{
-    const d = await api('/chats/'+id);
-    CUR.chat = d.chat; CUR.msgs = d.messages; CUR.member = d.member;
-    setView('chats'); renderChatRoom();
-  }catch(e){ toast(e.message); }
-}
-async function joinChat(id){
-  try{ await api('/chats/'+id+'/join',{method:'POST',body:{}}); await refreshAll(); openChat(id); }catch(e){ toast(e.message); }
-}
-function renderChatRoom(){
-  const c = CUR.chat; const V=$('#view');
-  const canWrite = c.type!=='channel' || c.owner_id===ME.id || (c.admins||[]).includes(ME.id);
-  V.innerHTML = `
-  <div class="chat-head">
-    <button class="burger" onclick="CUR.chat=null;renderView();renderList()" style="display:${window.innerWidth<760?'flex':'none'}">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button>
-    <div><div style="font-weight:700">${esc(c.title)} ${c.boosts?`<span class="badge-mini">🚀 ${c.boosts}</span>`:''}</div>
-    <div style="font-size:12px;color:var(--muted)">${c.type==='channel'?'Канал':c.type==='bot'?'Бот':'Группа'} · ${c.public?'публичный':'приватный'}</div></div>
-    <div style="flex:1"></div>
-    <button class="btn small ghost" onclick="boostChat()">🚀 Буст 50★</button>
-    <button class="btn small ghost" onclick="chatSettings()">⚙</button>
-  </div>
-  ${c.pinned?`<div style="padding:8px 18px;background:rgba(108,92,231,.1);font-size:13px;border-bottom:1px solid #2a2a2c">📌 ${esc(c.pinned)}</div>`:''}
-  <div class="chat-body" id="chatBody">${CUR.msgs.map(m=>msgHtml(m)).join('')}</div>
-  ${canWrite?`<div class="chat-input">
-    <input id="msgIn" placeholder="Сообщение…" onkeydown="if(event.key==='Enter')sendMsg()">
-    <button class="btn" onclick="sendMsg()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
-  </div>`:`<div style="padding:14px;text-align:center;color:var(--muted);font-size:13px;border-top:1px solid #2a2a2c">Только админы могут писать в канале</div>`}`;
-  const b=$('#chatBody'); b.scrollTop=b.scrollHeight;
-}
-function msgHtml(m){
-  const me = m.user_id===ME.id;
-  return `<div class="msg ${me?'me':''}">${me?'':`<div class="who">${esc(m.nickname)}</div>`}<div>${esc(m.text)}</div><div class="time">${(m.created_at||'').slice(11,16)}</div></div>`;
-}
-async function sendMsg(){
-  const t=$('#msgIn').value.trim(); if(!t) return;
-  try{ await api(`/chats/${CUR.chat.id}/message`,{method:'POST',body:{text:t}}); $('#msgIn').value=''; openChat(CUR.chat.id); }catch(e){ toast(e.message); }
-}
-async function boostChat(){
-  try{ await api(`/chats/${CUR.chat.id}/boost`,{method:'POST'}); toast('Канал забустен!'); await refreshAll(); openChat(CUR.chat.id);}catch(e){ toast(e.message); }
-}
-function newChatModal(){
-  modal(`<h3>Новый чат</h3>
-    <div class="field"><input id="ncTitle" placeholder="Название"></div>
-    <div class="field"><select id="ncType"><option value="group">Группа</option><option value="channel">Канал</option></select></div>
-    <div class="field"><label style="font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center"><input type="checkbox" id="ncPub" checked style="width:auto"> Публичный</label></div>
-    <button class="btn" onclick="createChat()">Создать</button>`);
-}
-async function createChat(){
-  try{
-    const d = await api('/chats',{method:'POST',body:{title:$('#ncTitle').value,type:$('#ncType').value,public:$('#ncPub').checked}});
-    closeModal(); await refreshAll(); openChat(d.chat.id);
-  }catch(e){ toast(e.message); }
-}
-function chatSettings(){
-  const c=CUR.chat; const isAdmin = c.owner_id===ME.id || (c.admins||[]).includes(ME.id);
-  if(!isAdmin) return toast('Нет прав');
-  modal(`<div class="grabber"></div><h3>Настройки чата</h3>
-    <div class="field"><input id="csTitle" value="${esc(c.title)}" placeholder="Название"></div>
-    <div class="field"><input id="csUser" value="${esc(c.username||'')}" placeholder="@юзернейм (публичная ссылка)"></div>
-    <div class="field"><input id="csPin" value="${esc(c.pinned||'')}" placeholder="Закреплённое сообщение"></div>
-    <div class="field"><label style="font-size:13px;color:var(--muted)">Медленный режим, сек (0 — выкл): <b id="smVal">${c.slow_mode}</b></label>
-      <input type="range" min="0" max="60" value="${c.slow_mode}" style="padding:0" oninput="document.getElementById('smVal').textContent=this.value" id="csSlow"></div>
-    <div class="field"><label style="font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center"><input type="checkbox" id="csPub" ${c.public?'checked':''} style="width:auto"> Публичный</label></div>
-    <div class="field"><input id="csAdmins" value="${(c.admins||[]).join(',')}" placeholder="ID админов через запятую"></div>
-    <button class="btn" onclick="saveChatSettings()">Сохранить</button>
-    <div style="margin-top:10px"><button class="btn ghost" onclick="navigator.clipboard.writeText(location.origin+'/#join/'+encodeURIComponent(CUR.chat.link_key));toast('Ссылка скопирована')">Скопировать ссылку-приглашение</button></div>`);
-}
-async function saveChatSettings(){
-  try{
-    await api(`/chats/${CUR.chat.id}/settings`,{method:'POST',body:{
-      title:$('#csTitle').value, username:$('#csUser').value, pinned:$('#csPin').value,
-      slow_mode:+$('#csSlow').value, public:$('#csPub').checked,
-      admins:$('#csAdmins').value.split(',').map(s=>parseInt(s.trim())).filter(Boolean)
-    }});
-    closeModal(); toast('Сохранено'); await refreshAll(); openChat(CUR.chat.id);
-  }catch(e){ toast(e.message); }
+function enterApp(user){
+  document.getElementById('auth').classList.add('hidden');
+  document.getElementById('app').classList.add('active');
+  document.getElementById('userName').textContent = user ? user.nickname : 'друг';
 }
 
-/* ================= PROFILE ================= */
-function openProfile(){ closeModal(); showUser(ME.username); }
-async function showUser(uname){
-  try{
-    const d = await api('/user/'+encodeURIComponent(uname));
-    const u=d.user; const isMe = u.id===ME.id;
-    modal(`<div class="grabber"></div>
-    <div class="banner" style="background:${u.banner||'linear-gradient(135deg,#3a2e7a,#1c1c1e)'};margin:-22px -22px 0;border-radius:26px 26px 0 0">
-      ${isMe?`<button class="btn small ghost edit" onclick="editBanner()">Изменить фон</button>`:''}</div>
-    <div class="profile-card">${avatarHtml(u,92)}
-      <div class="pname" style="color:${esc(u.nick_color)};font-family:${esc(u.nick_font)}">${esc(u.nickname)} ${u.is_premium?premiumSvg():''}</div>
-      <div class="pnick">@${esc(u.username)} · ${u.hidden_id&& !isMe ? 'ID скрыт' : 'ID '+u.display_id} · ${(u.created_at||'').slice(0,10)}</div>
-      <div class="tags">${labelTags(u)}<span class="tag">Уровень ${u.level}</span><span class="tag">${u.gift_level} гифт-опыта</span>${d.clan?`<span class="tag" style="border-color:${esc(d.clan.color)}">${esc(d.clan.tag)} ${esc(d.clan.name)}</span>`:''}</div>
-      ${u.bio?`<p style="color:var(--muted);font-size:14px;margin-bottom:10px">${esc(u.bio)}</p>`:''}
-      ${isMe?`
-      <div class="wallet-row">
-        <div class="wallet-card" onclick="openWallet('stars')"><div class="scene" style="width:40px;height:40px"><div class="cube sphere" style="--gbg:linear-gradient(135deg,#ffe37e,#f7b733);animation-duration:4s"><i></i><i></i><i></i><i></i><i></i><i></i></div></div><div><div class="amt">${money(u.stars)}</div><div class="lbl">Звёзды</div></div></div>
-        <div class="wallet-card" onclick="openWallet('gram')"><div class="scene" style="width:40px;height:40px"><div class="cube" style="--gbg:linear-gradient(135deg,#5ac8fa,#007aff);animation-duration:5s"><i></i><i></i><i></i><i></i><i></i><i></i></div></div><div><div class="amt">${money(u.gram)}</div><div class="lbl">GRAM</div></div></div>
-      </div>
-      <button class="btn" onclick="openWallet()">AnoxGram Wallet</button>
-      <div style="height:10px"></div>
-      <div class="grid2">
-        <button class="btn ghost" onclick="editProfile()">Редактировать</button>
-        <button class="btn ghost" onclick="sendGiftModal('${esc(u.username)}')">Подарить подарок</button>
-      </div>`
-      :`<div class="grid2">
-        <button class="btn" onclick="sendGiftModal('${esc(u.username)}')">Подарок</button>
-        <button class="btn ghost" onclick="transferModal('${esc(u.username)}')">Перевод</button>
-      </div>`}
-      <div class="section-title">Подарки (${d.gifts.length})</div>
-      <div class="gifts-grid">${d.gifts.map(g=>`<div class="gift ${g.is_nft?'nft':''}">${giftScene(g,52)}<div class="gname">${esc(g.name)}</div><div class="grar">${esc(g.rarity)}${g.unique_key?' · '+esc(g.unique_key):''}</div></div>`).join('')||'<div style="color:var(--muted);font-size:13px">Нет подарков</div>'}</div>
-    </div>`, true);
-  }catch(e){ toast(e.message); }
-}
-function editProfile(){
-  const u=ME;
-  modal(`<div class="grabber"></div><h3>Редактировать профиль</h3>
-    <div class="field"><input id="epNick" value="${esc(u.nickname)}" placeholder="Имя"></div>
-    <div class="field"><textarea id="epBio" placeholder="О себе" rows="2">${esc(u.bio||'')}</textarea></div>
-    <div class="grid2">
-      <div class="field"><label style="font-size:12px;color:var(--muted)">Цвет аватара</label><input type="color" id="epColor" value="${esc(u.avatar_color)}" style="height:44px;padding:4px"></div>
-      <div class="field"><label style="font-size:12px;color:var(--muted)">Цвет ника</label><input type="color" id="epNickColor" value="${esc(u.nick_color)}" style="height:44px;padding:4px"></div>
-    </div>
-    <div class="grid2">
-      <div class="field"><label style="font-size:12px;color:var(--muted)">Шрифт ника</label><select id="epFont">${['Inter','system-ui','Georgia','monospace','cursive'].map(f=>`<option ${u.nick_font===f?'selected':''}>${f}</option>`).join('')}</select></div>
-      <div class="field"><label style="font-size:12px;color:var(--muted)">Акцент</label><input type="color" id="epAccent" value="${esc(u.accent)}" style="height:44px;padding:4px"></div>
-    </div>
-    <div class="field"><label style="font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center"><input type="checkbox" id="epHide" ${u.hidden_id?'checked':''} style="width:auto"> Скрывать ID</label></div>
-    <div class="field"><label style="font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center"><input type="checkbox" id="epGlow" ${u.effect==='glow'?'checked':''} style="width:auto"> Эффект свечения аватарки</label></div>
-    <button class="btn" onclick="saveProfile()">Сохранить</button>`);
-}
-async function saveProfile(){
-  try{
-    ME = (await api('/profile',{method:'POST',body:{
-      nickname:$('#epNick').value, bio:$('#epBio').value, avatar_color:$('#epColor').value,
-      nick_color:$('#epNickColor').value, nick_font:$('#epFont').value, accent:$('#epAccent').value,
-      hidden_id:$('#epHide').checked, effect:$('#epGlow').checked?'glow':''
-    }})).user;
-    closeModal(); toast('Сохранено'); await refreshAll(); openProfile();
-  }catch(e){ toast(e.message); }
-}
-function editBanner(){
-  const cur = ME.banner||'';
-  modal(`<div class="grabber"></div><h3>Фон профиля</h3>
-    <div class="grid2">
-      ${['linear-gradient(135deg,#3a2e7a,#1c1c1e)','linear-gradient(135deg,#667eea,#764ba2)','linear-gradient(135deg,#f093fb,#f5576c)','linear-gradient(135deg,#43e97b,#38f9d7)','linear-gradient(135deg,#fa709a,#fee140)','linear-gradient(135deg,#30cfd0,#330867)'].map(b=>`<div onclick="setBanner('${b}')" style="height:64px;border-radius:14px;background:${b};cursor:pointer;border:2px solid ${cur===b?'var(--accent)':'transparent'}"></div>`).join('')}
-    </div>
-    <div style="height:10px"></div>
-    <input id="custBanner" placeholder="Или свой CSS-градиент" value="${esc(cur)}">
-    <div style="height:10px"></div><button class="btn" onclick="setBanner(document.getElementById('custBanner').value)">Применить</button>`);
-}
-async function setBanner(b){ try{ ME=(await api('/profile',{method:'POST',body:{banner:b}})).user; closeModal(); openProfile(); }catch(e){ toast(e.message); } }
-
-/* ================= WALLET ================= */
-function openWallet(tab){
-  api('/wallet').then(d=>{
-    modal(`<div class="grabber"></div><h3>AnoxGram Wallet</h3>
-    <div class="wallet-row">
-      <div class="wallet-card"><div class="scene" style="width:40px;height:40px"><div class="cube sphere" style="--gbg:linear-gradient(135deg,#ffe37e,#f7b733)"><i></i><i></i><i></i><i></i><i></i><i></i></div></div><div><div class="amt">${money(d.stars)}</div><div class="lbl">Звёзды</div></div></div>
-      <div class="wallet-card"><div class="scene" style="width:40px;height:40px"><div class="cube" style="--gbg:linear-gradient(135deg,#5ac8fa,#007aff)"><i></i><i></i><i></i><i></i><i></i><i></i></div></div><div><div class="amt">${money(d.gram)}</div><div class="lbl">GRAM</div></div></div>
-    </div>
-    <div class="grid2">
-      <button class="btn" onclick="transferModal()">Перевести</button>
-      <button class="btn ghost" onclick="requestModal()">Запросить</button>
-    </div><div style="height:8px"></div>
-    <div class="grid2">
-      <button class="btn gold" onclick="exchangeModal()">Обмен (100 GRAM = 1★)</button>
-      <button class="btn green" onclick="buyStars()">Купить ★ у @anoxgrambot</button>
-    </div>
-    <div class="section-title">История</div>
-    ${d.history.map(t=>`<div class="set-item"><div class="txt" style="font-size:14px">${kindName(t.kind)} · ${money(t.amount)} ${t.currency==='stars'?'★':'GRAM'}<div style="font-size:12px;color:var(--muted)">${esc(t.note||'')} · ${(t.created_at||'').slice(0,16).replace('T',' ')}</div></div></div>`).join('')||'<div style="color:var(--muted)">Пусто</div>'}`);
-  }).catch(e=>toast(e.message));
-}
-function kindName(k){return {transfer:'Перевод',request:'Запрос',gift:'Подарок',exchange:'Обмен',purchase:'Покупка',bonus:'Бонус',admin:'Админ',upgrade:'Апгрейд',craft:'Крафт',boost:'Буст',bot:'Бот',clan:'Клан',market:'Маркет'}[k]||k;}
-function transferModal(to){
-  modal(`<div class="grabber"></div><h3>Перевод</h3>
-  <div class="field"><input id="trTo" value="${to||''}" placeholder="Ник или ID получателя"></div>
-  <div class="grid2">
-    <div class="field"><input id="trAmt" type="number" min="1" placeholder="Сумма"></div>
-    <div class="field"><select id="trCur"><option value="stars">★ Звёзды</option><option value="gram">GRAM</option></select></div>
-  </div>
-  <div class="field"><input id="trNote" placeholder="Комментарий (необязательно)"></div>
-  <button class="btn" onclick="doTransfer()">Отправить</button>`);
-}
-async function doTransfer(){
-  try{ await api('/transfer',{method:'POST',body:{to:$('#trTo').value,amount:+$('#trAmt').value,currency:$('#trCur').value,note:$('#trNote').value}}); closeModal(); toast('Отправлено'); await refreshAll(); }
-  catch(e){ toast(e.message); }
-}
-function requestModal(){
-  modal(`<div class="grabber"></div><h3>Запрос средств</h3>
-  <div class="field"><input id="rqTo" placeholder="Ник или ID"></div>
-  <div class="grid2"><div class="field"><input id="rqAmt" type="number" min="1" placeholder="Сумма"></div>
-  <div class="field"><select id="rqCur"><option value="stars">★</option><option value="gram">GRAM</option></select></div></div>
-  <button class="btn" onclick="doRequest()">Запросить</button>`);
-}
-async function doRequest(){ try{ await api('/request',{method:'POST',body:{to:$('#rqTo').value,amount:+$('#rqAmt').value,currency:$('#rqCur').value}}); closeModal(); toast('Запрос отправлен'); }catch(e){toast(e.message);} }
-function exchangeModal(){
-  modal(`<div class="grabber"></div><h3>Обмен валют</h3>
-  <p style="color:var(--muted);font-size:13px;margin-bottom:14px">Курс: 100 GRAM = 1 Telegram Star</p>
-  <div class="field"><input id="exAmt" type="number" min="1" placeholder="Количество звёзд"></div>
-  <div class="grid2">
-    <button class="btn gold" onclick="doExchange('gram_to_stars')">GRAM → ★</button>
-    <button class="btn ghost" onclick="doExchange('stars_to_gram')">★ → GRAM</button>
-  </div>`);
-}
-async function doExchange(dir){
-  try{ await api('/exchange',{method:'POST',body:{direction:dir,amount:+$('#exAmt').value}}); closeModal(); toast('Обмен выполнен'); await refreshAll(); openWallet(); }
-  catch(e){ toast(e.message); }
-}
-async function buyStars(){
-  modal(`<div class="grabber"></div><h3>Покупка Звёзд</h3>
-  <p style="color:var(--muted);font-size:13px;margin-bottom:14px">Пополнение GRAM — через бота <b>@anoxgrambot</b> в Telegram. Курс: 100 GRAM = 1 Telegram Star.</p>
-  <div class="field"><input id="bsAmt" type="number" min="1" value="1" placeholder="Звёзды"></div>
-  <button class="btn green" onclick="doBuyStars()">Купить за GRAM</button>`);
-}
-async function doBuyStars(){
-  try{ await api('/buy_stars',{method:'POST',body:{amount:+$('#bsAmt').value}}); closeModal(); toast('Звёзды зачислены'); await refreshAll(); }
-  catch(e){ toast(e.message); }
+async function checkAuth(){
+  if(!TOKEN) return;
+  try {
+    const res = await fetch(API + '/api/me', { headers: { 'X-Token': TOKEN } });
+    if(res.ok){
+      const data = await res.json();
+      enterApp(data.user);
+    } else {
+      TOKEN = ''; localStorage.removeItem('anox_token');
+    }
+  } catch(e) {}
 }
 
-/* ================= GIFTS ================= */
-function sendGiftModal(to){
-  const prices={common:50,rare:200,epic:500,legendary:1500,nft:5000};
-  modal(`<div class="grabber"></div><h3>Отправить подарок</h3>
-  <div class="field"><input id="sgTo" value="${to||''}" placeholder="Ник или ID"></div>
-  <div class="field"><input id="sgName" placeholder="Название подарка"></div>
-  <div class="gifts-grid">${Object.entries(prices).map(([r,p])=>`
-    <div class="gift ${r==='nft'?'nft':''}" style="cursor:pointer" onclick="doSendGift('${r}')">
-      <div class="scene" style="width:52px;height:52px"><div class="cube ${['cube','sphere','pyramid','heart','star','gem'][Object.keys(prices).indexOf(r)%6]}" style="--gbg:${['linear-gradient(135deg,#667eea,#764ba2)','linear-gradient(135deg,#f093fb,#f5576c)','linear-gradient(135deg,#4facfe,#00f2fe)','linear-gradient(135deg,#43e97b,#38f9d7)','linear-gradient(135deg,#fa709a,#fee140)','linear-gradient(135deg,#30cfd0,#330867)'][Object.keys(prices).indexOf(r)%6]}"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
-      <div class="gname">${r}</div><div class="grar">${p} ★</div></div>`).join('')}
-  </div>`);
-}
-async function doSendGift(rarity){
-  try{ await api('/gifts/send',{method:'POST',body:{to:$('#sgTo').value,name:$('#sgName').value,rarity}}); closeModal(); toast('Подарок отправлен!'); await refreshAll(); }
-  catch(e){ toast(e.message); }
-}
-function giftMenu(id){
-  const g = listCache.gifts.find(x=>x.id===id); if(!g) return;
-  const btns = [];
-  if(g.is_nft) btns.push(`<button class="btn" onclick="upgradeGift(${g.id})">Апгрейд NFT (только модель/фон)</button>`);
-  btns.push(`<button class="btn ghost" onclick="sellGiftModal(${g.id})">Выставить на маркет</button>`);
-  const selected = window._craft = window._craft||[];
-  btns.push(`<button class="btn ghost" onclick="toggleCraft(${g.id})">В крафт (${selected.length}/4)</button>`);
-  btns.push(`<button class="btn gold" onclick="doCraft()" ${selected.length===4?'':'disabled style="opacity:.5"'}>Скрафтить 4 NFT → уникальный предмет</button>`);
-  modal(`<div class="grabber"></div><h3>${esc(g.name)}</h3>
-    <div style="text-align:center;margin:10px 0">${giftScene(g,90)}</div>
-    <p style="text-align:center;color:var(--muted);font-size:13px">${esc(g.rarity)} · ур. ${g.upgrade_level}${g.unique_key?' · '+esc(g.unique_key):''}</p>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px">${btns.join('')}</div>`);
-}
-function toggleCraft(id){
-  const s = window._craft = window._craft||[];
-  const i = s.indexOf(id);
-  if(i>=0) s.splice(i,1); else if(s.length<4) s.push(id);
-  closeModal(); giftMenu(id);
-}
-async function upgradeGift(id){
-  try{ await api(`/gifts/${id}/upgrade`,{method:'POST',body:{}}); closeModal(); toast('NFT улучшен!'); await refreshAll(); }catch(e){ toast(e.message); }
-}
-async function doCraft(){
-  try{
-    const d = await api('/gifts/craft',{method:'POST',body:{ids:window._craft||[]}});
-    window._craft=[]; closeModal();
-    modal(`<div class="grabber"></div><h3 style="text-align:center">Уникальный предмет создан!</h3>
-      <div style="text-align:center;margin:16px 0;animation:pop .6s">${giftScene(d.gift,110)}</div>
-      <p style="text-align:center;color:var(--gold);font-weight:700">${esc(d.gift.unique_key)}</p>`);
-    await refreshAll();
-  }catch(e){ toast(e.message); }
-}
-function sellGiftModal(id){
-  modal(`<div class="grabber"></div><h3>Продажа на маркете</h3>
-  <div class="field"><input id="slPrice" type="number" min="1" placeholder="Цена в звёздах"></div>
-  <button class="btn" onclick="doSell(${id})">Выставить</button>`);
-}
-async function doSell(id){
-  try{ await api('/market/sell',{method:'POST',body:{gift_id:id,price:+$('#slPrice').value}}); closeModal(); toast('Лот создан'); await refreshAll(); setView('market'); }catch(e){toast(e.message);}
-}
-function renderGiftsPage(V){
-  V.innerHTML = `<div class="topbar"><h2>Мои подарки</h2>
-    <button class="btn small" onclick="sendGiftModal()">+ Подарить</button></div>
-    <div style="padding:18px;overflow-y:auto" class="fade">
-    <div class="gifts-grid">${listCache.gifts.map(g=>`<div class="gift ${g.is_nft?'nft':''}" onclick="giftMenu(${g.id})">${giftScene(g,64)}<div class="gname">${esc(g.name)}</div><div class="grar">${esc(g.rarity)} · ур.${g.upgrade_level}</div></div>`).join('')||'<div class="empty">Подарков нет — подарите кому-нибудь!</div>'}</div></div>`;
-}
-function renderMarket(V){
-  V.innerHTML = `<div class="topbar"><h2>Маркет NFT-подарков</h2><button class="btn small ghost" onclick="refreshAll()">Обновить</button></div>
-  <div style="padding:18px;overflow-y:auto;flex:1" class="fade"><div class="market-grid">
-  ${listCache.market.map(m=>`<div class="card" style="text-align:center">
-    <div class="gift ${m.is_nft?'nft':''}" style="background:none">${giftScene(m,70)}</div>
-    <div style="font-weight:700;margin-top:8px">${esc(m.name)}</div>
-    <div style="font-size:12px;color:var(--muted)">${esc(m.rarity)} · @${esc(m.username)}${m.upgrade_level?' · ур.'+m.upgrade_level:''}</div>
-    <button class="btn small gold" style="width:100%;margin-top:10px" onclick="buyMarket(${m.id})">Купить за ${money(m.price)} ★</button>
-  </div>`).join('')||'<div class="empty">Лотов нет</div>'}</div></div>`;
-}
-async function buyMarket(id){
-  try{ await api(`/market/${id}/buy`,{method:'POST'}); toast('Куплено!'); await refreshAll(); }catch(e){ toast(e.message); }
+function logout(){
+  TOKEN = ''; localStorage.removeItem('anox_token');
+  location.reload();
 }
 
-/* ================= CLANS ================= */
-function renderClans(V){
-  V.innerHTML = `<div class="topbar"><h2>Кланы</h2><button class="btn small" onclick="newClanModal()">+ Создать (50K ★)</button></div>
-  <div style="padding:18px;overflow-y:auto;flex:1" class="fade"><div class="market-grid">
-  ${listCache.clans.map(c=>`<div class="card" onclick="openClan(${c.id})">
-    <div style="display:flex;gap:12px;align-items:center">
-      <div class="clan-emblem" style="background:${esc(c.color)}">${esc(c.tag||c.name[0])}</div>
-      <div><div style="font-weight:700">${esc(c.name)} ${c.badge?`<span class="badge-mini">${esc(c.badge)}</span>`:''}</div>
-      <div style="font-size:12px;color:var(--muted)">${c.members_count} участников</div></div>
-    </div></div>`).join('')||'<div class="empty">Кланов нет</div>'}</div></div>`;
-}
-function newClanModal(){
-  modal(`<div class="grabber"></div><h3>Создание клана — 50 000 ★</h3>
-  <div class="field"><input id="clName" placeholder="Название клана"></div>
-  <div class="field"><input id="clTag" placeholder="Тег (3-5 символов)" maxlength="5"></div>
-  <div class="grid2">
-    <div class="field"><label style="font-size:12px;color:var(--muted)">Цвет</label><input type="color" id="clColor" value="#5a5ae6" style="height:44px;padding:4px"></div>
-    <div class="field"><input id="clBadge" placeholder="Значок (необязательно)"></div>
-  </div>
-  <button class="btn" onclick="createClan()">Создать клан</button>`);
-}
-async function createClan(){
-  try{
-    const d = await api('/clans',{method:'POST',body:{name:$('#clName').value,tag:$('#clTag').value,color:$('#clColor').value,badge:$('#clBadge').value}});
-    closeModal(); toast('Клан создан!'); await refreshAll();
-    modal(`<h3>Ссылка для вступления</h3><p style="word-break:break-all;background:var(--panel2);padding:12px;border-radius:12px">${esc(location.origin+d.invite)}</p>
-    <button class="btn" onclick="navigator.clipboard.writeText(location.origin+'${d.invite}');toast('Скопировано')">Скопировать</button>`);
-  }catch(e){ toast(e.message); }
-}
-async function openClan(id){
-  const c = listCache.clans.find(x=>x.id===id); if(!c) return;
-  const detail = await api('/clans').then(d=>d.clans.find(x=>x.id===id));
-  const isMember = detail && detail.members && detail.members[String(ME.id)];
-  modal(`<div class="grabber"></div>
-  <div style="display:flex;gap:14px;align-items:center;margin-bottom:16px">
-    <div class="clan-emblem" style="background:${esc(c.color)};width:64px;height:64px;font-size:26px">${esc(c.tag||c.name[0])}</div>
-    <div><h3 style="margin:0">${esc(c.name)}</h3><div style="font-size:12px;color:var(--muted)">${c.members_count} участников ${c.badge?'· '+esc(c.badge):''}</div></div>
-  </div>
-  ${isMember?`<div class="section-title">Состав · ваша роль: ${esc(isMember)}</div>
-    <div style="max-height:220px;overflow-y:auto">${Object.entries(detail.members).map(([uid,role])=>`<div class="set-item"><div class="txt" style="font-size:14px">ID ${uid} — ${esc(role)}</div></div>`).join('')}</div>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
-      ${isMember==='Владелец'||isMember==='Со-владелец'?`<button class="btn ghost" onclick="clanRoles(${id})">Управление ролями</button>`:''}
-      <button class="btn danger" onclick="leaveClan(${id})">Покинуть клан</button>
-    </div>`
-  :`<button class="btn" onclick="joinClanPrompt('${esc(detail.link_key)}')">Вступить по ссылке</button>`}`);
-}
-function joinClanPrompt(key){
-  modal(`<div class="grabber"></div><h3>Вступление в клан</h3>
-  <div class="field"><input id="jcKey" placeholder="Ключ приглашения" value="${esc(key)}"></div>
-  <button class="btn" onclick="doJoinClan()">Вступить</button>`);
-}
-async function doJoinClan(){
-  try{ await api('/clans/join/'+encodeURIComponent($('#jcKey').value)); closeModal(); toast('Вы в клане!'); await refreshAll(); }catch(e){toast(e.message);}
-}
-async function leaveClan(id){
-  try{ await api(`/clans/${id}/leave`,{method:'POST'}); closeModal(); toast('Вы покинули клан'); await refreshAll(); }catch(e){toast(e.message);}
-}
-function clanRoles(id){
-  const c = listCache.clans.find(x=>x.id===id);
-  api('/clans').then(d=>{
-    const detail = d.clans.find(x=>x.id===id);
-    modal(`<div class="grabber"></div><h3>Роли клана</h3>
-    ${Object.entries(detail.members).map(([uid,role])=>`
-      <div class="set-item"><div class="txt" style="font-size:14px">ID ${uid} · ${esc(role)}</div>
-      <select onchange="setRole(${id},${uid},this.value)" style="width:130px;padding:8px">
-        ${['Владелец','Со-владелец','Админ','Участник'].map(r=>`<option ${r===role?'selected':''}>${r}</option>`).join('')}
-      </select></div>`).join('')}`);
-  });
-}
-async function setRole(cid,uid,role){
-  try{ await api(`/clans/${cid}/role`,{method:'POST',body:{user_id:uid,role}}); toast('Роль обновлена'); await refreshAll(); }catch(e){toast(e.message);}
-}
-
-/* ================= BotFather ================= */
-async function botFather(){
-  const d = await api('/bots').catch(()=>({bots:[]}));
-  modal(`<div class="grabber"></div><h3>BotFather — мои боты</h3>
-  ${d.bots.map(b=>`<div class="set-item"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5ac8fa" stroke-width="2"><rect x="5" y="8" width="14" height="10" rx="3"/><path d="M12 8V4M9 4h6"/><circle cx="9.5" cy="13" r="1" fill="#5ac8fa"/><circle cx="14.5" cy="13" r="1" fill="#5ac8fa"/></svg></div>
-    <div class="txt" style="font-size:14px">@${esc(b.username)}<div style="font-size:11px;color:var(--muted);word-break:break-all">${esc(b.token)}</div></div></div>`).join('')||'<p style="color:var(--muted);font-size:13px">У вас нет ботов</p>'}
-  <div style="height:12px"></div>
-  <div class="field"><input id="bfName" placeholder="Имя бота"></div>
-  <div class="field"><input id="bfUname" placeholder="username_bot (оканчивается на bot)"></div>
-  <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Стоимость: 100 GRAM. Токен можно использовать из Python (requests → ${API}/api/...).</p>
-  <button class="btn" onclick="createBot()">Создать бота</button>`);
-}
-async function createBot(){
-  try{
-    const d = await api('/bots',{method:'POST',body:{name:$('#bfName').value,username:$('#bfUname').value}});
-    modal(`<div class="grabber"></div><h3>Бот создан!</h3>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:10px">Токен для Python:</p>
-    <p style="word-break:break-all;background:var(--panel2);padding:12px;border-radius:12px;font-size:13px">${esc(d.bot.token)}</p>
-    <div style="height:10px"></div>
-    <button class="btn" onclick="navigator.clipboard.writeText('${d.bot.token}');toast('Токен скопирован')">Скопировать токен</button>`);
-    await refreshAll();
-  }catch(e){ toast(e.message); }
-}
-
-/* ================= SETTINGS ================= */
-function openSettings(){
-  const S = [
-    ['Профиль','#a29bfe',"openProfile()"],
-    ['Уведомления','#5ac8fa',"toast('Уведомления: вкл/выкл')"],
-    ['Магазин','#ffd166',"setView('market')"],
-    ['Маркет','#f093fb',"setView('market')"],
-    ['Кланы','#38ef7d',"setView('clans')"],
-    ['Premium','#ffe37e',"toast('Premium: 500 ★/мес (админ выдаёт)')"],
-    ['Валюта','#5ac8fa',"openWallet()"],
-    ['AnoxGram Wallet','#f7b733',"openWallet()"],
-    ['Фрагмент (номера/юзернеймы)','#a29bfe',"fragmentModal()"],
-    ['Язык','#8e8e93',"langModal()"],
-    ['Конфиденциальность','#30d158',"editProfile()"],
-    ['Устройства','#5ac8fa',"toast('Сессии: это устройство')"],
-    ['Безопасность','#ff453a',"toast('Смена пароля — через админа')"],
-    ['Оформление','#f093fb',"editProfile()"],
-    ['Шрифты','#a29bfe',"editProfile()"],
-    ['Микрофон','#8e8e93',"toast('Микрофон: разрешён')"],
-    ['Звук','#8e8e93',"toast('Звуки сообщений: вкл')"],
-    ['Папки','#5ac8fa',"toast('Создание папок скоро')"],
-    ['Производительность','#30d158',"toast('Анимации: 60 FPS')"],
-    ['Память','#f7b733',"toast('Кэш: '+((performance.memory?.usedJSHeapSize/1048576)|0)+' МБ')"],
-    ['Информация','#8e8e93',"toast('AnoxGram 1.0 · приватный мессенджер')"],
-    ['Соглашение','#8e8e93',"toast('Используя сервис, вы соглашаетесь с правилами')"],
-    ['Политика','#8e8e93',"toast('Мы не передаём данные третьим лицам')"],
-    ['Поддержка','#5ac8fa',"supportModal()"],
-    ['BotFather (мои боты)','#5ac8fa',"botFather()"],
-    ['Выйти','#ff453a',"logout()"],
-  ];
-  modal(`<div class="grabber"></div><h3>Настройки</h3>
-  ${S.map(([t,c,f])=>`<div class="set-item" onclick="closeModal();${f}">
-    <div class="ic" style="background:${c}22"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></div>
-    <div class="txt">${t}</div>
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#48484a" stroke-width="2.5" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
-  </div>`).join('')}`, true);
-}
-function fragmentModal(){
-  modal(`<div class="grabber"></div><h3>Фрагмент</h3>
-  <p style="color:var(--muted);font-size:13px;margin-bottom:14px">Коллекционные номера и юзернеймы выдаёт администрация. Ваш ID: <b>${ME.display_id}</b></p>
-  <button class="btn ghost" onclick="toast('Заявка отправлена администрации')">Запросить красивый номер</button>
-  <div style="height:10px"></div>
-  <button class="btn ghost" onclick="toast('Заявка отправлена администрации')">Запросить юзернейм @${esc(ME.username)}</button>`);
-}
-function langModal(){
-  modal(`<div class="grabber"></div><h3>Язык</h3>
-  ${['Русский','English','Українська'].map(l=>`<div class="set-item" onclick="closeModal();toast('Язык: ${l}')"><div class="txt">${l}</div></div>`).join('')}`);
-}
-function supportModal(){
-  modal(`<div class="grabber"></div><h3>Поддержка</h3>
-  <p style="color:var(--muted);font-size:13px">Напишите в официальный канал или боту @anoxgrambot. Обычно отвечаем в течение часа.</p>
-  <div style="height:10px"></div>
-  <button class="btn" onclick="closeModal();joinChatByName('anoxgram')">Открыть канал поддержки</button>`);
-}
-async function joinChatByName(un){
-  try{
-    const ch = await api('/chats');
-    const c = [...ch.mine, ...ch.public].find(x=>x.username===un);
-    if(c) openChat(c.id); else toast('Канал не найден');
-  }catch(e){toast(e.message);}
-}
-
-/* ================= MODAL ================= */
-function modal(html, big){
-  $('#modalRoot').innerHTML = `<div class="modal-bg" onclick="if(event.target===this)closeModal()">
-    <div class="modal" style="${big?'max-width:560px':''}">${html}</div></div>`;
-}
-function closeModal(){ $('#modalRoot').innerHTML=''; }
-
-/* ================= INIT ================= */
-(function(){
-  if(TOKEN){ boot(); }
-  const m = location.hash.match(/#join\/(.+)/);
-  if(m){ window._joinKey = m[1]; }
-  setInterval(()=>{ if(ME && VIEW==='chats') refreshAll(); }, 15000);
-})();
+checkAuth();
 </script>
 </body>
 </html>
