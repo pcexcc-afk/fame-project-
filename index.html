@@ -43,7 +43,7 @@ input{font-family:inherit;background:var(--panel2);border:1px solid #3a3a3c;bord
       <button id="tabReg" onclick="switchTab('reg')">Регистрация</button>
     </div>
     <div id="authErr" class="err hidden"></div>
-    <div class="field"><input id="aUser" placeholder="Ник (a-z, 0-9, _)" autocomplete="username"></div>
+    <div class="field"><input id="aUser" placeholder="Ник (можно с @)" autocomplete="username"></div>
     <div class="field hidden" id="fNick"><input id="aNick" placeholder="Отображаемое имя"></div>
     <div class="field"><input id="aPass" type="password" placeholder="Пароль" autocomplete="current-password"></div>
     <button class="btn" id="authBtn" onclick="doAuth()">Войти</button>
@@ -90,6 +90,9 @@ async function doAuth(){
   btn.textContent = 'Загрузка...';
   btn.disabled = true;
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 20000);
+
   try {
     const body = { username: user, password: pass };
     if(AUTH_MODE === 'reg') body.nickname = document.getElementById('aNick').value.trim() || user;
@@ -97,9 +100,11 @@ async function doAuth(){
     const res = await fetch(API + '/api/' + (AUTH_MODE === 'login' ? 'login' : 'register'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      signal: controller.signal
     });
     
+    clearTimeout(timeoutId);
     const data = await res.json();
     
     if(!res.ok){
@@ -113,7 +118,12 @@ async function doAuth(){
     localStorage.setItem('anox_token', TOKEN);
     enterApp(data.user);
   } catch(e) {
-    showErr('Ошибка сети. Сервер на Render просыпается (подожди 30 сек и попробуй снова)');
+    clearTimeout(timeoutId);
+    if (e.name === 'AbortError') {
+      showErr('Сервер просыпается (Render Free). Подожди 30 секунд и нажми кнопку еще раз.');
+    } else {
+      showErr('Ошибка сети. Проверь соединение.');
+    }
     btn.textContent = AUTH_MODE === 'login' ? 'Войти' : 'Создать аккаунт';
     btn.disabled = false;
   }
@@ -122,7 +132,7 @@ async function doAuth(){
 function enterApp(user){
   document.getElementById('auth').classList.add('hidden');
   document.getElementById('app').classList.add('active');
-  document.getElementById('userName').textContent = user ? user.nickname : 'друг';
+  document.getElementById('userName').textContent = user ? (user.nickname || user.username) : 'друг';
 }
 
 async function checkAuth(){
