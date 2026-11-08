@@ -1,159 +1,157 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>AnoxGram</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>woxAI</title>
 <style>
-:root{--bg:#0e0e10;--panel:#1c1c1e;--panel2:#2c2c2e;--text:#f2f2f7;--muted:#8e8e93;--accent:#6c5ce7;--gold:#ffd166;--green:#30d158;--red:#ff453a}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;overflow:hidden}
-button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
-input{font-family:inherit;background:var(--panel2);border:1px solid #3a3a3c;border-radius:12px;color:var(--text);padding:12px 14px;width:100%;outline:none;font-size:15px}
-.hidden{display:none!important}
-#auth{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(1200px 600px at 50% -10%,#2a1e5c 0%,var(--bg) 60%);z-index:50;padding:20px}
-.auth-card{width:100%;max-width:400px;background:rgba(28,28,30,.85);border:1px solid #333;border-radius:26px;padding:32px}
-.logo{display:flex;align-items:center;gap:12px;margin-bottom:22px}
-.logo h1{font-size:26px}
-.logo h1 span{color:var(--gold)}
-.tabs{display:flex;background:var(--panel2);border-radius:14px;padding:4px;margin-bottom:20px}
-.tabs button{flex:1;padding:10px;border-radius:11px;color:var(--muted);font-weight:600}
-.tabs button.on{background:var(--accent);color:#fff}
-.field{margin-bottom:14px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--accent),#8e6cf0);color:#fff;border-radius:14px;padding:13px 20px;font-weight:700;font-size:15px;width:100%}
-.btn:active{transform:scale(.96)}
-.err{background:rgba(255,69,58,.12);border:1px solid rgba(255,69,58,.4);color:#ff9b95;border-radius:12px;padding:10px 14px;font-size:14px;margin-bottom:14px}
-.hint{color:var(--muted);font-size:13px;text-align:center;margin-top:14px}
-#app{display:flex;height:100dvh;display:none}
-#app.active{display:flex}
-#main{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;color:var(--muted);gap:14px}
-.logout{position:fixed;bottom:20px;left:20px;right:20px;background:var(--red);color:#fff;padding:14px;border-radius:14px;font-weight:700}
+:root{--bg:#0b0d12;--p:#12151c;--l:#232838;--t:#e6e9f2;--m:#8a92a8;--a:#7c5cff;--b:#00d4ff}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:var(--bg);color:var(--t);font:15px/1.55 system-ui,sans-serif}
+button,select,textarea,input{font:inherit;color:inherit}
+#intro{position:fixed;inset:0;z-index:50;background:radial-gradient(circle at 50% 45%,#1b1445,#05060a 70%);transition:opacity .8s}
+#intro.hide{opacity:0;pointer-events:none}
+#gl{width:100%;height:100%;display:block}
+#enter{position:absolute;left:50%;bottom:11%;transform:translateX(-50%);padding:12px 38px;border:0;border-radius:99px;background:linear-gradient(90deg,var(--a),var(--b));color:#fff;font-weight:600;cursor:pointer;box-shadow:0 0 30px #7c5cff88}
+#app{display:none;height:100dvh}
+#app.on{display:flex}
+#main{flex:1;min-width:0;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--l);background:var(--p)}
+.logo{font-weight:800;font-size:18px;background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sp{flex:1}
+select{background:var(--bg);border:1px solid var(--l);border-radius:8px;padding:7px 8px}
+#msgs{flex:1;overflow:auto;padding:18px 14px;display:flex;flex-direction:column;gap:14px}
+.u{align-self:flex-end;max-width:85%;padding:10px 14px;border-radius:16px 16px 4px 16px;background:linear-gradient(135deg,var(--a),#5b3fe0);color:#fff;white-space:pre-wrap;word-break:break-word;animation:pop .5s .35s backwards}
+@keyframes pop{from{opacity:0;transform:translateY(24px) scale(.9)}}
+.a{background:var(--p);border:1px solid var(--l);border-radius:14px;padding:10px 14px;word-break:break-word;max-width:85%}
+.a img{max-width:100%;border-radius:10px;margin-top:8px}
+.tag{font-size:12px;font-weight:700;color:var(--b);margin-bottom:4px}
+pre{background:#07080c;border:1px solid var(--l);border-radius:8px;padding:10px;overflow:auto;margin:8px 0;white-space:pre-wrap}
+code{font:13px ui-monospace,monospace}
+:not(pre)>code{background:#07080c;padding:1px 5px;border-radius:4px}
+#comp{padding:10px 14px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--l);background:var(--p)}
+#box{display:flex;gap:8px;align-items:flex-end;background:var(--bg);border:1px solid var(--l);border-radius:14px;padding:8px}
+#ta{flex:1;resize:none;border:0;outline:0;background:none;max-height:160px;padding:6px}
+#go{border:0;border-radius:10px;width:42px;height:38px;background:linear-gradient(135deg,var(--a),var(--b));cursor:pointer;font-size:18px}
+.hint{margin:auto;text-align:center;color:var(--m)}
+.hint h2{font-size:34px}
+/* Auth */
+#auth{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(1200px 600px at 50% -10%,#2a1e5c 0%,var(--bg) 60%);z-index:60;padding:20px}
+.card{width:100%;max-width:400px;background:var(--p);border:1px solid var(--l);border-radius:26px;padding:32px}
+.card h1{font-size:24px;margin-bottom:18px;background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.card input{width:100%;padding:12px;margin-bottom:12px;background:var(--bg);border:1px solid var(--l);border-radius:10px}
+.card button{width:100%;padding:12px;border:0;border-radius:10px;background:linear-gradient(135deg,var(--a),var(--b));color:#fff;font-weight:600;cursor:pointer}
+.card .link{color:var(--m);font-size:13px;text-align:center;margin-top:12px;cursor:pointer}
+.err{color:#ff6b6b;font-size:13px;margin-bottom:10px}
 </style>
 </head>
 <body>
 
+<div id="intro"><canvas id="gl"></canvas><button id="enter">Войти</button></div>
+
 <div id="auth">
-  <div class="auth-card">
-    <div class="logo">
-      <svg width="40" height="40" viewBox="0 0 46 46"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a29bfe"/><stop offset="1" stop-color="#6c5ce7"/></linearGradient></defs><rect x="4" y="4" width="38" height="38" rx="12" fill="url(#lg)"/><path d="M14 30 L23 13 L32 30" stroke="#fff" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="24" r="2.4" fill="#fff"/></svg>
-      <h1>Anox<span>Gram</span></h1>
-    </div>
-    <div class="tabs">
-      <button id="tabLogin" class="on" onclick="switchTab('login')">Вход</button>
-      <button id="tabReg" onclick="switchTab('reg')">Регистрация</button>
-    </div>
-    <div id="authErr" class="err hidden"></div>
-    <div class="field"><input id="aUser" placeholder="Ник (можно с @)" autocomplete="username"></div>
-    <div class="field hidden" id="fNick"><input id="aNick" placeholder="Отображаемое имя"></div>
-    <div class="field"><input id="aPass" type="password" placeholder="Пароль" autocomplete="current-password"></div>
-    <button class="btn" id="authBtn" onclick="doAuth()">Войти</button>
-    <div class="hint">Стартовый бонус: 1 000 Звёзд</div>
+  <div class="card">
+    <h1 id="authTitle">Вход в woxAI</h1>
+    <div id="authErr" class="err"></div>
+    <input id="authUser" placeholder="Логин">
+    <input id="authPass" type="password" placeholder="Пароль">
+    <button onclick="doAuth()">Войти</button>
+    <div class="link" onclick="switchAuth()">Нет аккаунта? Регистрация</div>
   </div>
 </div>
 
 <div id="app">
-  <main id="main">
-    <div style="font-size:64px">⭐</div>
-    <div>Добро пожаловать, <b id="userName"></b>!</div>
-    <div style="font-size:14px">Сайт и сервер связаны успешно.</div>
-    <button class="logout" onclick="logout()">Выйти</button>
-  </main>
+  <div id="main">
+    <header>
+      <span class="logo">woxAI</span><span class="sp"></span>
+      <select id="model">
+        <option value="Troll-Fast">Troll-Fast</option>
+        <option value="Anox-Core">Anox-Core</option>
+        <option value="Onyx-Brain">Onyx-Brain</option>
+      </select>
+    </header>
+    <div id="msgs"></div>
+    <div id="comp"><div id="box"><textarea id="ta" rows="1" placeholder="Спроси что угодно…"></textarea><button id="go">➤</button></div></div>
+  </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-const API = 'https://fame-api-1.onrender.com';
-let TOKEN = localStorage.getItem('anox_token') || '';
-let AUTH_MODE = 'login';
+const $=s=>document.querySelector(s),msgs=$('#msgs'),ta=$('#ta');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const md=t=>t.split(/```/).map((p,i)=>i%2?`<pre><code>${esc(p.replace(/^\w*\n/,''))}</code></pre>`:esc(p).replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/\n/g,'<br>')).join('');
+let AUTH_MODE='login';
 
-function switchTab(m){
-  AUTH_MODE = m;
-  document.getElementById('tabLogin').classList.toggle('on', m==='login');
-  document.getElementById('tabReg').classList.toggle('on', m==='reg');
-  document.getElementById('fNick').classList.toggle('hidden', m==='login');
-  document.getElementById('authBtn').textContent = m==='login' ? 'Войти' : 'Создать аккаунт';
-  document.getElementById('authErr').classList.add('hidden');
-}
+// 3D-вход
+(()=>{
+  const intro=$('#intro');let off=false;
+  const close=()=>{if(off)return;off=true;intro.classList.add('hide');setTimeout(()=>intro.remove(),900)};
+  $('#enter').onclick=close;
+  setTimeout(close,6000);
+  try{
+    const R=new THREE.WebGLRenderer({canvas:$('#gl'),antialias:true,alpha:true}),S=new THREE.Scene(),
+      C=new THREE.PerspectiveCamera(50,1,.1,100),G=new THREE.Group();
+    R.setPixelRatio(Math.min(devicePixelRatio,2));C.position.z=7;
+    const lc=document.createElement('canvas');lc.width=1024;lc.height=400;const g=lc.getContext('2d');
+    g.font='800 200px system-ui';g.textBaseline='middle';
+    const w1=g.measureText('wox').width,w2=g.measureText('AI').width,x0=(1024-w1-w2)/2;
+    const gr=g.createLinearGradient(x0,0,x0+w1,0);gr.addColorStop(0,'#7c5cff');gr.addColorStop(1,'#00d4ff');
+    g.shadowColor='#7c5cff';g.shadowBlur=40;g.fillStyle=gr;g.fillText('wox',x0,200);g.fillStyle='#fff';g.fillText('AI',x0+w1,200);
+    G.add(new THREE.Mesh(new THREE.PlaneGeometry(6,2.34),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(lc),transparent:true})));
+    const wire=(geo,c)=>new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:c,wireframe:true,transparent:true,opacity:.4}));
+    G.add(wire(new THREE.TorusKnotGeometry(2.4,.5,140,16),0x7c5cff),wire(new THREE.IcosahedronGeometry(3.6,1),0x00d4ff));
+    S.add(G);
+    const rs=()=>{R.setSize(innerWidth,innerHeight);C.aspect=innerWidth/innerHeight;C.updateProjectionMatrix();G.userData.s=Math.min(1,C.aspect)};
+    rs();addEventListener('resize',rs);
+    const T0=performance.now();
+    (function loop(){
+      if(off)return;
+      const t=(performance.now()-T0)/1000,k=Math.min(1,t/1.4),e=1-Math.pow(1-k,3);
+      G.scale.setScalar(e*G.userData.s);G.rotation.y=Math.sin(t*.8)*.5;
+      R.render(S,C);requestAnimationFrame(loop);
+    })();
+  }catch(e){close()}
+})();
 
-function showErr(t){
-  const el = document.getElementById('authErr');
-  el.textContent = t;
-  el.classList.remove('hidden');
+function switchAuth(){
+  AUTH_MODE=AUTH_MODE==='login'?'register':'login';
+  $('#authTitle').textContent=AUTH_MODE==='login'?'Вход в woxAI':'Регистрация в woxAI';
+  $('.card button').textContent=AUTH_MODE==='login'?'Войти':'Создать аккаунт';
+  $('.card .link').textContent=AUTH_MODE==='login'?'Нет аккаунта? Регистрация':'Есть аккаунт? Вход';
 }
 
 async function doAuth(){
-  document.getElementById('authErr').classList.add('hidden');
-  const user = document.getElementById('aUser').value.trim();
-  const pass = document.getElementById('aPass').value;
-  if(!user || !pass){ showErr('Введите ник и пароль'); return; }
-  
-  const btn = document.getElementById('authBtn');
-  btn.textContent = 'Загрузка...';
-  btn.disabled = true;
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 20000);
-
-  try {
-    const body = { username: user, password: pass };
-    if(AUTH_MODE === 'reg') body.nickname = document.getElementById('aNick').value.trim() || user;
-    
-    const res = await fetch(API + '/api/' + (AUTH_MODE === 'login' ? 'login' : 'register'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      signal: controller.signal
-    });
-    
-    clearTimeout(timeoutId);
-    const data = await res.json();
-    
-    if(!res.ok){
-      showErr(data.error || 'Ошибка сервера');
-      btn.textContent = AUTH_MODE === 'login' ? 'Войти' : 'Создать аккаунт';
-      btn.disabled = false;
-      return;
-    }
-    
-    TOKEN = data.token;
-    localStorage.setItem('anox_token', TOKEN);
-    enterApp(data.user);
-  } catch(e) {
-    clearTimeout(timeoutId);
-    if (e.name === 'AbortError') {
-      showErr('Сервер просыпается (Render Free). Подожди 30 секунд и нажми кнопку еще раз.');
-    } else {
-      showErr('Ошибка сети. Проверь соединение.');
-    }
-    btn.textContent = AUTH_MODE === 'login' ? 'Войти' : 'Создать аккаунт';
-    btn.disabled = false;
-  }
+  $('#authErr').textContent='';
+  const username=$('#authUser').value.trim(), password=$('#authPass').value;
+  if(!username||!password){$('#authErr').textContent='Заполни все поля';return}
+  try{
+    const r=await fetch('/api/'+AUTH_MODE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
+    const d=await r.json();
+    if(!r.ok){$('#authErr').textContent=d.error||'Ошибка';return}
+    $('#auth').style.display='none';$('#app').classList.add('on');
+    showHint();
+  }catch(e){$('#authErr').textContent='Ошибка сети'}
 }
 
-function enterApp(user){
-  document.getElementById('auth').classList.add('hidden');
-  document.getElementById('app').classList.add('active');
-  document.getElementById('userName').textContent = user ? (user.nickname || user.username) : 'друг';
+function showHint(){msgs.innerHTML='<div class="hint"><h2 class="logo">woxAI</h2><p>Напиши «нарисуй кота» или задай любой вопрос</p></div>'}
+
+async function send(){
+  const text=ta.value.trim();if(!text)return;
+  ta.value='';
+  if(msgs.querySelector('.hint'))msgs.innerHTML='';
+  const u=document.createElement('div');u.className='u';u.textContent=text;msgs.append(u);msgs.scrollTop=msgs.scrollHeight;
+  const a=document.createElement('div');a.className='a';a.innerHTML='<div class="tag">woxAI</div><div class="body">...</div>';msgs.append(a);
+  try{
+    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,model:$('#model').value})});
+    const d=await r.json();
+    a.querySelector('.body').innerHTML=md(d.reply||'Нет ответа');
+  }catch(e){a.querySelector('.body').textContent='Ошибка сети'}
+  msgs.scrollTop=msgs.scrollHeight;
 }
 
-async function checkAuth(){
-  if(!TOKEN) return;
-  try {
-    const res = await fetch(API + '/api/me', { headers: { 'X-Token': TOKEN } });
-    if(res.ok){
-      const data = await res.json();
-      enterApp(data.user);
-    } else {
-      TOKEN = ''; localStorage.removeItem('anox_token');
-    }
-  } catch(e) {}
-}
-
-function logout(){
-  TOKEN = ''; localStorage.removeItem('anox_token');
-  location.reload();
-}
-
-checkAuth();
+ta.oninput=()=>{ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight,160)+'px'};
+ta.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}};
+$('#go').onclick=send;
 </script>
 </body>
 </html>
