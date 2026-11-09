@@ -1,157 +1,172 @@
 <!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="utf-8">
+<html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>woxAI</title>
+<title>Umbra</title>
 <style>
-:root{--bg:#0b0d12;--p:#12151c;--l:#232838;--t:#e6e9f2;--m:#8a92a8;--a:#7c5cff;--b:#00d4ff}
-*{box-sizing:border-box;margin:0}
-html,body{height:100%;background:var(--bg);color:var(--t);font:15px/1.55 system-ui,sans-serif}
-button,select,textarea,input{font:inherit;color:inherit}
-#intro{position:fixed;inset:0;z-index:50;background:radial-gradient(circle at 50% 45%,#1b1445,#05060a 70%);transition:opacity .8s}
-#intro.hide{opacity:0;pointer-events:none}
-#gl{width:100%;height:100%;display:block}
-#enter{position:absolute;left:50%;bottom:11%;transform:translateX(-50%);padding:12px 38px;border:0;border-radius:99px;background:linear-gradient(90deg,var(--a),var(--b));color:#fff;font-weight:600;cursor:pointer;box-shadow:0 0 30px #7c5cff88}
-#app{display:none;height:100dvh}
-#app.on{display:flex}
-#main{flex:1;min-width:0;display:flex;flex-direction:column}
-header{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--l);background:var(--p)}
-.logo{font-weight:800;font-size:18px;background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
-.sp{flex:1}
-select{background:var(--bg);border:1px solid var(--l);border-radius:8px;padding:7px 8px}
-#msgs{flex:1;overflow:auto;padding:18px 14px;display:flex;flex-direction:column;gap:14px}
-.u{align-self:flex-end;max-width:85%;padding:10px 14px;border-radius:16px 16px 4px 16px;background:linear-gradient(135deg,var(--a),#5b3fe0);color:#fff;white-space:pre-wrap;word-break:break-word;animation:pop .5s .35s backwards}
-@keyframes pop{from{opacity:0;transform:translateY(24px) scale(.9)}}
-.a{background:var(--p);border:1px solid var(--l);border-radius:14px;padding:10px 14px;word-break:break-word;max-width:85%}
-.a img{max-width:100%;border-radius:10px;margin-top:8px}
-.tag{font-size:12px;font-weight:700;color:var(--b);margin-bottom:4px}
-pre{background:#07080c;border:1px solid var(--l);border-radius:8px;padding:10px;overflow:auto;margin:8px 0;white-space:pre-wrap}
-code{font:13px ui-monospace,monospace}
-:not(pre)>code{background:#07080c;padding:1px 5px;border-radius:4px}
-#comp{padding:10px 14px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--l);background:var(--p)}
-#box{display:flex;gap:8px;align-items:flex-end;background:var(--bg);border:1px solid var(--l);border-radius:14px;padding:8px}
-#ta{flex:1;resize:none;border:0;outline:0;background:none;max-height:160px;padding:6px}
-#go{border:0;border-radius:10px;width:42px;height:38px;background:linear-gradient(135deg,var(--a),var(--b));cursor:pointer;font-size:18px}
-.hint{margin:auto;text-align:center;color:var(--m)}
-.hint h2{font-size:34px}
-/* Auth */
-#auth{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(1200px 600px at 50% -10%,#2a1e5c 0%,var(--bg) 60%);z-index:60;padding:20px}
-.card{width:100%;max-width:400px;background:var(--p);border:1px solid var(--l);border-radius:26px;padding:32px}
-.card h1{font-size:24px;margin-bottom:18px;background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
-.card input{width:100%;padding:12px;margin-bottom:12px;background:var(--bg);border:1px solid var(--l);border-radius:10px}
-.card button{width:100%;padding:12px;border:0;border-radius:10px;background:linear-gradient(135deg,var(--a),var(--b));color:#fff;font-weight:600;cursor:pointer}
-.card .link{color:var(--m);font-size:13px;text-align:center;margin-top:12px;cursor:pointer}
-.err{color:#ff6b6b;font-size:13px;margin-bottom:10px}
-</style>
-</head>
-<body>
-
-<div id="intro"><canvas id="gl"></canvas><button id="enter">Войти</button></div>
-
-<div id="auth">
-  <div class="card">
-    <h1 id="authTitle">Вход в woxAI</h1>
-    <div id="authErr" class="err"></div>
-    <input id="authUser" placeholder="Логин">
-    <input id="authPass" type="password" placeholder="Пароль">
-    <button onclick="doAuth()">Войти</button>
-    <div class="link" onclick="switchAuth()">Нет аккаунта? Регистрация</div>
-  </div>
-</div>
-
-<div id="app">
-  <div id="main">
-    <header>
-      <span class="logo">woxAI</span><span class="sp"></span>
-      <select id="model">
-        <option value="Troll-Fast">Troll-Fast</option>
-        <option value="Anox-Core">Anox-Core</option>
-        <option value="Onyx-Brain">Onyx-Brain</option>
-      </select>
-    </header>
-    <div id="msgs"></div>
-    <div id="comp"><div id="box"><textarea id="ta" rows="1" placeholder="Спроси что угодно…"></textarea><button id="go">➤</button></div></div>
-  </div>
-</div>
-
+:root{--bg:#0e0e10;--p:#1c1c1e;--a:#8b5cf6;--m:#8e8e93}
+*{box-sizing:border-box;margin:0;font-family:system-ui,-apple-system,sans-serif}
+[hidden]{display:none!important}
+body{background:var(--bg);color:#f2f2f7;height:100dvh;overflow:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(600px 400px at 85% 0,#8b5cf633,transparent),radial-gradient(500px 400px at 0 100%,#06b6d422,transparent)}
+.g{background:#1c1c1eb8;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid #ffffff17;border-radius:20px}
+#v{height:100dvh;overflow:auto;padding:16px 14px 110px;max-width:720px;margin:auto;animation:in .35s}
+@keyframes in{from{opacity:0;transform:translateY(10px)}}
+h2,h3{margin:8px 0}.m{color:var(--m);font-size:13px}.pad{padding:14px}
+#nav{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:4px;padding:6px;z-index:5;border-radius:28px}
+#nav button{background:none;border:0;color:var(--m);padding:8px 18px;border-radius:22px;display:flex;flex-direction:column;align-items:center;font-size:12px;cursor:pointer;transition:.25s}
+#nav button.on{background:var(--a);color:#fff;transform:translateY(-2px)}
+button,input,select{font:inherit;color:inherit}
+input,select{background:#ffffff0d;border:1px solid #ffffff1a;border-radius:14px;padding:11px 13px;width:100%;outline:0;margin:4px 0}
+select option{background:var(--p)}input:focus,select:focus{border-color:var(--a)}
+label{display:block;margin:6px 0;font-size:14px}
+.b{background:var(--a);border:0;border-radius:14px;padding:11px 16px;cursor:pointer;transition:.2s;margin:4px 0}
+.b:hover{filter:brightness(1.15);transform:translateY(-1px)}
+.sm{background:#ffffff14;border:0;border-radius:10px;padding:6px 10px;margin:3px 2px;cursor:pointer;font-size:13px}.sm:hover{background:var(--a)}
+.row{display:flex;gap:10px;align-items:center;padding:12px;margin:8px 0;cursor:pointer;transition:.2s}.row:hover{transform:translateX(3px);border-color:var(--a)}
+.av{width:44px;height:44px;border-radius:50%;background:#333 center/cover;display:grid;place-items:center;flex:none;font-weight:700}
+.bn{height:110px;background:linear-gradient(135deg,#4c1d95,#0e7490) center/cover}
+.lb{font-style:normal;font-size:12px;padding:2px 7px;border-radius:9px;margin-left:5px;white-space:nowrap}
+.tabs{display:flex;gap:6px;overflow:auto;padding-bottom:8px}.tb{background:#ffffff0f;border:0;border-radius:16px;padding:8px 14px;white-space:nowrap;cursor:pointer}.tb.on{background:var(--a)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.gc{padding:10px;text-align:center;animation:in .4s}.gc canvas{width:110px;height:110px}
+.nft{color:#fbbf24;font-size:13px}.bal{display:flex;gap:16px;margin:10px 0;font-weight:600}
+.adm{display:flex;gap:12px;align-items:center}.adm canvas{width:110px;height:110px;flex:none}
+.au{margin-top:8vh;text-align:center}.au canvas{width:130px;height:130px}.au h1{letter-spacing:3px;margin-bottom:8px}.au a{display:block;margin-top:12px;cursor:pointer}
+#chat{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;max-width:720px;margin:auto;z-index:8;animation:in .25s}
+.hd{display:flex;gap:12px;align-items:center;padding:12px 14px;margin:8px;border-radius:18px}.ic{background:none;border:0;font-size:20px;cursor:pointer}
+#ms{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:82%;background:var(--p);padding:8px 12px;border-radius:16px 16px 16px 4px;animation:in .25s;word-break:break-word}
+.msg.me{align-self:flex-end;background:#6d3fd6;border-radius:16px 16px 4px 16px}.msg small{display:block;margin-bottom:2px}
+.in{display:flex;gap:8px;padding:8px;margin:8px 8px calc(8px + env(safe-area-inset-bottom));border-radius:22px}.in input{margin:0}
+#md{position:fixed;inset:0;background:#000a;z-index:9;display:grid;place-items:center;padding:16px}#md>div{width:100%;max-width:420px;max-height:85vh;overflow:auto;background:var(--p)}
+.toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);padding:10px 18px;z-index:20;animation:in .3s}
+</style></head><body>
+<div id="v"></div><div id="chat" hidden></div><div id="md" hidden></div>
+<div id="nav" class="g" hidden>
+<button data-a="nv" data-k="chats" class="on">💬<span>Чаты</span></button>
+<button data-a="nv" data-k="prof">👤<span>Профиль</span></button>
+<button data-a="nv" data-k="set">⚙️<span>Настройки</span></button></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
 <script>
-const $=s=>document.querySelector(s),msgs=$('#msgs'),ta=$('#ta');
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const md=t=>t.split(/```/).map((p,i)=>i%2?`<pre><code>${esc(p.replace(/^\w*\n/,''))}</code></pre>`:esc(p).replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/\n/g,'<br>')).join('');
-let AUTH_MODE='login';
+const API="https://YOUR-APP.onrender.com"; // ← адрес бэкенда на Render
+let T=localStorage.ut||"",U=null,sio=null,cur=null,ptab="me";
+const $=s=>document.querySelector(s),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const FONTS=["system-ui","Georgia","'Courier New'","'Trebuchet MS'","Impact","cursive"],C=c=>c=="gram"?"💠":"⭐";
+const LB={"Новичок":["🌱","#34d399"],"Галочка":["✔","#3b82f6"],"Scam":["⚠","#ef4444"],"Fake":["✖","#f97316"],"Hold":["⏳","#eab308"],"Major":["💎","#06b6d4"],"Владелец Umbra":["👑","#a855f7"]};
+const toast=m=>{const e=document.createElement("div");e.className="toast g";e.textContent=m;document.body.append(e);setTimeout(()=>e.remove(),2800)};
+async function api(p,b){const r=await fetch(API+p,{method:b?"POST":"GET",headers:{"Content-Type":"application/json",Authorization:T},body:b?JSON.stringify(b):undefined});const d=await r.json().catch(()=>({}));if(!r.ok){if(r.status==401&&T)out();throw new Error(d.error||"Ошибка сети")}return d}
+const nm=(u,f)=>`<span style="color:${u.color};font-family:${u.font};text-shadow:${u.glow?`0 0 12px ${u.color}`:"none"};font-weight:600">${esc(u.nick)}</span>`+u.labels.map(l=>{const b=LB[l]||["•","#888"];return `<i class="lb" title="${esc(l)}" style="color:${b[1]};background:${b[1]}26">${b[0]}${f?" "+esc(l):""}</i>`}).join("");
+const modal=h=>{$("#md").innerHTML=`<div class="g pad">${h}<button class="sm" data-a="close" style="margin-top:8px">Закрыть</button></div>`;$("#md").hidden=false};
 
-// 3D-вход
-(()=>{
-  const intro=$('#intro');let off=false;
-  const close=()=>{if(off)return;off=true;intro.classList.add('hide');setTimeout(()=>intro.remove(),900)};
-  $('#enter').onclick=close;
-  setTimeout(close,6000);
-  try{
-    const R=new THREE.WebGLRenderer({canvas:$('#gl'),antialias:true,alpha:true}),S=new THREE.Scene(),
-      C=new THREE.PerspectiveCamera(50,1,.1,100),G=new THREE.Group();
-    R.setPixelRatio(Math.min(devicePixelRatio,2));C.position.z=7;
-    const lc=document.createElement('canvas');lc.width=1024;lc.height=400;const g=lc.getContext('2d');
-    g.font='800 200px system-ui';g.textBaseline='middle';
-    const w1=g.measureText('wox').width,w2=g.measureText('AI').width,x0=(1024-w1-w2)/2;
-    const gr=g.createLinearGradient(x0,0,x0+w1,0);gr.addColorStop(0,'#7c5cff');gr.addColorStop(1,'#00d4ff');
-    g.shadowColor='#7c5cff';g.shadowBlur=40;g.fillStyle=gr;g.fillText('wox',x0,200);g.fillStyle='#fff';g.fillText('AI',x0+w1,200);
-    G.add(new THREE.Mesh(new THREE.PlaneGeometry(6,2.34),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(lc),transparent:true})));
-    const wire=(geo,c)=>new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:c,wireframe:true,transparent:true,opacity:.4}));
-    G.add(wire(new THREE.TorusKnotGeometry(2.4,.5,140,16),0x7c5cff),wire(new THREE.IcosahedronGeometry(3.6,1),0x00d4ff));
-    S.add(G);
-    const rs=()=>{R.setSize(innerWidth,innerHeight);C.aspect=innerWidth/innerHeight;C.updateProjectionMatrix();G.userData.s=Math.min(1,C.aspect)};
-    rs();addEventListener('resize',rs);
-    const T0=performance.now();
-    (function loop(){
-      if(off)return;
-      const t=(performance.now()-T0)/1000,k=Math.min(1,t/1.4),e=1-Math.pow(1-k,3);
-      G.scale.setScalar(e*G.userData.s);G.rotation.y=Math.sin(t*.8)*.5;
-      R.render(S,C);requestAnimationFrame(loop);
-    })();
-  }catch(e){close()}
-})();
+/* ===== 3D-подарки: один WebGL-рендерер рисует во все canvas ===== */
+const R=new THREE.WebGLRenderer({alpha:true,antialias:true});R.setSize(160,160);
+const S=new THREE.Scene(),Cm=new THREE.PerspectiveCamera(40,1,.1,50);Cm.position.z=5;
+S.add(new THREE.AmbientLight(0xffffff,.55));const PL=new THREE.PointLight(0xffffff,1.3);PL.position.set(3,4,5);S.add(PL);
+function geo(k){
+ if(k=="cube")return new THREE.BoxGeometry(1.5,1.5,1.5);
+ if(k=="sphere")return new THREE.SphereGeometry(.95,32,32);
+ if(k=="pyramid")return new THREE.ConeGeometry(1.1,1.8,4);
+ if(k=="crystal")return new THREE.OctahedronGeometry(1.15);
+ if(k=="knot")return new THREE.TorusKnotGeometry(.8,.28,100,16);
+ const s=new THREE.Shape();
+ if(k=="star"){for(let i=0;i<10;i++){const r=i%2?.55:1.25,a=i*Math.PI/5+Math.PI/2,x=Math.cos(a)*r,y=Math.sin(a)*r;i?s.lineTo(x,y):s.moveTo(x,y)}}
+ else{s.moveTo(0,.5);s.bezierCurveTo(0,.8,-.2,1.2,-.7,1.2);s.bezierCurveTo(-1.4,1.2,-1.4,.3,-1.4,.3);s.bezierCurveTo(-1.4,-.4,-.7,-.9,0,-1.4);s.bezierCurveTo(.7,-.9,1.4,-.4,1.4,.3);s.bezierCurveTo(1.4,.3,1.4,1.2,.7,1.2);s.bezierCurveTo(.2,1.2,0,.8,0,.5)}
+ const g=new THREE.ExtrudeGeometry(s,{depth:.4,bevelEnabled:true,bevelSize:.1,bevelThickness:.1,bevelSegments:3});g.center();return g}
+function mesh(k,c){const grp=new THREE.Group(),g=geo(k);
+ const m=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:.25,metalness:.5,roughness:.25,flatShading:k=="crystal"}));
+ const gl=new THREE.Mesh(g,new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.2,side:THREE.BackSide}));gl.scale.setScalar(1.18);
+ grp.add(m,gl);grp.userData.gl=gl;return grp}
+const GL=[];function g3(cv,k,c){if(cv)GL.push({cv,m:mesh(k,c),t:Math.random()*9})}
+(function loop(t){requestAnimationFrame(loop);
+ for(let i=GL.length;i--;){const g=GL[i];if(!g.cv.isConnected){GL.splice(i,1);continue}
+  const s=t/1000+g.t;g.m.rotation.y=s;g.m.rotation.x=Math.sin(s*.7)*.3;g.m.position.y=Math.sin(s*1.6)*.18;g.m.userData.gl.material.opacity=.15+.1*Math.sin(s*3);
+  S.add(g.m);R.render(S,Cm);S.remove(g.m);const x=g.cv.getContext("2d");x.clearRect(0,0,160,160);x.drawImage(R.domElement,0,0,160,160)}})(0);
+function card(x,act){const id="c"+Math.random().toString(36).slice(2);setTimeout(()=>g3(document.getElementById(id),x.shape,x.color));
+ return `<div class="g gc"><canvas id="${id}" width="160" height="160"></canvas><b>${esc(x.name)}${x.num?` <span class="nft">#${x.num}</span>`:""}</b><div>${act}</div></div>`}
 
-function switchAuth(){
-  AUTH_MODE=AUTH_MODE==='login'?'register':'login';
-  $('#authTitle').textContent=AUTH_MODE==='login'?'Вход в woxAI':'Регистрация в woxAI';
-  $('.card button').textContent=AUTH_MODE==='login'?'Войти':'Создать аккаунт';
-  $('.card .link').textContent=AUTH_MODE==='login'?'Нет аккаунта? Регистрация':'Есть аккаунт? Вход';
-}
+/* ===== Действия (делегирование кликов) ===== */
+const A={};
+document.addEventListener("click",e=>{const a=e.target.closest("[data-a]");if(a&&A[a.dataset.a])A[a.dataset.a](a.dataset,a)});
+const post=async(p,b,ok)=>{try{await api(p,b);toast(ok||"Готово");profV()}catch(e){toast(e.message)}};
+A.close=()=>$("#md").hidden=true;
+A.nv=d=>nav(d.k);
+A.sw=d=>authV(+d.r);
+A.login=()=>doAuth(0);A.reg=()=>doAuth(1);
+async function doAuth(reg){const b={username:$("#lu").value,password:$("#lp").value};if(reg)b.nick=$("#ln").value;
+ try{const d=await api(reg?"/api/register":"/api/login",b);T=d.token;localStorage.ut=T;U=d.user;start()}catch(e){toast(e.message)}}
+function out(){T="";localStorage.removeItem("ut");U=null;sio&&sio.disconnect();$("#nav").hidden=true;$("#chat").hidden=true;authV()}
+A.logout=out;
 
-async function doAuth(){
-  $('#authErr').textContent='';
-  const username=$('#authUser').value.trim(), password=$('#authPass').value;
-  if(!username||!password){$('#authErr').textContent='Заполни все поля';return}
-  try{
-    const r=await fetch('/api/'+AUTH_MODE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
-    const d=await r.json();
-    if(!r.ok){$('#authErr').textContent=d.error||'Ошибка';return}
-    $('#auth').style.display='none';$('#app').classList.add('on');
-    showHint();
-  }catch(e){$('#authErr').textContent='Ошибка сети'}
-}
+/* ===== Вход ===== */
+function authV(reg){$("#v").innerHTML=`<div class="g pad au"><canvas id="lg" width="160" height="160"></canvas><h1>UMBRA</h1>${reg?`<input id="ln" placeholder="Ник">`:""}<input id="lu" placeholder="@юзернейм" autocapitalize="off"><input id="lp" type="password" placeholder="Пароль"><button class="b" style="width:100%" data-a="${reg?"reg":"login"}">${reg?"Создать аккаунт":"Войти"}</button><a class="m" data-a="sw" data-r="${reg?0:1}">${reg?"Уже есть аккаунт? Войти":"Нет аккаунта? Зарегистрироваться"}</a></div>`;g3($("#lg"),"sphere","#8b5cf6")}
+async function boot(){if(!T)return authV();try{U=await api("/api/me");start()}catch{authV()}}
+function start(){$("#nav").hidden=false;conn();nav("chats")}
+function nav(t){cur=null;$("#chat").hidden=true;document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.k==t));({chats:chatsV,prof:profV,set:setV})[t]()}
 
-function showHint(){msgs.innerHTML='<div class="hint"><h2 class="logo">woxAI</h2><p>Напиши «нарисуй кота» или задай любой вопрос</p></div>'}
+/* ===== Чаты ===== */
+function conn(){sio&&sio.disconnect();sio=io(API);sio.on("connect",()=>sio.emit("auth",T));
+ sio.on("msg",m=>{if(cur&&cur.id==m.chat)addMsg(m);else{if(m.uid!=U.id)toast("💬 "+m.nick+": "+m.text.slice(0,40));if(!cur&&$("#cl"))chatsV()}});sio.on("err",toast)}
+async function chatsV(){const c=await api("/api/chats");
+ $("#v").innerHTML=`<h2>Чаты</h2><div class="g pad" style="display:flex;gap:8px"><button class="b" data-a="newchat">＋ Создать</button><button class="b" data-a="disc" style="background:#ffffff14">🔎 Найти</button></div><div id="cl">`+
+ c.map(x=>`<div class="g row" data-a="open" data-id="${x.id}" data-n="${esc(x.title)}"><div class="av">${x.type=="dm"?"👤":x.type=="group"?"👥":"📢"}</div><div style="flex:1;min-width:0"><b>${esc(x.title)}</b><div class="m">${x.last?esc(x.last.text.slice(0,50)):"Нет сообщений"}</div></div></div>`).join("")+`</div>`}
+A.newchat=()=>modal(`<h3>Новый чат</h3><select id="nt"><option value="dm">Личный (по @юзернейму)</option><option value="group">Группа</option><option value="channel">Канал</option></select><input id="nv" placeholder="@юзернейм или название"><label><input id="np" type="checkbox" style="width:auto"> Публичный (виден в поиске)</label><button class="b" data-a="mk">Создать</button>`);
+A.mk=async()=>{const v=$("#nv").value;try{const r=await api("/api/chats",{type:$("#nt").value,title:v,username:v,public:$("#np").checked});A.close();openChat(r.id,v)}catch(e){toast(e.message)}};
+A.disc=()=>{modal(`<h3>Публичные чаты</h3><input id="dq" placeholder="Название"><button class="b" data-a="ds">Найти</button><div id="dr"></div>`);A.ds()};
+A.ds=async()=>{$("#dr").innerHTML=(await api("/api/discover?q="+encodeURIComponent($("#dq").value))).map(c=>`<div class="g row" data-a="jn" data-id="${c.id}" data-n="${esc(c.title)}">${c.type=="group"?"👥":"📢"} ${esc(c.title)}</div>`).join("")||`<div class="m">Ничего не найдено</div>`};
+A.jn=async d=>{try{await api(`/api/chats/${d.id}/join`,{});A.close();openChat(d.id,d.n)}catch(e){toast(e.message)}};
+A.open=d=>openChat(d.id,d.n);
+A.back=()=>{cur=null;$("#chat").hidden=true;chatsV()};
+const msg=m=>`<div class="msg ${m.uid==U.id?"me":""}"><small>${nm(m)}</small>${esc(m.text)}</div>`;
+function addMsg(m){const ms=$("#ms");ms.insertAdjacentHTML("beforeend",msg(m));ms.scrollTop=1e9}
+async function openChat(id,title){try{const m=await api(`/api/chats/${id}/msgs`);cur={id};const c=$("#chat");c.hidden=false;
+ c.innerHTML=`<div class="g hd"><button class="ic" data-a="back">←</button><b>${esc(title)}</b></div><div id="ms">${m.map(msg).join("")}</div><div class="g in"><input id="mi" placeholder="Сообщение" autocomplete="off"><button class="b" style="margin:0" data-a="send">➤</button></div>`;
+ $("#ms").scrollTop=1e9;$("#mi").onkeydown=e=>e.key=="Enter"&&A.send()}catch(e){toast(e.message)}}
+A.send=()=>{const i=$("#mi");if(!i.value.trim())return;sio.emit("send",{token:T,chat:cur.id,text:i.value});i.value=""};
 
-async function send(){
-  const text=ta.value.trim();if(!text)return;
-  ta.value='';
-  if(msgs.querySelector('.hint'))msgs.innerHTML='';
-  const u=document.createElement('div');u.className='u';u.textContent=text;msgs.append(u);msgs.scrollTop=msgs.scrollHeight;
-  const a=document.createElement('div');a.className='a';a.innerHTML='<div class="tag">woxAI</div><div class="body">...</div>';msgs.append(a);
-  try{
-    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,model:$('#model').value})});
-    const d=await r.json();
-    a.querySelector('.body').innerHTML=md(d.reply||'Нет ответа');
-  }catch(e){a.querySelector('.body').textContent='Ошибка сети'}
-  msgs.scrollTop=msgs.scrollHeight;
-}
+/* ===== Профиль (кошелёк, подарки, магазин, маркет, админ) ===== */
+const PT=[["me","Профиль"],["w","Кошелёк"],["g","Подарки"],["s","Магазин"],["m","Маркет"]];
+async function profV(){try{U=await api("/api/me")}catch(e){return toast(e.message)}
+ const tabs=PT.concat(U.admin?[["a","Админ"]]:[]);
+ $("#v").innerHTML=`<div class="tabs">${tabs.map(([k,n])=>`<button class="tb ${k==ptab?"on":""}" data-a="ptab" data-k="${k}">${n}</button>`).join("")}</div><div id="pb"></div>`;
+ try{await({me:pMe,w:pW,g:pG,s:pS,m:pM,a:pA}[ptab]||pMe)()}catch(e){toast(e.message)}}
+A.ptab=d=>{ptab=d.k;profV()};
+function pMe(){const u=U;$("#pb").innerHTML=`<div class="g" style="overflow:hidden"><div class="bn" style="background-image:url(${u.banner||""})"></div><div style="padding:0 16px 16px;margin-top:-34px"><div class="av" style="width:72px;height:72px;font-size:28px;border:3px solid var(--p);background-image:url(${u.avatar||""})">${u.avatar?"":esc(u.nick[0])}</div><h2>${nm(u,1)}</h2><div class="m">${esc(u.username)} · ID ${u.id} · с ${new Date(u.created*1000).toLocaleDateString()}</div><div style="margin:8px 0">${u.badges.map(b=>`<span class="lb" style="background:#ffffff14">${esc(b)}</span>`).join("")||`<span class="m">Бейджиков пока нет</span>`}</div><div class="bal"><span>⭐ ${u.stars}</span><span>💠 ${u.gram} GRAM</span></div>${u.wfrozen?"<div>🧊 Кошелёк заморожен</div>":""}</div></div>`}
+async function pW(){const h=await api("/api/wallet");
+ $("#pb").innerHTML=`<div class="g pad"><h3>⭐ ${U.stars} · 💠 ${U.gram}</h3>${U.wfrozen?"<div>🧊 Кошелёк заморожен</div>":""}<input id="tt" placeholder="@получатель" autocapitalize="off"><input id="ta" type="number" placeholder="Сумма"><select id="tc"><option value="stars">⭐ Звёзды</option><option value="gram">💠 GRAM</option></select><button class="b" data-a="tr">Перевести</button></div><h3>История</h3>`+
+ (h.map(x=>{const o=x.a==U.id;return `<div class="g row"><div style="flex:1"><div>${esc(x.note||"Перевод")}</div><div class="m">${o?"→ "+esc(x.bn||"система"):"← "+esc(x.an||"система")} · ${new Date(x.ts*1000).toLocaleString()}</div></div><b style="color:${o?"#f87171":"#34d399"}">${o?"−":"+"}${x.amt} ${C(x.cur)}</b></div>`}).join("")||`<div class="m">Операций пока нет</div>`)}
+A.tr=()=>post("/api/transfer",{to:$("#tt").value,amount:$("#ta").value,cur:$("#tc").value},"Перевод выполнен");
+async function pG(){const i=await api("/api/inv");
+ $("#pb").innerHTML=`<div class="grid">${i.map(x=>card(x,x.price==0?`<button class="sm" data-a="gsend" data-id="${x.id}">Дарить</button><button class="sm" data-a="gsell" data-id="${x.id}">Продать</button><button class="sm" data-a="gauc" data-id="${x.id}">Аукцион</button>${x.num?"":`<button class="sm" data-a="craft" data-g="${x.gift}">Крафт</button>`}`:x.price>0?`<div class="m">В продаже: ${x.price} ${C(x.cur)}</div><button class="sm" data-a="gunl" data-id="${x.id}">Снять</button>`:`<div class="m">На аукционе</div>`)).join("")||`<div class="m">Подарков нет — загляните в магазин</div>`}</div>`+
+ (U.nfn.length?`<h3>NFT-юзернеймы</h3>`+U.nfn.map(n=>`<div class="g row" data-a="nfn" data-n="${esc(n)}">${esc(n)}<span class="m">нажмите, чтобы использовать</span></div>`).join(""):"")+`<p class="m" style="margin-top:12px">Крафт: 3 одинаковых обычных подарка превращаются в NFT с номером.</p>`}
+A.gsend=d=>{const to=prompt("Кому подарить (@юзернейм)?");to&&post("/api/gift/send",{inv:+d.id,to},"Подарок отправлен")};
+A.gsell=d=>{const p=prompt("Цена?");if(!p)return;post("/api/market/list",{inv:+d.id,price:+p,cur:confirm("OK — ⭐ звёзды, Отмена — 💠 GRAM")?"stars":"gram"},"Выставлено на маркет")};
+A.gunl=d=>post("/api/market/list",{inv:+d.id,price:0,cur:"stars"},"Снято с продажи");
+A.gauc=d=>{const s=prompt("Стартовая ставка?");if(!s)return;const m=prompt("Длительность, минут?","60");if(!m)return;post("/api/auction/new",{inv:+d.id,start:+s,minutes:+m,cur:confirm("OK — ⭐ звёзды, Отмена — 💠 GRAM")?"stars":"gram"},"Аукцион запущен")};
+A.craft=d=>post("/api/craft",{gift:+d.g},"Создан NFT-подарок");
+A.nfn=d=>post("/api/nfn/use",{name:d.n},"Юзернейм изменён");
+async function pS(){const s=await api("/api/shop");$("#pb").innerHTML=`<div class="grid">${s.map(x=>card({...x,num:0},`<div class="m">${x.nft?"NFT · выпущено "+x.minted:"Обычный"}</div><button class="sm" data-a="buy" data-id="${x.id}">${x.price} ${C(x.cur)}</button>`)).join("")}</div>`}
+A.buy=d=>post("/api/shop/buy",{gift:+d.id},"Покупка завершена");
+async function pM(){const[m,a]=await Promise.all([api("/api/market"),api("/api/auctions")]);
+ $("#pb").innerHTML=`<h3>Маркет</h3><div class="grid">${m.map(x=>card(x,`<div class="m">${esc(x.seller)}</div><button class="sm" data-a="mbuy" data-id="${x.id}">${x.price} ${C(x.cur)}</button>`)).join("")||`<div class="m">Лотов нет</div>`}</div><h3>Аукционы</h3><div class="grid">${a.map(x=>card(x,`<div class="m">до ${new Date(x.ends*1000).toLocaleString()}<br>ставка ${x.bid} ${C(x.cur)} ${esc(x.bidder||"")}</div><button class="sm" data-a="bid" data-id="${x.id}">Сделать ставку</button>`)).join("")||`<div class="m">Аукционов нет</div>`}</div>`}
+A.mbuy=d=>post("/api/market/buy",{inv:+d.id},"Куплено");
+A.bid=d=>{const a=prompt("Ваша ставка?");a&&post("/api/auction/bid",{id:+d.id,amount:+a},"Ставка принята")};
 
-ta.oninput=()=>{ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight,160)+'px'};
-ta.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}};
-$('#go').onclick=send;
-</script>
-</body>
-</html>
+/* ===== Админ-панель ===== */
+const AH={give:"v=stars|gram, n=±сумма",label:"v=метка, n=1 выдать / 0 забрать",badge:"v=бейджик, n=1 / 0",giftg:"v=ID подарка, n=номер NFT (0 — авто)",giftt:"v=ID предмета (забрать)",freeze:"n=1 заморозить / 0 разморозить аккаунт",wfreeze:"n=1 / 0 кошелёк",nfn:"v=@имя, n=1 выдать / 0 забрать",admin:"n=1 назначить / 0 снять (владелец)",broadcast:"v=текст рассылки"};
+async function pA(){const[us,lg]=await Promise.all([api("/api/admin/users"),api("/api/admin/logs")]);
+ $("#pb").innerHTML=`<div class="g pad adm"><canvas id="ak" width="160" height="160"></canvas><div style="flex:1"><h3>Админ-панель</h3><input id="au" placeholder="@юзернейм" autocapitalize="off"><select id="aa">${Object.entries(AH).map(([k,v])=>`<option value="${k}">${k} — ${v}</option>`).join("")}</select><input id="av2" placeholder="v"><input id="an" type="number" placeholder="n"><button class="b" data-a="adm">Выполнить</button></div></div><h3>Пользователи</h3>`+
+ us.map(x=>`<div class="g row" data-a="pick" data-u="${esc(x.username)}"><div style="flex:1"><b>${esc(x.nick)}</b> <span class="m">${esc(x.username)} · ID ${x.id}${x.admin?" · админ":""}</span></div><span class="m">${x.frozen?"❄ ":""}${x.wfrozen?"🧊 ":""}⭐${x.stars} 💠${x.gram}</span></div>`).join("")+
+ `<h3>Логи</h3>`+lg.map(l=>`<div class="m" style="padding:4px 0">${new Date(l.ts*1000).toLocaleString()} · ${esc(l.who)} · <b>${esc(l.act)}</b> ${esc(l.info)}</div>`).join("");
+ g3($("#ak"),"knot","#8b5cf6")}
+A.pick=d=>{$("#au").value=d.u;scrollTo(0,0);$("#v").scrollTop=0};
+A.adm=()=>post("/api/admin/do",{act:$("#aa").value,user:$("#au").value,v:$("#av2").value,n:+$("#an").value||0},"Выполнено");
+
+/* ===== Настройки / кастомизация ===== */
+function setV(){const u=U;$("#v").innerHTML=`<h2>Настройки</h2><div class="g pad"><h3>Внешний вид профиля</h3><input id="sn" value="${esc(u.nick)}" maxlength="30" placeholder="Ник"><label>Цвет ника <input id="sc" type="color" value="${u.color}"></label><select id="sf">${FONTS.map(f=>`<option value="${f}" ${f==u.font?"selected":""} style="font-family:${f}">${f.replace(/'/g,"")}</option>`).join("")}</select><label><input id="sg" type="checkbox" ${u.glow?"checked":""} style="width:auto"> Свечение ника</label><label>Аватарка <input id="sa" type="file" accept="image/*"></label><label>Баннер <input id="sb" type="file" accept="image/*"></label><div style="margin:10px 0;font-size:20px">${nm(u)}</div><button class="b" data-a="save">Сохранить</button></div><button class="b" style="background:#ffffff14;width:100%" data-a="logout">Выйти</button>`}
+const img=(f,w,h)=>new Promise(r=>{if(!f)return r(null);const i=new Image();i.onload=()=>{const c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d"),s=Math.max(w/i.width,h/i.height);x.drawImage(i,(w-i.width*s)/2,(h-i.height*s)/2,i.width*s,i.height*s);r(c.toDataURL("image/jpeg",.8))};i.src=URL.createObjectURL(f)});
+A.save=async()=>{const b={nick:$("#sn").value,color:$("#sc").value,font:$("#sf").value,glow:$("#sg").checked};
+ const a=await img($("#sa").files[0],128,128),n=await img($("#sb").files[0],600,200);if(a)b.avatar=a;if(n)b.banner=n;
+ try{U=await api("/api/profile",b);toast("Сохранено");setV()}catch(e){toast(e.message)}};
+boot();
+</script></body></html>
