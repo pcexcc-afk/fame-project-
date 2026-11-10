@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Umbra</title>
+<title>Shade</title>
 <style>
 :root{--bg:#0e0e10;--p:#1c1c1e;--a:#8b5cf6;--m:#8e8e93}
 *{box-sizing:border-box;margin:0;font-family:system-ui,-apple-system,sans-serif}
@@ -49,17 +49,17 @@ label{display:block;margin:6px 0;font-size:14px}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
 <script>
-const API="https://YOUR-APP.onrender.com"; // ← адрес бэкенда на Render
+const API="https://fame-api-1.onrender.com"; // Твой сервер Render
 let T=localStorage.ut||"",U=null,sio=null,cur=null,ptab="me";
 const $=s=>document.querySelector(s),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const FONTS=["system-ui","Georgia","'Courier New'","'Trebuchet MS'","Impact","cursive"],C=c=>c=="gram"?"💠":"⭐";
-const LB={"Новичок":["🌱","#34d399"],"Галочка":["✔","#3b82f6"],"Scam":["⚠","#ef4444"],"Fake":["✖","#f97316"],"Hold":["⏳","#eab308"],"Major":["💎","#06b6d4"],"Владелец Umbra":["👑","#a855f7"]};
+const LB={"Новичок":["🌱","#34d399"],"Галочка":["✔","#3b82f6"],"Scam":["⚠","#ef4444"],"Fake":["✖","#f97316"],"Hold":["⏳","#eab308"],"Major":["💎","#06b6d4"],"Владелец Shade":["👑","#a855f7"]};
 const toast=m=>{const e=document.createElement("div");e.className="toast g";e.textContent=m;document.body.append(e);setTimeout(()=>e.remove(),2800)};
 async function api(p,b){const r=await fetch(API+p,{method:b?"POST":"GET",headers:{"Content-Type":"application/json",Authorization:T},body:b?JSON.stringify(b):undefined});const d=await r.json().catch(()=>({}));if(!r.ok){if(r.status==401&&T)out();throw new Error(d.error||"Ошибка сети")}return d}
 const nm=(u,f)=>`<span style="color:${u.color};font-family:${u.font};text-shadow:${u.glow?`0 0 12px ${u.color}`:"none"};font-weight:600">${esc(u.nick)}</span>`+u.labels.map(l=>{const b=LB[l]||["•","#888"];return `<i class="lb" title="${esc(l)}" style="color:${b[1]};background:${b[1]}26">${b[0]}${f?" "+esc(l):""}</i>`}).join("");
 const modal=h=>{$("#md").innerHTML=`<div class="g pad">${h}<button class="sm" data-a="close" style="margin-top:8px">Закрыть</button></div>`;$("#md").hidden=false};
 
-/* ===== 3D-подарки: один WebGL-рендерер рисует во все canvas ===== */
+/* 3D подарки */
 const R=new THREE.WebGLRenderer({alpha:true,antialias:true});R.setSize(160,160);
 const S=new THREE.Scene(),Cm=new THREE.PerspectiveCamera(40,1,.1,50);Cm.position.z=5;
 S.add(new THREE.AmbientLight(0xffffff,.55));const PL=new THREE.PointLight(0xffffff,1.3);PL.position.set(3,4,5);S.add(PL);
@@ -85,7 +85,7 @@ const GL=[];function g3(cv,k,c){if(cv)GL.push({cv,m:mesh(k,c),t:Math.random()*9}
 function card(x,act){const id="c"+Math.random().toString(36).slice(2);setTimeout(()=>g3(document.getElementById(id),x.shape,x.color));
  return `<div class="g gc"><canvas id="${id}" width="160" height="160"></canvas><b>${esc(x.name)}${x.num?` <span class="nft">#${x.num}</span>`:""}</b><div>${act}</div></div>`}
 
-/* ===== Действия (делегирование кликов) ===== */
+/* Действия */
 const A={};
 document.addEventListener("click",e=>{const a=e.target.closest("[data-a]");if(a&&A[a.dataset.a])A[a.dataset.a](a.dataset,a)});
 const post=async(p,b,ok)=>{try{await api(p,b);toast(ok||"Готово");profV()}catch(e){toast(e.message)}};
@@ -98,13 +98,13 @@ async function doAuth(reg){const b={username:$("#lu").value,password:$("#lp").va
 function out(){T="";localStorage.removeItem("ut");U=null;sio&&sio.disconnect();$("#nav").hidden=true;$("#chat").hidden=true;authV()}
 A.logout=out;
 
-/* ===== Вход ===== */
-function authV(reg){$("#v").innerHTML=`<div class="g pad au"><canvas id="lg" width="160" height="160"></canvas><h1>UMBRA</h1>${reg?`<input id="ln" placeholder="Ник">`:""}<input id="lu" placeholder="@юзернейм" autocapitalize="off"><input id="lp" type="password" placeholder="Пароль"><button class="b" style="width:100%" data-a="${reg?"reg":"login"}">${reg?"Создать аккаунт":"Войти"}</button><a class="m" data-a="sw" data-r="${reg?0:1}">${reg?"Уже есть аккаунт? Войти":"Нет аккаунта? Зарегистрироваться"}</a></div>`;g3($("#lg"),"sphere","#8b5cf6")}
+/* Вход */
+function authV(reg){$("#v").innerHTML=`<div class="g pad au"><canvas id="lg" width="160" height="160"></canvas><h1>SHADE</h1>${reg?`<input id="ln" placeholder="Ник">`:""}<input id="lu" placeholder="@юзернейм" autocapitalize="off"><input id="lp" type="password" placeholder="Пароль"><button class="b" style="width:100%" data-a="${reg?"reg":"login"}">${reg?"Создать аккаунт":"Войти"}</button><a class="m" data-a="sw" data-r="${reg?0:1}">${reg?"Уже есть аккаунт? Войти":"Нет аккаунта? Зарегистрироваться"}</a></div>`;g3($("#lg"),"sphere","#8b5cf6")}
 async function boot(){if(!T)return authV();try{U=await api("/api/me");start()}catch{authV()}}
 function start(){$("#nav").hidden=false;conn();nav("chats")}
 function nav(t){cur=null;$("#chat").hidden=true;document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.k==t));({chats:chatsV,prof:profV,set:setV})[t]()}
 
-/* ===== Чаты ===== */
+/* Чаты */
 function conn(){sio&&sio.disconnect();sio=io(API);sio.on("connect",()=>sio.emit("auth",T));
  sio.on("msg",m=>{if(cur&&cur.id==m.chat)addMsg(m);else{if(m.uid!=U.id)toast("💬 "+m.nick+": "+m.text.slice(0,40));if(!cur&&$("#cl"))chatsV()}});sio.on("err",toast)}
 async function chatsV(){const c=await api("/api/chats");
@@ -124,7 +124,7 @@ async function openChat(id,title){try{const m=await api(`/api/chats/${id}/msgs`)
  $("#ms").scrollTop=1e9;$("#mi").onkeydown=e=>e.key=="Enter"&&A.send()}catch(e){toast(e.message)}}
 A.send=()=>{const i=$("#mi");if(!i.value.trim())return;sio.emit("send",{token:T,chat:cur.id,text:i.value});i.value=""};
 
-/* ===== Профиль (кошелёк, подарки, магазин, маркет, админ) ===== */
+/* Профиль, кошелёк, магазин, маркет, админка */
 const PT=[["me","Профиль"],["w","Кошелёк"],["g","Подарки"],["s","Магазин"],["m","Маркет"]];
 async function profV(){try{U=await api("/api/me")}catch(e){return toast(e.message)}
  const tabs=PT.concat(U.admin?[["a","Админ"]]:[]);
@@ -152,7 +152,7 @@ async function pM(){const[m,a]=await Promise.all([api("/api/market"),api("/api/a
 A.mbuy=d=>post("/api/market/buy",{inv:+d.id},"Куплено");
 A.bid=d=>{const a=prompt("Ваша ставка?");a&&post("/api/auction/bid",{id:+d.id,amount:+a},"Ставка принята")};
 
-/* ===== Админ-панель ===== */
+/* Админ-панель */
 const AH={give:"v=stars|gram, n=±сумма",label:"v=метка, n=1 выдать / 0 забрать",badge:"v=бейджик, n=1 / 0",giftg:"v=ID подарка, n=номер NFT (0 — авто)",giftt:"v=ID предмета (забрать)",freeze:"n=1 заморозить / 0 разморозить аккаунт",wfreeze:"n=1 / 0 кошелёк",nfn:"v=@имя, n=1 выдать / 0 забрать",admin:"n=1 назначить / 0 снять (владелец)",broadcast:"v=текст рассылки"};
 async function pA(){const[us,lg]=await Promise.all([api("/api/admin/users"),api("/api/admin/logs")]);
  $("#pb").innerHTML=`<div class="g pad adm"><canvas id="ak" width="160" height="160"></canvas><div style="flex:1"><h3>Админ-панель</h3><input id="au" placeholder="@юзернейм" autocapitalize="off"><select id="aa">${Object.entries(AH).map(([k,v])=>`<option value="${k}">${k} — ${v}</option>`).join("")}</select><input id="av2" placeholder="v"><input id="an" type="number" placeholder="n"><button class="b" data-a="adm">Выполнить</button></div></div><h3>Пользователи</h3>`+
@@ -162,7 +162,7 @@ async function pA(){const[us,lg]=await Promise.all([api("/api/admin/users"),api(
 A.pick=d=>{$("#au").value=d.u;scrollTo(0,0);$("#v").scrollTop=0};
 A.adm=()=>post("/api/admin/do",{act:$("#aa").value,user:$("#au").value,v:$("#av2").value,n:+$("#an").value||0},"Выполнено");
 
-/* ===== Настройки / кастомизация ===== */
+/* Настройки */
 function setV(){const u=U;$("#v").innerHTML=`<h2>Настройки</h2><div class="g pad"><h3>Внешний вид профиля</h3><input id="sn" value="${esc(u.nick)}" maxlength="30" placeholder="Ник"><label>Цвет ника <input id="sc" type="color" value="${u.color}"></label><select id="sf">${FONTS.map(f=>`<option value="${f}" ${f==u.font?"selected":""} style="font-family:${f}">${f.replace(/'/g,"")}</option>`).join("")}</select><label><input id="sg" type="checkbox" ${u.glow?"checked":""} style="width:auto"> Свечение ника</label><label>Аватарка <input id="sa" type="file" accept="image/*"></label><label>Баннер <input id="sb" type="file" accept="image/*"></label><div style="margin:10px 0;font-size:20px">${nm(u)}</div><button class="b" data-a="save">Сохранить</button></div><button class="b" style="background:#ffffff14;width:100%" data-a="logout">Выйти</button>`}
 const img=(f,w,h)=>new Promise(r=>{if(!f)return r(null);const i=new Image();i.onload=()=>{const c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d"),s=Math.max(w/i.width,h/i.height);x.drawImage(i,(w-i.width*s)/2,(h-i.height*s)/2,i.width*s,i.height*s);r(c.toDataURL("image/jpeg",.8))};i.src=URL.createObjectURL(f)});
 A.save=async()=>{const b={nick:$("#sn").value,color:$("#sc").value,font:$("#sf").value,glow:$("#sg").checked};
